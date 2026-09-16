@@ -13,7 +13,7 @@ static func save_session(session: HotelSession, path: String = DEFAULT_PATH) -> 
 	var file := FileAccess.open(temporary, FileAccess.WRITE)
 	if file == null:
 		return "Não foi possível gravar o save."
-	file.store_string(JSON.stringify(snapshot))
+	file.store_string(JSON.stringify(snapshot, "", true, true))
 	file.flush()
 	var write_error: Error = file.get_error()
 	file.close()

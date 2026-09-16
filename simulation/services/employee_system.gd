@@ -16,7 +16,7 @@ func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, del
 		elif actor.state == &"cleaning":
 			actor.workload += delta
 			actor.timer -= delta * actor.skill
-			if actor.timer <= 0:
+			if actor.timer <= SimulationRules.TIME_EPSILON:
 				var room := hotel.by_id(actor.assignment)
 				if room != null:
 					room.dirty = false

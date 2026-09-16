@@ -1,6 +1,9 @@
 class_name SimulationRules
 extends Resource
 
+# Less than one millionth of a tick: absorbs JSON/binary rounding at time boundaries.
+const TIME_EPSILON: float = 0.00000001
+
 @export var tick: float = 0.1
 @export var day_seconds: float = 120.0
 @export var arrival_interval: float = 9.0

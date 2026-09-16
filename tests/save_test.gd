@@ -39,7 +39,10 @@ func _initialize() -> void:
 	var loaded := SaveStore.load_session(path)
 	check(loaded.error.is_empty(), "disk load")
 	if loaded.session != null:
-		check(JSON.stringify(SessionSnapshot.capture(loaded.session)) == JSON.stringify(SessionSnapshot.capture(session)), "disk state identical")
+		var before := SessionSnapshot.capture(session)
+		var after := SessionSnapshot.capture(loaded.session)
+		var mismatch := preload("res://tests/snapshot_comparison.gd").difference(before, after, "disk")
+		check(mismatch.is_empty(), "disk state equivalent: " + mismatch)
 	check(not SaveStore.load_session("user://absent-regression.json").error.is_empty(), "missing file rejected")
 	var broken := original.duplicate(true)
 	broken.version = 99

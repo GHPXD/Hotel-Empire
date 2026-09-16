@@ -77,7 +77,7 @@ func _choose_lift(actor: ActorState) -> ElevatorState:
 func _step_lift(lift: ElevatorState, actors: Dictionary, delta: float) -> void:
 	if not lift.passengers.is_empty() or not lift.queue.members.is_empty():
 		lift.busy_seconds += delta
-	if lift.door_timer > 0:
+	if lift.door_timer > SimulationRules.TIME_EPSILON:
 		lift.door_timer = maxf(0, lift.door_timer - delta)
 		return
 	if not is_equal_approx(lift.floor_position, float(lift.target_floor)):

@@ -59,7 +59,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 		return
 	actor.waiting += delta
 	actor.happiness = maxf(0, actor.happiness - delta * rules.waiting_penalty)
-	if actor.waiting > rules.patience_seconds:
+	if actor.waiting > rules.patience_seconds + SimulationRules.TIME_EPSILON:
 		reception.queue.leave(actor.id)
 		actor.happiness = minf(actor.happiness, 35)
 		actor.travel_to(-0.8, 0, &"exit")
@@ -74,7 +74,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 	if not staffed:
 		return
 	actor.timer += delta
-	if actor.timer < reception.definition().service_duration:
+	if actor.timer + SimulationRules.TIME_EPSILON < reception.definition().service_duration:
 		return
 	for room in hotel.rooms:
 		var definition := room.definition()
@@ -96,7 +96,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 		return
 
 func _choose(actor: ActorState, hotel: HotelModel, transport: TransportSystem) -> void:
-	if actor.age >= rules.stay_seconds or actor.happiness <= 10:
+	if actor.age + SimulationRules.TIME_EPSILON >= rules.stay_seconds or actor.happiness <= 10:
 		_release_room(actor, hotel)
 		actor.travel_to(-0.8, 0, &"exit")
 		return
@@ -140,7 +140,7 @@ func _queue_service(actor: ActorState, hotel: HotelModel, delta: float) -> void:
 		room.users.append(actor.id)
 		actor.timer = room.definition().service_duration
 		actor.state = &"using"
-	elif actor.waiting > rules.patience_seconds:
+	elif actor.waiting > rules.patience_seconds + SimulationRules.TIME_EPSILON:
 		room.queue.leave(actor.id)
 		actor.state = &"deciding"
 	else:
@@ -148,7 +148,7 @@ func _queue_service(actor: ActorState, hotel: HotelModel, delta: float) -> void:
 
 func _use(actor: ActorState, hotel: HotelModel, delta: float, time: float) -> void:
 	actor.timer -= delta
-	if actor.timer > 0:
+	if actor.timer > SimulationRules.TIME_EPSILON:
 		return
 	var room := hotel.by_id(actor.target_room)
 	if room != null:

@@ -36,7 +36,7 @@ func tick(delta: float) -> void:
 	guests.step(actors, hotel, transport, delta, time)
 	if opened:
 		arrival_timer -= delta
-		if arrival_timer <= 0:
+		if arrival_timer <= SimulationRules.TIME_EPSILON:
 			arrival_timer = rules.arrival_interval * rng.randf_range(0.8, 1.2) * (1.4 - guests.reputation / 100.0)
 			if guest_count() < rules.max_guests:
 				spawn_guest()
