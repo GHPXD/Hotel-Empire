@@ -1,0 +1,63 @@
+extends SceneTree
+
+var failures: int = 0
+
+func _initialize() -> void:
+	var session := HotelSession.new()
+	var empty := HotelAnalytics.summary(session)
+	check(empty.beds == 0 and empty.occupancy == 0 and empty.happiness == 0, "empty hotel has finite zero metrics")
+	var reception := session.hotel.build(HotelCatalog.room(&"reception"), 0, 0)
+	session.hotel.add_floor()
+	var bed_a := session.hotel.build(HotelCatalog.room(&"bedroom"), 0, 1)
+	var bed_b := session.hotel.build(HotelCatalog.room(&"bedroom"), 2, 1)
+	var shaft := session.hotel.build(HotelCatalog.room(&"elevator"), 8, 0)
+	bed_a.dirty = true
+	var guest := session.spawn_guest()
+	guest.happiness = 60
+	guest.state = &"checkin"
+	guest.target_room = reception.id
+	guest.waiting = 12.5
+	reception.queue.join(guest.id)
+	var other := session.spawn_guest()
+	other.happiness = 80
+	other.state = &"using"
+	other.bedroom = bed_b.id
+	other.target_room = bed_b.id
+	bed_b.occupant = other.id
+	bed_b.users.append(other.id)
+	session.hire(HotelSession.EMPLOYEES[0])
+	var passenger := session.spawn_guest()
+	passenger.state = &"lift_queue"
+	passenger.elevator_id = shaft.id
+	passenger.happiness = 70
+	passenger.waiting = 8
+	session.transport.lifts[0].queue.join(passenger.id)
+	var before := SessionSnapshot.capture(session)
+	var metrics := HotelAnalytics.summary(session)
+	check(metrics.beds == 2 and metrics.occupied == 1 and metrics.dirty == 1 and metrics.occupancy == 50, "occupancy and cleaning derived correctly")
+	check(metrics.guests == 3 and metrics.staff == 1 and metrics.happiness == 70, "present guests average excludes staff")
+	check(metrics.room_queue == 1 and metrics.lift_queue == 1 and metrics.longest_wait == 12.5, "current waits split by service and transport")
+	check(metrics.costs.total == session.recurring_costs().total, "fixed-cost projection reconciles")
+	check(HotelAnalytics.rooms(session, &"lodging", 1, 2)[0].id == bed_a.id, "category floor and cleaning intersection")
+	check(HotelAnalytics.rooms(session, &"lodging", 0).is_empty(), "empty filtered result")
+	check(HotelAnalytics.rooms(session, &"transport", 1, 1)[0].id == shaft.id, "shaft appears on all floors with real lift queue")
+	var busy := HotelAnalytics.rooms(session, &"", -1, 3)
+	check(busy.size() == 1 and busy[0].id == bed_b.id, "in-use includes reserved bedroom")
+	var ordered := HotelAnalytics.rooms(session)
+	check(ordered[0].id == reception.id and ordered[1].id == shaft.id, "queues first with stable ID tiebreak")
+	check(SessionSnapshot.capture(session) == before, "analytics never mutates simulation")
+	check(UILabels.state(&"riding") == "No elevador" and UILabels.role(&"guest") == "Hóspede", "player labels translated")
+	var path: String = "user://preferences-test.cfg"
+	check(UIPreferences.save_large_text(true, path) == OK and UIPreferences.load_large_text(path), "text preference roundtrip")
+	check(UIPreferences.save_large_text(false, path) == OK and not UIPreferences.load_large_text(path), "normal text preference roundtrip")
+	var config := ConfigFile.new()
+	config.set_value("interface", "large_text", "invalid")
+	config.save(path)
+	check(not UIPreferences.load_large_text(path), "malformed preference defaults safely")
+	print(JSON.stringify({"suite": "analytics", "failures": failures}))
+	quit(1 if failures else 0)
+
+func check(condition: bool, message: String) -> void:
+	if not condition:
+		failures += 1
+		push_error(message)
