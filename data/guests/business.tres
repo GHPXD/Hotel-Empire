@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GuestArchetype" load_steps=2 format=3]
+[ext_resource type="Script" path="res://entities/guests/guest_archetype.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"business"
+display_name = "Negócios"
+description = "Prefere atendimento rápido; estadia e paciência menores."
+budget = 420
+price_weight = 0.1
+duration_weight = 0.8
+patience_multiplier = 0.9
+stay_multiplier = 0.85
+color = Color(0.25, 0.66, 0.7, 1)

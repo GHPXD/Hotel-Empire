@@ -31,6 +31,11 @@ var workload: float = 0.0
 var agreed_price: int = 0
 var preferred_room: int = -1
 var preferred_floor: int = -1
+var archetype_id: StringName = &"balanced"
+var service_uses: int = 0
+
+func archetype() -> GuestArchetype:
+	return HotelCatalog.guest(archetype_id)
 
 func travel_to(column: float, level: int, arrival: StringName) -> void:
 	target_x = column

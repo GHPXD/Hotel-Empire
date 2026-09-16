@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EventDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/events/event_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"local_fair"
+display_name = "Feira da cidade"
+description = "Procura 50% maior. Prepare quartos limpos e confira filas. Fechar chegadas continua disponível."
+arrival_multiplier = 1.5

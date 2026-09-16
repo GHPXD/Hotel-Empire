@@ -30,6 +30,14 @@ func upgrade_error(room: RoomState) -> String:
 			return "Conclua o objetivo: %s." % objective.display_name
 	return ""
 
+func build_error(definition: RoomDefinition) -> String:
+	if definition.required_objective.is_empty() or completed.has(definition.required_objective):
+		return ""
+	for objective in OBJECTIVES:
+		if objective.id == definition.required_objective:
+			return "Conclua o objetivo: %s." % objective.display_name
+	return "Conteúdo indisponível."
+
 func next_objective() -> ObjectiveDefinition:
 	for objective in OBJECTIVES:
 		if not completed.has(objective.id):

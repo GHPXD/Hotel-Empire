@@ -14,7 +14,7 @@ func _initialize() -> void:
 	check(queue.join(1) and queue.join(1) and queue.join(2), "unique queue members")
 	check(not queue.join(3), "queue capacity")
 	check(queue.take() == 1 and queue.take() == 2 and queue.take() == -1, "FIFO")
-	check(HotelCatalog.ROOMS.size() == 4 and HotelCatalog.room(&"bedroom").price == 140, "resource catalog")
+	check(HotelCatalog.ROOMS.size() == 6 and HotelCatalog.room(&"bedroom").price == 140, "resource catalog")
 	print(JSON.stringify({"suite": "foundation", "failures": failures}))
 	quit(1 if failures else 0)
 

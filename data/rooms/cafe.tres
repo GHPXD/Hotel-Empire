@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RoomDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://hotel/rooms/room_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"cafe"
+display_name = "Café Brisa"
+category = &"service"
+width = 2
+build_cost = 700
+maintenance = 12
+capacity = 2
+service_duration = 4.0
+price = 16
+need = &"hunger"
+relief = 40.0
+required_objective = &"first_stays"
+color = Color(0.59, 0.43, 0.30, 1)

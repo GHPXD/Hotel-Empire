@@ -1,14 +1,14 @@
 class_name SessionSnapshot
 extends RefCounted
-## Schema v3 adds persistent objectives and legacy upgrade access.
+## Schema v4 adds guest profiles and separates meals from all service uses.
 
-const VERSION: int = 3
+const VERSION: int = 4
 const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income", "level"]
-const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload", "agreed_price", "preferred_room", "preferred_floor"]
+const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload", "agreed_price", "preferred_room", "preferred_floor", "archetype_id", "service_uses"]
 const LIFT_FIELDS: Array[String] = ["room_id", "column", "capacity", "floor_position", "target_floor", "door_timer", "boarded", "delivered", "wait_total", "wait_max", "busy_seconds"]
 const SESSION_FIELDS: Array[String] = ["next_actor_id", "time", "tick_count", "arrival_timer", "day", "opened", "speed"]
 const ECONOMY_FIELDS: Array[String] = ["cash", "revenue", "expenses", "capital_spent"]
-const GUEST_FIELDS: Array[String] = ["completed", "meals_served", "bookings", "score_total", "reputation"]
+const GUEST_FIELDS: Array[String] = ["completed", "meals_served", "bookings", "score_total", "reputation", "service_uses"]
 const STATES: Array[StringName] = [&"arriving", &"walking", &"lift_queue", &"riding", &"checkin", &"deciding", &"service_queue", &"using", &"exit", &"idle", &"working", &"cleaning"]
 
 static func capture(session: HotelSession) -> Dictionary:
@@ -38,8 +38,10 @@ static func restore(data: Variant) -> Dictionary:
 	var legacy: bool = data is Dictionary and data.get("version") == 2
 	if legacy:
 		data = data.duplicate(true)
-		data.version = VERSION
+		data.version = 3
 		data["progression"] = {"completed": [], "legacy_access": true}
+	if data is Dictionary and data.get("version") == 3:
+		data = _migrate_v3(data)
 	if not data is Dictionary or data.get("version") != VERSION:
 		return _error("Versão de save desconhecida ou formato inválido.")
 	var session := HotelSession.new()
@@ -54,6 +56,8 @@ static func restore(data: Variant) -> Dictionary:
 	session.time = session.tick_count * session.rules.tick
 	if session.guests.reputation < 0 or session.guests.reputation > 100:
 		return _error("Reputação inválida.")
+	if session.guests.service_uses < session.guests.meals_served or session.guests.service_uses < 0:
+		return _error("Contagem de serviços inválida.")
 	for key in ["rooms", "actors", "lifts", "ledger"]:
 		if not data.get(key) is Array:
 			return _error("Lista ausente: " + key)
@@ -86,6 +90,8 @@ static func restore(data: Variant) -> Dictionary:
 			return _error("Agente inválido ou duplicado.")
 		if actor.role not in [&"guest", &"receptionist", &"cleaner"] or actor.state not in STATES or actor.destination_state not in STATES:
 			return _error("Papel ou estado de agente desconhecido.")
+		if actor.archetype() == null or actor.service_uses < actor.meals or actor.service_uses < 0:
+			return _error("Perfil ou contagem de serviços inválida.")
 		if actor.agreed_price < 0 or actor.preferred_floor < -1 or actor.preferred_floor >= session.hotel.floors or actor.preferred_room < -1:
 			return _error("Preço ou atribuição inválida.")
 		if actor.preferred_room >= 0:
@@ -262,4 +268,17 @@ static func _migrate_v1(original: Dictionary) -> Dictionary:
 		if actor.get("state") == "using" and definition != null and definition.category == &"service":
 			actor["agreed_price"] = definition.price
 	data.version = 2
+	return data
+
+static func _migrate_v3(original: Dictionary) -> Dictionary:
+	var data := original.duplicate(true)
+	if not data.get("actors") is Array or not data.get("guests") is Dictionary:
+		return {}
+	for actor: Variant in data.actors:
+		if not actor is Dictionary:
+			return {}
+		actor["archetype_id"] = "balanced"
+		actor["service_uses"] = actor.get("meals")
+	data.guests["service_uses"] = data.guests.get("meals_served")
+	data.version = VERSION
 	return data

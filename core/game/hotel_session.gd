@@ -5,11 +5,11 @@ extends RefCounted
 const EMPLOYEES: Array[EmployeeDefinition] = [preload("res://data/employees/receptionist.tres"), preload("res://data/employees/cleaner.tres")]
 var rules: SimulationRules = preload("res://data/simulation.tres")
 var economy := HotelEconomy.new()
-var hotel := HotelModel.new(economy)
+var progression := HotelProgression.new()
+var hotel := HotelModel.new(economy, progression)
 var transport := TransportSystem.new(rules)
 var guests := GuestSystem.new(rules)
 var employees := EmployeeSystem.new(rules)
-var progression := HotelProgression.new()
 var actors: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var next_actor_id: int = 1
@@ -36,7 +36,7 @@ func tick(delta: float) -> void:
 	transport.step(actors, delta)
 	guests.step(actors, hotel, transport, delta, time)
 	if opened:
-		arrival_timer -= delta
+		arrival_timer -= delta * float(HotelEvents.state(tick_count, rules).multiplier)
 		if arrival_timer <= SimulationRules.TIME_EPSILON:
 			arrival_timer = rules.arrival_interval * rng.randf_range(0.8, 1.2) * (1.4 - guests.reputation / 100.0)
 			if guest_count() < rules.max_guests:
@@ -69,7 +69,9 @@ func spawn_guest() -> ActorState:
 	actor.id = next_actor_id
 	next_actor_id += 1
 	actor.display_name = "Visitante %03d" % actor.id
-	actor.money = rules.starting_budget
+	var profile: GuestArchetype = HotelCatalog.GUESTS[rng.randi_range(0, HotelCatalog.GUESTS.size() - 1)]
+	actor.archetype_id = profile.id
+	actor.money = profile.budget
 	actor.speed = rules.walk_speed * rng.randf_range(0.85, 1.15)
 	actor.needs.hunger = rng.randf_range(30, 55)
 	actors[actor.id] = actor

@@ -10,9 +10,11 @@ var floors: int = 1
 var next_room_id: int = 1
 var rooms: Array[RoomState] = []
 var economy: HotelEconomy
+var progression: HotelProgression
 
-func _init(wallet: HotelEconomy) -> void:
+func _init(wallet: HotelEconomy, progress: HotelProgression = null) -> void:
 	economy = wallet
+	progression = progress if progress != null else HotelProgression.new()
 
 func room_at(column: int, floor_index: int) -> RoomState:
 	if floor_index < 0 or floor_index >= floors or column < 0 or column >= COLUMNS:
@@ -33,6 +35,9 @@ func by_id(room_id: int) -> RoomState:
 func build_error(definition: RoomDefinition, column: int, floor_index: int) -> String:
 	if definition == null:
 		return "Selecione uma construção."
+	var locked := progression.build_error(definition)
+	if not locked.is_empty():
+		return locked
 	if floor_index < 0 or floor_index >= floors:
 		return "Construa o andar primeiro."
 	if column < 0 or column + definition.width > COLUMNS:

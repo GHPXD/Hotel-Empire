@@ -3,6 +3,7 @@ extends RefCounted
 
 var completed: int = 0
 var meals_served: int = 0
+var service_uses: int = 0
 var bookings: int = 0
 var score_total: float = 0.0
 var reputation: float = 65.0
@@ -19,7 +20,7 @@ func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, del
 		actor.age += delta
 		actor.needs.hunger = minf(100, actor.needs.hunger + delta * rules.hunger_rate)
 		actor.needs.energy = minf(100, actor.needs.energy + delta * rules.energy_rate)
-		actor.needs.entertainment = minf(100, actor.needs.entertainment + delta * 0.1)
+		actor.needs.entertainment = minf(100, actor.needs.entertainment + delta * actor.archetype().entertainment_rate)
 		actor.needs.comfort = minf(100, actor.needs.comfort + delta * 0.1)
 		if actor.needs.hunger > 90:
 			actor.happiness = maxf(0, actor.happiness - delta * 0.15)
@@ -59,7 +60,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 		return
 	actor.waiting += delta
 	actor.happiness = maxf(0, actor.happiness - delta * rules.waiting_penalty)
-	if actor.waiting > rules.patience_seconds + SimulationRules.TIME_EPSILON:
+	if actor.waiting > rules.patience_seconds * actor.archetype().patience_multiplier + SimulationRules.TIME_EPSILON:
 		reception.queue.leave(actor.id)
 		actor.happiness = minf(actor.happiness, 35)
 		actor.travel_to(-0.8, 0, &"exit")
@@ -96,7 +97,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 		return
 
 func _choose(actor: ActorState, hotel: HotelModel, transport: TransportSystem) -> void:
-	if actor.age + SimulationRules.TIME_EPSILON >= rules.stay_seconds or actor.happiness <= 10:
+	if actor.age + SimulationRules.TIME_EPSILON >= rules.stay_seconds * actor.archetype().stay_multiplier or actor.happiness <= 10:
 		_release_room(actor, hotel)
 		actor.travel_to(-0.8, 0, &"exit")
 		return
@@ -112,9 +113,15 @@ func _choose(actor: ActorState, hotel: HotelModel, transport: TransportSystem) -
 		if not transport.accessible(actor.floor_index, room.floor_index) or room.queue.members.size() >= room.queue.capacity:
 			continue
 		var distance: float = absf(room.center() - actor.x) + absf(room.floor_index - actor.floor_index) * 3.0
-		var score: float = float(actor.needs.get(String(definition.need), 0.0)) - distance * 0.6 - room.queue.members.size() * 4.0
+		var urgency: float = float(actor.needs.get(String(definition.need), 0.0))
+		if definition.need == &"entertainment":
+			urgency *= actor.archetype().entertainment_weight
+		# Relief matters: a snack need not dominate a meal when hunger is high.
+		var benefit: float = minf(urgency, definition.relief)
+		var score: float = benefit - distance * 0.6 - room.queue.members.size() * 4.0
 		if definition.category == &"service":
-			score -= room.price() * 0.15
+			score -= room.price() * actor.archetype().price_weight
+			score -= room.duration() * actor.archetype().duration_weight
 			score += room.satisfaction_bonus()
 		actor.utility_scores[str(room.id)] = score
 		if score > best_score:
@@ -146,7 +153,7 @@ func _queue_service(actor: ActorState, hotel: HotelModel, delta: float) -> void:
 		actor.timer = room.duration()
 		actor.agreed_price = room.price() if room.definition().category == &"service" else 0
 		actor.state = &"using"
-	elif actor.waiting > rules.patience_seconds + SimulationRules.TIME_EPSILON:
+	elif actor.waiting > rules.patience_seconds * actor.archetype().patience_multiplier + SimulationRules.TIME_EPSILON:
 		room.queue.leave(actor.id)
 		actor.state = &"deciding"
 	else:
@@ -166,8 +173,11 @@ func _use(actor: ActorState, hotel: HotelModel, delta: float, time: float) -> vo
 			actor.money -= actor.agreed_price
 			room.income += actor.agreed_price
 			hotel.economy.transact(actor.agreed_price, definition.display_name, time)
-			actor.meals += 1
-			meals_served += 1
+			actor.service_uses += 1
+			service_uses += 1
+			if definition.need == &"hunger":
+				actor.meals += 1
+				meals_served += 1
 		else:
 			actor.sleeps += 1
 	actor.state = &"deciding"

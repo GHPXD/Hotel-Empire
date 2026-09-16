@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GuestArchetype" load_steps=2 format=3]
+[ext_resource type="Script" path="res://entities/guests/guest_archetype.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"leisure"
+display_name = "Lazer"
+description = "Busca entretenimento e permanece mais tempo no hotel."
+budget = 360
+entertainment_weight = 1.7
+entertainment_rate = 0.85
+patience_multiplier = 1.15
+stay_multiplier = 1.15
+color = Color(0.72, 0.48, 0.75, 1)
