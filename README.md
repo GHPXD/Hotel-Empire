@@ -1,7 +1,7 @@
 # Hotel Empire
 
 Tycoon 2D original em Godot **4.7.2**, GDScript tipado, renderer Compatibility.
-Estado: **M0 + M1 vertical slice + M2 simulação**, validados. Protótipo, ainda sem arte final
+Estado: **M0–M3**, validados: construção, simulação e gestão. Protótipo, ainda sem arte final
 ou balanceamento de produção.
 
 Abra `project.godot` no Godot e execute F6 na cena principal ou F5 no projeto.
@@ -17,14 +17,21 @@ aguardam limpeza. Clique nos personagens para inspecionar necessidades e estado.
 Pausa/1x/2x/3x controlam o tempo. Fechar chegadas permite esvaziar o hotel.
 Espaço pausa/retoma; F3 mostra debug. Salvar (ou Ctrl+S) preserva a sessão em
 `user://hotel-v1.json`; Carregar restaura inclusive filas e viagens em andamento.
-Novo hotel pede confirmação e preserva o arquivo salvo. Finanças exibe o extrato.
+Novo hotel pede confirmação e preserva o arquivo salvo. Finanças exibe extrato e
+custos fixos diários de manutenção e salários.
+
+Selecione uma sala ou elevador para comparar e comprar upgrades até N3 no inspetor
+(role a lateral para baixo). Equipe permite fixar recepcionistas em recepções e
+camareiros em andares, ou voltar ao automático. Uma nova preferência não cancela
+viagem ou limpeza em andamento. Saves usam schema v2 e migram arquivos v1;
+o nome `hotel-v1.json` foi mantido para encontrar partidas anteriores.
 
 Sugestão inicial: recepção e bistrô no térreo, elevador em coluna livre, outro andar
 com vários quartos. Contrate os dois tipos de funcionário antes de abrir chegadas.
 Poucos quartos criam fila na recepção; expansão excessiva pressiona transporte e limpeza.
 
 No Windows deste ambiente: `powershell -File tools/test.ps1 -Visual` executa import,
-quatro suítes headless e dois testes gráficos. Passe `-GodotPath` para outro engine.
+cinco suítes headless e três testes gráficos. Passe `-GodotPath` para outro engine.
 Testes isolam dados em `.runtime/`; não sobrescrevem seu save normal.
 Acrescente `-Stress` para cinco seeds, 20 checkpoints de save e transporte com
 100/250/500/1000 agentes. Evidências: [benchmarks](docs/benchmarks/README.md).
@@ -45,8 +52,8 @@ saída precisa existir. Templates de teste custam dinheiro e podem ser recusados
 O JSON inclui receitas, despesas, ocupação, satisfação, esperas, rotas, tempo de tick,
 memória do processo e falhas. Medidas headless não equivalem a FPS com renderização.
 
-Limitações atuais: placeholders procedurais, atribuição automática de equipe, uma
-categoria de hóspede, sem áudio/upgrades/progressão e sem export validado. Testes
+Limitações atuais: placeholders procedurais, uma categoria de hóspede, sem áudio,
+desbloqueios/objetivos e sem export validado. Testes
 multi-seed são regressões, não balanceamento final. UI desktop testada; mobile/Web futuros.
 
 Consulte [ROADMAP.md](ROADMAP.md), [ARCHITECTURE.md](ARCHITECTURE.md) e

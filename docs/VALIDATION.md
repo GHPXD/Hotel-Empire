@@ -77,3 +77,24 @@
   tower burst 1000: 20 andares, 1000 saídas, apenas 24 reservas. Zero falhas nos dois.
 - Tempos e resultados completos preservados em `docs/benchmarks/`. Sem ajustes arbitrários
   de custos/preços: esta etapa mede e corrige comportamento, não declara economia final.
+
+## M3 — upgrades, equipe e finanças
+- `tools/test.ps1 -Stress -Visual`: dez suítes aprovadas, sem erros/leaks do engine.
+- Upgrades dos quatro tipos até N3: custo exato, manutenção efetiva, limite e saldo
+  insuficiente; Resources base permanecem imutáveis. Save/load preserva níveis.
+- Serviço iniciado mantém preço contratado mesmo após upgrade e save/load;
+  novos hóspedes sem saldo para o preço atualizado escolhem novamente.
+- Equipe: mudança de recepção, exclusividade/reserva de posto, mudança de andar
+  durante limpeza e viagem, retorno ao automático e limpeza de referência ao demolir.
+- Fixture real M2 (`tests/fixtures/m2-save-v1.json`) migra sem alterar a entrada,
+  continua 600 ticks e salva em v2. Níveis inválidos são rejeitados.
+- Check-in ficou mais rápido; transporte de 20 passageiros passou de 279 para 125
+  ticks com elevador N3 no cenário isolado. Não equivale a retorno econômico validado.
+- Teste gráfico compra upgrade pelo mouse, seleciona camareiro/andar pelo teclado,
+  aplica preferência e abre Finanças para conferir custos fixos. PopupMenus recebem
+  eventos via Input com window_id; controles normais recebem eventos do viewport.
+- Teste gráfico adicional com resolução solicitada 1024×720 aprovado; capturas reais
+  1024×640 inspecionadas, incluindo rolagem do inspetor e painel Equipe. Capturas locais:
+  `.runtime/m3-staff.png` e `.runtime/m3-upgrade.png`.
+- Economia segue como hipótese de protótipo; contrato e próximo experimento em
+  `docs/M3_BALANCE.md`. Navegação integral por teclado/controller permanece pendente.

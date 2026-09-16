@@ -12,6 +12,7 @@ var ui_timer: float = 0.0
 var save_path: String = SaveStore.DEFAULT_PATH
 var new_dialog: ConfirmationDialog
 var finances_dialog: AcceptDialog
+var staff_panel: StaffPanel
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -40,6 +41,12 @@ func _ready() -> void:
 	hud.new_requested.connect(_confirm_new)
 	hud.debug_requested.connect(_toggle_debug)
 	hud.finances_requested.connect(_show_finances)
+	hud.staff_requested.connect(_show_staff)
+	hud.upgrade_requested.connect(_upgrade_selected)
+	staff_panel = StaffPanel.new()
+	staff_panel.theme = hud.theme
+	staff_panel.assignment_changed.connect(_refresh)
+	add_child(staff_panel)
 	new_dialog = ConfirmationDialog.new()
 	new_dialog.title = "Novo hotel"
 	new_dialog.dialog_text = "Começar do zero? Progresso não salvo será perdido.\nSeu arquivo salvo será preservado."
@@ -117,7 +124,7 @@ func _refresh() -> void:
 	hud.refresh_simulation(session, selected_actor)
 	var lift := session.transport.lift_by_id(selection)
 	if lift != null:
-		hud.inspector.text = "ELEVADOR #%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
+		hud.inspector.text = "ELEVADOR #%d • N%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, hotel.by_id(selection).level, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
 
 func _hire(definition: EmployeeDefinition) -> void:
 	var error := session.hire(definition)
@@ -130,6 +137,8 @@ func _select_actor(id: int) -> void:
 	_refresh()
 
 func _replace_session(value: HotelSession) -> void:
+	staff_panel.hide()
+	staff_panel.session = null
 	if hotel.changed.is_connected(_refresh):
 		hotel.changed.disconnect(_refresh)
 	session = value
@@ -167,11 +176,21 @@ func _toggle_debug() -> void:
 
 func _show_finances() -> void:
 	var lines: String = "Caixa: $ %d\nReceita: $ %d\nDespesas operacionais: $ %d\nLucro operacional: $ %d\nInvestimento: $ %d\n\nÚLTIMAS TRANSAÇÕES\n" % [economy.cash, economy.revenue, economy.expenses, economy.profit(), economy.capital_spent]
+	var costs := session.recurring_costs()
+	lines = "CUSTO FIXO ATUAL / DIA\nManutenção: $ %d • Salários: $ %d • Total: $ %d\n\n" % [costs.maintenance, costs.salaries, costs.total] + lines
 	for index in range(maxi(0, economy.ledger.size() - 10), economy.ledger.size()):
 		var item: Dictionary = economy.ledger[index]
 		lines += "%+d  %s\n" % [item.amount, item.reason]
 	finances_dialog.dialog_text = lines
 	finances_dialog.popup_centered(Vector2i(480, 420))
+
+func _show_staff() -> void:
+	staff_panel.open_for(session)
+
+func _upgrade_selected() -> void:
+	var error := session.upgrade_room(selection)
+	hud.message.text = "Melhoria aplicada. Serviços em curso mantêm o preço combinado." if error.is_empty() else error
+	_refresh()
 
 func _register_input() -> void:
 	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}]:

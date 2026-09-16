@@ -13,6 +13,8 @@ signal load_requested
 signal new_requested
 signal debug_requested
 signal finances_requested
+signal staff_requested
+signal upgrade_requested
 
 var stats: Label
 var message: Label
@@ -21,6 +23,8 @@ var world_slot: Control
 var operations: Label
 var open_button: Button
 var debug_label: Label
+var upgrade_button: Button
+var upgrade_preview: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -60,6 +64,7 @@ func _ready() -> void:
 	_button(session_bar, "Salvar", func() -> void: save_requested.emit())
 	_button(session_bar, "Carregar", func() -> void: load_requested.emit())
 	_button(session_bar, "Finanças", func() -> void: finances_requested.emit())
+	_button(session_bar, "Equipe", func() -> void: staff_requested.emit())
 	_button(session_bar, "Debug • F3", func() -> void: debug_requested.emit())
 	debug_label = Label.new()
 	debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -107,6 +112,13 @@ func _ready() -> void:
 	inspector.text = "Construa uma recepção no térreo para começar."
 	inspector.custom_minimum_size.x = 235
 	tools.add_child(inspector)
+	upgrade_preview = Label.new()
+	upgrade_preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tools.add_child(upgrade_preview)
+	upgrade_button = Button.new()
+	upgrade_button.custom_minimum_size.y = 44
+	upgrade_button.pressed.connect(func() -> void: upgrade_requested.emit())
+	tools.add_child(upgrade_button)
 	var footer := PanelContainer.new()
 	layout.add_child(footer)
 	message = Label.new()
@@ -115,10 +127,20 @@ func _ready() -> void:
 	footer.add_child(message)
 
 func refresh(hotel: HotelModel, selected: RoomState) -> void:
+	upgrade_button.visible = selected != null
+	upgrade_preview.visible = selected != null
 	stats.text = "$ %s    |    %d andar(es)    |    Investido: $ %d" % [hotel.economy.cash, hotel.floors, hotel.economy.capital_spent]
 	if selected != null:
 		var definition := selected.definition()
-		inspector.text = "%s  #%d\n\nCapacidade: %d\nUsuários: %d\nFila: %d\nReceita: $ %d\nManutenção: $ %d/dia\n\nDemolição sem reembolso." % [definition.display_name, selected.id, definition.capacity, selected.users.size(), selected.queue.members.size(), selected.income, definition.maintenance]
+		inspector.text = "%s  #%d • N%d\n\nCapacidade: %d\nUsuários: %d\nFila: %d\nReceita: $ %d\nTarifa: $ %d\nAtendimento: %.1fs\nManutenção: $ %d/dia\n\nDemolição sem reembolso." % [definition.display_name, selected.id, selected.level, selected.capacity(), selected.users.size(), selected.queue.members.size(), selected.income, selected.price(), selected.duration(), selected.maintenance()]
+		var next := selected.next_upgrade()
+		upgrade_button.disabled = next == null or hotel.economy.cash < next.cost
+		upgrade_button.text = "Nível máximo" if next == null else "Melhorar para N%d • $ %d" % [selected.level + 1, next.cost]
+		upgrade_preview.text = "" if next == null else "PRÓXIMO NÍVEL\nCapacidade: %d → %d\nTarifa: $ %d → $ %d\nManutenção: $ %d → $ %d/dia" % [selected.capacity(), definition.capacity + next.capacity_bonus, selected.price(), definition.price + next.price_bonus, selected.maintenance(), definition.maintenance + next.maintenance_bonus]
+		if next != null and definition.category == &"transport":
+			upgrade_preview.text += "\nVelocidade: %.2fx → %.2fx" % [selected.speed_multiplier(), next.speed_multiplier]
+		elif next != null:
+			upgrade_preview.text += "\nAtendimento: %.1fs → %.1fs\nBônus satisfação: +%.0f → +%.0f" % [selected.duration(), definition.service_duration * next.duration_multiplier, selected.satisfaction_bonus(), next.satisfaction_bonus]
 	else:
 		inspector.text = "SEU PRIMEIRO HOTEL\n\n1. Recepção no térreo\n2. Quartos para hospedar\n3. Bistrô para refeições\n4. Elevador para expandir\n\nPoços ocupam a mesma coluna em todos os andares."
 

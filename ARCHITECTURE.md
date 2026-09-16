@@ -23,12 +23,25 @@ IDs estáveis ligam ActorState, RoomState e ElevatorState. IA/transporte rodam a
 render redesenha os placeholders a cada frame. Relógio vem de ticks inteiros para evitar
 deriva acumulada. O RNG é exclusivo da sessão, nunca o gerador global.
 
-`SessionSnapshot` v1 define campos explicitamente e valida tipos, limites, geometria,
+`SessionSnapshot` v2 define campos explicitamente e valida tipos, limites, geometria,
 catálogo e referências antes de retornar uma sessão nova. Seed/state do RNG são strings
 decimais para preservar 64 bits no JSON. `SaveStore` escreve temporário e mantém `.bak`
-do save anterior. Versões desconhecidas são rejeitadas; migrações só surgirão com v2.
+do save anterior. Saves v1 migram para nível 1 e preferências automáticas, reconstruindo
+o preço de serviços já iniciados. Outras versões desconhecidas são rejeitadas.
 `Main` troca a sessão apenas após sucesso; nova partida descarta os modelos anteriores.
 
 Elevadores atendem o passageiro embarcado mais antigo, depois a chamada mais antiga.
 Fila FIFO é determinística; o despacho ainda não é uma otimização coletiva de direção.
 Cada poço atende todos os andares e impede construção na mesma coluna.
+
+## Gestão M3
+
+`RoomState` guarda o nível e deriva atributos de `UpgradeDefinition` imutável.
+Modificadores são absolutos em relação à definição base; o custo compra um nível.
+Transporte sincroniza capacidade e velocidade sem recriar filas ou passageiros.
+O preço é contratado na admissão do serviço (`agreed_price`) e preservado no save.
+
+Preferências de equipe (`preferred_room`/`preferred_floor`) são separadas da tarefa
+atual (`assignment`). Mudanças aguardam sua conclusão; postos fixos são reservados
+contra atribuições automáticas. Snapshots validam capacidades efetivas, níveis,
+referências e exclusividade de postos. Demolição limpa preferências obsoletas.

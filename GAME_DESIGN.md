@@ -12,3 +12,9 @@ receber visitantes e corrigir gargalos. Sem login, backend ou monetização.
 
 Economia inicial é hipótese de protótipo: validar retorno e gargalos com simulações
 antes de declarar balanceamento concluído. Expansão de conteúdo aguarda ciclo integrado.
+
+M3 acrescenta a decisão entre expandir área e melhorar a instalação existente.
+Upgrades até N3 aumentam manutenção além do investimento inicial. Preços já contratados
+são preservados. Atribuir limpeza a um andar prioriza esse andar e pode deixar outro
+sem cobertura; modo automático distribui trabalho disponível. Hipóteses e critérios
+numéricos estão em [M3_BALANCE](docs/M3_BALANCE.md).

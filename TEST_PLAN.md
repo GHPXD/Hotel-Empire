@@ -26,3 +26,11 @@ de agentes, reconciliação do caixa, capacidade, geometria, referências, ocupa
 snapshots periódicos. Transporte isolado deve entregar exatamente uma vez cada agente
 e drenar as filas para 100/250/500/1000 passageiros. Resultados de tempo são informativos,
 sem limiar dependente da máquina; FPS renderizado continua no plano de M8.
+
+M3: `management_test.gd` cobre custos/limites de upgrades, atributos efetivos,
+manutenção, contrato de preço, atribuições durante limpeza/viagem, reserva de postos,
+demolição, migração de save M2 real e continuidade. Compara check-in e transporte
+antes/depois. `ui_management.gd` compra upgrade por mouse, abre Equipe, seleciona
+funcionário/andar pelo teclado e aplica; confere custos fixos em Finanças.
+PopupMenus recebem `Input.parse_input_event` com window_id; demais controles usam
+`Viewport.push_input`. Capturas são inspecionadas; isso não cobre todo o teclado/controller.

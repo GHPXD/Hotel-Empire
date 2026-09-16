@@ -1,5 +1,12 @@
 # Changelog
 
+## M3 — gestão do hotel
+- Upgrades N2/N3 em quatro instalações, com comparação, custos e manutenção efetivos.
+- Equipe com recepções/andares preferidos e modo automático, preservando tarefas em curso.
+- Preço contratado protegido durante upgrades; finanças mostram custos fixos diários.
+- Snapshot v2 com migração de v1 e validação das novas invariantes.
+- Suítes de gestão e interface; dez suítes aprovadas, incluindo stress e retomada.
+
 ## 0.1.0 em desenvolvimento — 2026-09-16
 - Auditoria inicial: sem projeto Godot, cenas, código de jogo ou Git.
 - Preservada a visão do produto e as configurações/skills locais.

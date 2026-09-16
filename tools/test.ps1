@@ -13,9 +13,9 @@ try {
     $importLog = Join-Path $runtimeRoot 'import.log'
     $run = Start-Process -FilePath $GodotPath -ArgumentList @('--headless', '--editor', '--path', $projectRoot, '--log-file', $importLog, '--quit') -WindowStyle Hidden -PassThru -Wait
     if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $importLog -Pattern 'SCRIPT ERROR:|^ERROR:' -Quiet)) { throw 'Godot import failed; inspect .runtime/import.log' }
-    $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test')
+    $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test', 'management_test')
     if ($Stress) { $suites += @('save_multiseed_test', 'stress_test') }
-    if ($Visual) { $suites += @('ui_smoke', 'ui_resume') }
+    if ($Visual) { $suites += @('ui_smoke', 'ui_resume', 'ui_management') }
     foreach ($suite in $suites) {
         $testLog = Join-Path $runtimeRoot ($suite + '.log')
         $arguments = @('--path', $projectRoot, '--script', ('res://tests/' + $suite + '.gd'), '--log-file', $testLog)

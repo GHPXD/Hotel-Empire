@@ -129,7 +129,7 @@ func _draw_room(room: RoomState) -> void:
 			for i in 3:
 				draw_circle(base + Vector2(22 + i * 48, 15) * zoom_factor, 15 * zoom_factor, Color("f8e6bc"))
 		if zoom_factor >= 0.65:
-			_text(rectangle.position + Vector2(7, 19) * zoom_factor, definition.display_name, Color.WHITE, int(13 * zoom_factor))
+			_text(rectangle.position + Vector2(7, 19) * zoom_factor, definition.display_name + (" N%d" % room.level if room.level > 1 else ""), Color.WHITE, int(13 * zoom_factor))
 	if room.id == selected:
 		draw_rect(rectangle, Color("f9cd69"), false, 4)
 
