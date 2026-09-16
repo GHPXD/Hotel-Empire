@@ -6,7 +6,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M0 Foundation: projeto, dados, economia, fila, testes, boot validado.
 - [ ] M1 Vertical Slice: construção, câmera, hóspedes, serviços, transporte, funcionários,
   satisfação, save/load, HUD, debug e ciclo integrado validado.
-  - [ ] M1a construção/andares/seleção/demolição.
+  - [x] M1a construção/andares/seleção/demolição.
   - [ ] M1b hóspedes/check-in/decisão/serviços/economia.
   - [ ] M1c elevadores/filas/funcionários/limpeza/reputação.
   - [ ] M1d save/load/UI/diagnóstico/QA integrado.

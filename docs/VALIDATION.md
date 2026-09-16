@@ -11,3 +11,16 @@
 - Sandbox impediu probe de escrita do gda e configurações do editor; testes
   subsequentes executados com permissão de processo e user-data-root local.
 - Boot gráfico e gameplay ainda pendentes: M0 contém apenas a cena de fundação.
+
+## M1a — construção
+- 15 checks de construção passaram: overlap, limites, suporte, recepção no térreo,
+  poços em todos os andares, expansão, custos e bloqueio de demolição ocupada.
+- Todos os 11 scripts então existentes compilaram; fundação passou novamente.
+- Cena integrada: preflight ready, zero diagnósticos.
+- QA gráfico real em OpenGL/AMD: `tests/ui_smoke.gd` acionou botões e grid por
+  eventos de mouse, construiu quatro tipos em dois andares, rejeitou overlap e
+  cancelou construção. Zero falhas; captura inspecionada em `.runtime/construction-ui.png`.
+- Corrigido o harness de QA: `push_input(..., true)` para coordenadas locais sob
+  stretch. O primeiro teste usava coordenadas locais como coordenadas de janela.
+- Captura 1280×800 legível, sem recorte de comandos. Outras resoluções, zoom/pan
+  e teclado completo ainda precisam de cobertura adicional no M1d.
