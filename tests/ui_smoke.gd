@@ -12,7 +12,10 @@ func run() -> void:
 	current_scene = game
 	for frame in 5:
 		await process_frame
-	var buttons: Array[Node] = game.hud.find_children("*", "Button", true, false)
+	var buttons: Array[Node] = []
+	for button: Node in game.hud.find_children("*", "Button", true, false):
+		if button.text.contains("células") or button.text.begins_with("+ Andar") or button.text in ["Selecionar / cancelar", "Demolir seleção"]:
+			buttons.append(button)
 	await click(buttons[0].get_global_rect().get_center())
 	check(game.view.blueprint != null, "build button via input")
 	var cell: Vector2 = game.view.room_rect(0, 0).get_center() + game.view.global_position
@@ -31,6 +34,25 @@ func run() -> void:
 	check(game.hotel.rooms.size() == 4, "four room types built")
 	await click(buttons[5].get_global_rect().get_center())
 	check(game.view.blueprint == null, "cancel construction")
+	for button: Node in game.hud.find_children("*", "Button", true, false):
+		if button.text.begins_with("+ Recepcionista") or button.text.begins_with("+ Camareiro"):
+			var scroll: ScrollContainer = button.get_parent().get_parent()
+			scroll.ensure_control_visible(button)
+			await process_frame
+			await click(button.get_global_rect().get_center())
+	check(game.session.actors.size() == 2, "hire both employees through UI")
+	await click(game.hud.open_button.get_global_rect().get_center())
+	check(game.session.opened, "open arrivals")
+	for tick in 1200:
+		game.session.tick(0.1)
+	game._refresh()
+	for frame in 3:
+		await process_frame
+	check(game.session.guests.bookings > 0 and game.session.economy.revenue > 0, "operating hotel generates revenue")
+	for button: Node in game.hud.find_children("*", "Button", true, false):
+		if button.text == "Pausa":
+			await click(button.get_global_rect().get_center())
+	check(game.session.speed == 0, "pause button")
 	await RenderingServer.frame_post_draw
 	var path: String = "res://.runtime/construction-ui.png"
 	root.get_texture().get_image().save_png(path)

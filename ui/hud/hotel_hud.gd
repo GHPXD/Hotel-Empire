@@ -5,11 +5,16 @@ signal build_requested(definition: RoomDefinition)
 signal floor_requested
 signal demolish_requested
 signal cancel_requested
+signal hire_requested(definition: EmployeeDefinition)
+signal speed_requested(value: int)
+signal open_requested
 
 var stats: Label
 var message: Label
 var inspector: Label
 var world_slot: Control
+var operations: Label
+var open_button: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -29,6 +34,19 @@ func _ready() -> void:
 	stats = Label.new()
 	stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header_row.add_child(stats)
+	var toolbar := HBoxContainer.new()
+	layout.add_child(toolbar)
+	open_button = Button.new()
+	open_button.custom_minimum_size.x = 175
+	open_button.text = "Abrir hotel"
+	open_button.pressed.connect(func() -> void: open_requested.emit())
+	toolbar.add_child(open_button)
+	for speed_value in [0, 1, 2, 3]:
+		_button(toolbar, "Pausa" if speed_value == 0 else "%dx" % speed_value, func() -> void: speed_requested.emit(speed_value))
+	operations = Label.new()
+	operations.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	operations.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	toolbar.add_child(operations)
 	var content := HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 0)
@@ -60,6 +78,11 @@ func _ready() -> void:
 	_button(tools, "+ Andar   •   $ 750", func() -> void: floor_requested.emit())
 	_button(tools, "Selecionar / cancelar", func() -> void: cancel_requested.emit())
 	_button(tools, "Demolir seleção", func() -> void: demolish_requested.emit())
+	var staff_title := Label.new()
+	staff_title.text = "EQUIPE"
+	tools.add_child(staff_title)
+	for definition in HotelSession.EMPLOYEES:
+		_button(tools, "+ %s • $ %d" % [definition.display_name, definition.hire_cost], func() -> void: hire_requested.emit(definition))
 	inspector = Label.new()
 	inspector.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	inspector.text = "Construa uma recepção no térreo para começar."
@@ -86,6 +109,14 @@ func _button(parent: Control, text: String, action: Callable) -> void:
 	button.custom_minimum_size.y = 42
 	button.pressed.connect(action)
 	parent.add_child(button)
+
+func refresh_simulation(session: HotelSession, actor_id: int) -> void:
+	stats.text = "$ %d   |   Reputação %.0f   |   Hóspedes %d   |   Lucro $ %d   |   Dia %d • %dx" % [session.economy.cash, session.guests.reputation, session.guest_count(), session.economy.profit(), session.day + 1, session.speed]
+	open_button.text = "Fechar chegadas" if session.opened else "Abrir hotel"
+	operations.text = session.alerts()
+	var actor: ActorState = session.actors.get(actor_id)
+	if actor != null:
+		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %d\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d\n\nUtilidades:\n%s" % [actor.display_name, actor.role, actor.state, actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, actor.bedroom, actor.age, actor.waiting, actor.target_floor, str(actor.utility_scores)]
 
 func _build_theme() -> void:
 	theme = Theme.new()

@@ -4,10 +4,12 @@ extends Control
 
 signal cell_clicked(column: int, floor_index: int)
 signal cancelled
+signal actor_clicked(id: int)
 
 const CELL: float = 62.0
 const FLOOR_HEIGHT: float = 108.0
 var hotel: HotelModel
+var session: HotelSession
 var selected: int = -1
 var blueprint: RoomDefinition
 var zoom_factor: float = 1.0
@@ -48,6 +50,11 @@ func _gui_input(event: InputEvent) -> void:
 		if not event.pressed:
 			return
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			if blueprint == null and session != null:
+				for actor: ActorState in session.actors.values():
+					if actor_screen_position(actor).distance_to(pointer) < 14 * zoom_factor:
+						actor_clicked.emit(actor.id)
+						return
 			var cell := cell_at(pointer)
 			cell_clicked.emit(cell.x, cell.y)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
@@ -75,6 +82,8 @@ func _draw() -> void:
 		_text(floor_rect.position + Vector2(-35, 25), "T" if level == 0 else str(level), Color("455d5c"), 16)
 	for room in hotel.rooms:
 		_draw_room(room)
+	if session != null:
+		_draw_simulation()
 	if blueprint != null:
 		var cell := cell_at(pointer)
 		var valid: bool = hotel.build_error(blueprint, cell.x, cell.y).is_empty()
@@ -126,3 +135,42 @@ func _draw_room(room: RoomState) -> void:
 
 func _text(at: Vector2, value: String, color: Color, font_size: int) -> void:
 	draw_string(ThemeDB.fallback_font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+func actor_screen_position(actor: ActorState) -> Vector2:
+	var level: float = actor.floor_index
+	var column: float = actor.x
+	if actor.state == &"riding":
+		var lift := session.transport.lift_by_id(actor.elevator_id)
+		if lift != null:
+			level = lift.floor_position
+			column = lift.column
+	var offset: float = float(actor.id % 5) * 0.13 if actor.state in [&"checkin", &"service_queue", &"lift_queue"] else 0.0
+	return world_to_screen(Vector2((column + offset) * CELL, -level * FLOOR_HEIGHT - 20))
+
+func _draw_simulation() -> void:
+	for lift in session.transport.lifts:
+		var cabin := Rect2(world_to_screen(Vector2((lift.column - 0.37) * CELL, -(lift.floor_position + 0.72) * FLOOR_HEIGHT)), Vector2(CELL * 0.74, FLOOR_HEIGHT * 0.65) * zoom_factor)
+		draw_rect(cabin, Color("536c81"))
+		draw_rect(cabin, Color("e9d8a8"), false, 2)
+		if zoom_factor > 0.65:
+			_text(cabin.position + Vector2(8, 24) * zoom_factor, "%d/%d" % [lift.passengers.size(), lift.capacity], Color.WHITE, int(13 * zoom_factor))
+	for room in hotel.rooms:
+		if room.dirty:
+			var box := room_rect(room.column, room.floor_index, room.definition().width)
+			_text(box.position + Vector2(8, 42) * zoom_factor, "LIMPAR", Color("754827"), int(13 * zoom_factor))
+		if not room.queue.members.is_empty():
+			var box := room_rect(room.column, room.floor_index, room.definition().width)
+			_text(box.position + Vector2(8, 65) * zoom_factor, "Fila: %d" % room.queue.members.size(), Color("693e27"), int(13 * zoom_factor))
+	for actor: ActorState in session.actors.values():
+		var point := actor_screen_position(actor)
+		var shirt := Color("e6a84d") if actor.role == &"guest" else Color("526c98")
+		if actor.role == &"cleaner":
+			shirt = Color("b16573")
+		if actor.state == &"using":
+			shirt = shirt.lightened(0.2)
+		draw_line(point + Vector2(-3, 5) * zoom_factor, point + Vector2(-4, 17) * zoom_factor, Color("324859"), 3 * zoom_factor)
+		draw_line(point + Vector2(3, 5) * zoom_factor, point + Vector2(5, 17) * zoom_factor, Color("324859"), 3 * zoom_factor)
+		draw_rect(Rect2(point + Vector2(-6, -6) * zoom_factor, Vector2(12, 16) * zoom_factor), shirt)
+		draw_circle(point + Vector2(0, -12) * zoom_factor, 6 * zoom_factor, Color("e8be98"))
+		if actor.state in [&"lift_queue", &"checkin", &"service_queue"]:
+			_text(point + Vector2(-4, -24) * zoom_factor, "…", Color("664334"), int(18 * zoom_factor))

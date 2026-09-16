@@ -7,3 +7,6 @@
 - Plano incremental, arquitetura e critérios de validação documentados.
 - M1a: construção validada, andares, poços, demolição, seleção, HUD e câmera.
 - QA com entrada real no viewport e testes automatizados de construção.
+- M1b–c: tick fixo, hóspedes/utility simples, atendimento, receita, despesas,
+  filas, elevadores FIFO com capacidade, contratação, limpeza e reputação.
+- Inspeção de agentes, diagnóstico de filas e controles de operação/tempo.

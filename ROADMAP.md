@@ -7,8 +7,8 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [ ] M1 Vertical Slice: construção, câmera, hóspedes, serviços, transporte, funcionários,
   satisfação, save/load, HUD, debug e ciclo integrado validado.
   - [x] M1a construção/andares/seleção/demolição.
-  - [ ] M1b hóspedes/check-in/decisão/serviços/economia.
-  - [ ] M1c elevadores/filas/funcionários/limpeza/reputação.
+  - [x] M1b hóspedes/check-in/decisão/serviços/economia.
+  - [x] M1c elevadores/filas/funcionários/limpeza/reputação.
   - [ ] M1d save/load/UI/diagnóstico/QA integrado.
 - [ ] M2 Simulation Core: robustez, stress, métricas e múltiplas seeds.
 - [ ] M3 Hotel Management: upgrades, atribuições e finanças.

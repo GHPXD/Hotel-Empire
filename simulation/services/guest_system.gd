@@ -1,0 +1,171 @@
+class_name GuestSystem
+extends RefCounted
+
+var completed: int = 0
+var meals_served: int = 0
+var bookings: int = 0
+var score_total: float = 0.0
+var reputation: float = 65.0
+var rules: SimulationRules
+
+func _init(config: SimulationRules) -> void:
+	rules = config
+
+func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, delta: float, time: float) -> void:
+	var departures: Array[int] = []
+	for actor: ActorState in actors.values():
+		if actor.role != &"guest":
+			continue
+		actor.age += delta
+		actor.needs.hunger = minf(100, actor.needs.hunger + delta * rules.hunger_rate)
+		actor.needs.energy = minf(100, actor.needs.energy + delta * rules.energy_rate)
+		actor.needs.entertainment = minf(100, actor.needs.entertainment + delta * 0.1)
+		actor.needs.comfort = minf(100, actor.needs.comfort + delta * 0.1)
+		if actor.needs.hunger > 90:
+			actor.happiness = maxf(0, actor.happiness - delta * 0.15)
+		match actor.state:
+			&"arriving":
+				_arrive(actor, hotel)
+			&"checkin":
+				_check_in(actor, actors, hotel, transport, delta, time)
+			&"deciding":
+				_choose(actor, hotel, transport)
+			&"service_queue":
+				_queue_service(actor, hotel, delta)
+			&"using":
+				_use(actor, hotel, delta, time)
+			&"exit":
+				_release_room(actor, hotel)
+				completed += 1
+				score_total += actor.happiness
+				reputation = clampf(lerpf(reputation, actor.happiness, 0.12), 0, 100)
+				departures.append(actor.id)
+	for id in departures:
+		actors.erase(id)
+
+func _arrive(actor: ActorState, hotel: HotelModel) -> void:
+	for room in hotel.rooms:
+		if room.definition().category == &"reception" and room.queue.join(actor.id):
+			actor.target_room = room.id
+			actor.travel_to(room.center(), room.floor_index, &"checkin")
+			return
+	actor.travel_to(-0.8, 0, &"exit")
+
+func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transport: TransportSystem, delta: float, time: float) -> void:
+	var reception := hotel.by_id(actor.target_room)
+	if reception == null:
+		actor.travel_to(-0.8, 0, &"exit")
+		return
+	actor.waiting += delta
+	actor.happiness = maxf(0, actor.happiness - delta * rules.waiting_penalty)
+	if actor.waiting > rules.patience_seconds:
+		reception.queue.leave(actor.id)
+		actor.travel_to(-0.8, 0, &"exit")
+		return
+	if reception.queue.members.is_empty() or reception.queue.members[0] != actor.id:
+		return
+	var staffed: bool = false
+	for employee: ActorState in actors.values():
+		if employee.role == &"receptionist" and employee.assignment == reception.id and employee.state == &"working":
+			staffed = true
+			break
+	if not staffed:
+		return
+	actor.timer += delta
+	if actor.timer < reception.definition().service_duration:
+		return
+	for room in hotel.rooms:
+		var definition := room.definition()
+		if definition.category != &"lodging" or room.dirty or room.occupant >= 0:
+			continue
+		if actor.money < definition.price or not transport.accessible(actor.floor_index, room.floor_index):
+			continue
+		room.occupant = actor.id
+		actor.bedroom = room.id
+		actor.checked_in = true
+		actor.money -= definition.price
+		room.income += definition.price
+		hotel.economy.transact(definition.price, "Hospedagem", time)
+		bookings += 1
+		reception.queue.leave(actor.id)
+		actor.target_room = room.id
+		actor.timer = 0
+		actor.travel_to(room.center(), room.floor_index, &"service_queue")
+		return
+
+func _choose(actor: ActorState, hotel: HotelModel, transport: TransportSystem) -> void:
+	if actor.age >= rules.stay_seconds or actor.happiness <= 10:
+		_release_room(actor, hotel)
+		actor.travel_to(-0.8, 0, &"exit")
+		return
+	var best: RoomState
+	var best_score: float = -INF
+	actor.utility_scores.clear()
+	for room in hotel.rooms:
+		var definition := room.definition()
+		if definition.need.is_empty() or (definition.category == &"lodging" and room.id != actor.bedroom):
+			continue
+		if definition.category == &"service" and actor.money < definition.price:
+			continue
+		if not transport.accessible(actor.floor_index, room.floor_index) or room.queue.members.size() >= room.queue.capacity:
+			continue
+		var distance: float = absf(room.center() - actor.x) + absf(room.floor_index - actor.floor_index) * 3.0
+		var score: float = float(actor.needs.get(String(definition.need), 0.0)) - distance * 0.6 - room.queue.members.size() * 4.0
+		if definition.category == &"service":
+			score -= definition.price * 0.15
+		actor.utility_scores[str(room.id)] = score
+		if score > best_score:
+			best = room
+			best_score = score
+	if best != null:
+		actor.target_room = best.id
+		actor.travel_to(best.center(), best.floor_index, &"service_queue")
+	else:
+		_release_room(actor, hotel)
+		actor.travel_to(-0.8, 0, &"exit")
+
+func _queue_service(actor: ActorState, hotel: HotelModel, delta: float) -> void:
+	var room := hotel.by_id(actor.target_room)
+	if room == null:
+		actor.state = &"deciding"
+		return
+	if not room.queue.join(actor.id):
+		actor.state = &"deciding"
+		return
+	actor.waiting += delta
+	if room.queue.members[0] == actor.id and room.users.size() < room.definition().capacity:
+		room.queue.take()
+		room.users.append(actor.id)
+		actor.timer = room.definition().service_duration
+		actor.state = &"using"
+	elif actor.waiting > rules.patience_seconds:
+		room.queue.leave(actor.id)
+		actor.state = &"deciding"
+	else:
+		actor.happiness = maxf(0, actor.happiness - delta * rules.waiting_penalty)
+
+func _use(actor: ActorState, hotel: HotelModel, delta: float, time: float) -> void:
+	actor.timer -= delta
+	if actor.timer > 0:
+		return
+	var room := hotel.by_id(actor.target_room)
+	if room != null:
+		var definition := room.definition()
+		room.users.erase(actor.id)
+		actor.needs[String(definition.need)] = maxf(0, float(actor.needs.get(String(definition.need), 0)) - definition.relief)
+		actor.happiness = minf(100, actor.happiness + 3)
+		if definition.category == &"service":
+			actor.money -= definition.price
+			room.income += definition.price
+			hotel.economy.transact(definition.price, definition.display_name, time)
+			actor.meals += 1
+			meals_served += 1
+		else:
+			actor.sleeps += 1
+	actor.state = &"deciding"
+
+func _release_room(actor: ActorState, hotel: HotelModel) -> void:
+	var room := hotel.by_id(actor.bedroom)
+	if room != null and room.occupant == actor.id:
+		room.occupant = -1
+		room.dirty = true

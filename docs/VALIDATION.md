@@ -24,3 +24,16 @@
   stretch. O primeiro teste usava coordenadas locais como coordenadas de janela.
 - Captura 1280×800 legível, sem recorte de comandos. Outras resoluções, zoom/pan
   e teclado completo ainda precisam de cobertura adicional no M1d.
+
+## M1b–c — simulação operacional
+- `simulation_test.gd` strict: zero falhas/diagnósticos. Hóspede fez check-in,
+  dormiu, consumiu 3 refeições, saiu; receita $224, um quarto limpo e 7 entregas
+  de elevador (hóspede + funcionário). Salários/manutenção efetivamente cobrados.
+- Sem recepcionista: hóspede abandona após esgotar paciência.
+- 13 passageiros isolados: capacidade nunca excedeu 4, todos chegaram ao destino,
+  entrega exatamente uma vez, fila drenada e espera medida.
+- Validação agregada de 21 scripts e boot integrado sem diagnósticos.
+- UI smoke ampliado: contratar ambos funcionários, abrir hotel, gerar receita,
+  pausar. Zero falhas. Largura estável do botão de chegadas evita deslocar a pausa.
+- Conteúdo de simulação segue provisório; métricas acima demonstram funcionamento,
+  não balanceamento final. Multi-seeds/stress e save/load aguardam próximo marco.
