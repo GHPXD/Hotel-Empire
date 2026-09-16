@@ -112,7 +112,7 @@ static func invariant_error(session: HotelSession, starting_money: int) -> Strin
 	if session.guest_count() + session.guests.completed + staff != session.next_actor_id - 1:
 		return "An actor was lost or counted twice."
 	for room in session.hotel.rooms:
-		if room.users.size() > room.definition().capacity or room.queue.members.size() > room.queue.capacity:
+		if room.users.size() > room.capacity() or room.queue.members.size() > room.queue.capacity:
 			return "Room capacity exceeded."
 		if room.dirty and room.occupant >= 0:
 			return "Dirty bedroom allocated."

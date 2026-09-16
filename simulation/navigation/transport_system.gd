@@ -10,13 +10,16 @@ func _init(config: SimulationRules) -> void:
 
 func sync(hotel: HotelModel) -> void:
 	for room in hotel.rooms:
-		if room.definition().category != &"transport" or lift_by_id(room.id) != null:
+		if room.definition().category != &"transport":
 			continue
-		var lift := ElevatorState.new()
-		lift.room_id = room.id
-		lift.column = room.center()
-		lift.capacity = room.definition().capacity
-		lifts.append(lift)
+		var lift := lift_by_id(room.id)
+		if lift == null:
+			lift = ElevatorState.new()
+			lift.room_id = room.id
+			lift.column = room.center()
+			lifts.append(lift)
+		lift.capacity = room.capacity()
+		lift.speed_multiplier = room.speed_multiplier()
 	for index in range(lifts.size() - 1, -1, -1):
 		if hotel.by_id(lifts[index].room_id) == null:
 			lifts.remove_at(index)
@@ -81,7 +84,7 @@ func _step_lift(lift: ElevatorState, actors: Dictionary, delta: float) -> void:
 		lift.door_timer = maxf(0, lift.door_timer - delta)
 		return
 	if not is_equal_approx(lift.floor_position, float(lift.target_floor)):
-		lift.floor_position = move_toward(lift.floor_position, lift.target_floor, rules.elevator_speed * delta)
+		lift.floor_position = move_toward(lift.floor_position, lift.target_floor, rules.elevator_speed * lift.speed_multiplier * delta)
 		return
 	var exchanged: bool = false
 	for id in lift.passengers.duplicate():

@@ -1,10 +1,10 @@
 class_name SessionSnapshot
 extends RefCounted
-## Schema v1 stores primitive values and stable IDs, never Nodes or Resources.
+## Schema v2 adds room levels, locked service prices and staff preferences.
 
-const VERSION: int = 1
-const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income"]
-const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload"]
+const VERSION: int = 2
+const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income", "level"]
+const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload", "agreed_price", "preferred_room", "preferred_floor"]
 const LIFT_FIELDS: Array[String] = ["room_id", "column", "capacity", "floor_position", "target_floor", "door_timer", "boarded", "delivered", "wait_total", "wait_max", "busy_seconds"]
 const SESSION_FIELDS: Array[String] = ["next_actor_id", "time", "tick_count", "arrival_timer", "day", "opened", "speed"]
 const ECONOMY_FIELDS: Array[String] = ["cash", "revenue", "expenses", "capital_spent"]
@@ -33,6 +33,8 @@ static func capture(session: HotelSession) -> Dictionary:
 	return {"version": VERSION, "session": _read(session, SESSION_FIELDS), "economy": _read(session.economy, ECONOMY_FIELDS), "ledger": session.economy.ledger.duplicate(true), "floors": session.hotel.floors, "next_room_id": session.hotel.next_room_id, "rooms": rooms, "actors": actors, "lifts": lifts, "guests": _read(session.guests, GUEST_FIELDS), "cleaned": session.employees.cleaned, "path_requests": session.transport.path_requests, "rng_seed": str(session.rng.seed), "rng_state": str(session.rng.state)}
 
 static func restore(data: Variant) -> Dictionary:
+	if data is Dictionary and data.get("version") == 1:
+		data = _migrate_v1(data)
 	if not data is Dictionary or data.get("version") != VERSION:
 		return _error("Versão de save desconhecida ou formato inválido.")
 	var session := HotelSession.new()
@@ -58,6 +60,8 @@ static func restore(data: Variant) -> Dictionary:
 		var room := RoomState.new()
 		if not _write(room, item, ROOM_FIELDS) or room.definition() == null or room.id < 1 or room.id >= session.hotel.next_room_id or session.hotel.by_id(room.id) != null:
 			return _error("Sala desconhecida ou ID inválido.")
+		if room.level < 1 or room.level > room.definition().upgrades.size() + 1:
+			return _error("Nível de sala inválido.")
 		var previous_cash: int = session.economy.cash
 		session.economy.cash = 100000000
 		var geometry_error := session.hotel.build_error(room.definition(), room.column, room.floor_index)
@@ -65,15 +69,27 @@ static func restore(data: Variant) -> Dictionary:
 		if not geometry_error.is_empty() or (room.definition().category == &"transport" and room.floor_index != 0):
 			return _error("Geometria inválida: " + geometry_error)
 		room.queue.capacity = room.definition().queue_capacity
-		if not _ids(item.get("queue"), room.queue.members, room.queue.capacity) or not _ids(item.get("users"), room.users, room.definition().capacity):
+		if not _ids(item.get("queue"), room.queue.members, room.queue.capacity) or not _ids(item.get("users"), room.users, room.capacity()):
 			return _error("Ocupação inválida.")
 		session.hotel.rooms.append(room)
+	var reserved_posts: Dictionary = {}
 	for item: Variant in data.actors:
 		var actor := ActorState.new()
 		if not _write(actor, item, ACTOR_FIELDS) or actor.id < 1 or actor.id >= session.next_actor_id or session.actors.has(actor.id):
 			return _error("Agente inválido ou duplicado.")
 		if actor.role not in [&"guest", &"receptionist", &"cleaner"] or actor.state not in STATES or actor.destination_state not in STATES:
 			return _error("Papel ou estado de agente desconhecido.")
+		if actor.agreed_price < 0 or actor.preferred_floor < -1 or actor.preferred_floor >= session.hotel.floors or actor.preferred_room < -1:
+			return _error("Preço ou atribuição inválida.")
+		if actor.preferred_room >= 0:
+			var preferred := session.hotel.by_id(actor.preferred_room)
+			if actor.role != &"receptionist" or preferred == null or preferred.definition().category != &"reception":
+				return _error("Posto de recepção inválido.")
+			if reserved_posts.has(actor.preferred_room):
+				return _error("Dois recepcionistas fixos no mesmo posto.")
+			reserved_posts[actor.preferred_room] = actor.id
+		if actor.preferred_floor >= 0 and actor.role != &"cleaner":
+			return _error("Andar de limpeza inválido.")
 		if actor.floor_index < 0 or actor.floor_index >= session.hotel.floors or actor.target_floor < 0 or actor.target_floor >= session.hotel.floors or actor.x < -2 or actor.x > HotelModel.COLUMNS or actor.target_x < -2 or actor.target_x > HotelModel.COLUMNS or actor.speed <= 0 or actor.speed > 10 or actor.skill <= 0 or actor.skill > 10 or actor.money < 0 or actor.happiness < 0 or actor.happiness > 100 or actor.age < 0 or actor.waiting < 0:
 			return _error("Atributos de agente fora dos limites.")
 		if not item.get("needs") is Dictionary or not item.get("utility_scores") is Dictionary:
@@ -96,8 +112,9 @@ static func restore(data: Variant) -> Dictionary:
 		if not _write(lift, item, LIFT_FIELDS) or lift_ids.has(lift.room_id):
 			return _error("Elevador inválido ou duplicado.")
 		var room := session.hotel.by_id(lift.room_id)
-		if room == null or room.definition().category != &"transport" or lift.column != room.center() or lift.capacity != room.definition().capacity or lift.floor_position < 0 or lift.floor_position > session.hotel.floors - 1 or lift.target_floor < 0 or lift.target_floor >= session.hotel.floors or lift.door_timer < 0:
+		if room == null or room.definition().category != &"transport" or lift.column != room.center() or lift.capacity != room.capacity() or lift.floor_position < 0 or lift.floor_position > session.hotel.floors - 1 or lift.target_floor < 0 or lift.target_floor >= session.hotel.floors or lift.door_timer < 0:
 			return _error("Geometria do elevador inválida.")
+		lift.speed_multiplier = room.speed_multiplier()
 		if not _ids(item.get("queue"), lift.queue.members, 2000) or not _ids(item.get("passengers"), lift.passengers, lift.capacity):
 			return _error("Fila do elevador inválida.")
 		lift_ids.append(lift.room_id)
@@ -144,6 +161,8 @@ static func _validate_relations(session: HotelSession) -> String:
 			var room := session.hotel.by_id(actor.target_room)
 			if room == null or not room.users.has(actor.id):
 				return "Uso de serviço inconsistente."
+			if actor.agreed_price > actor.money:
+				return "Orçamento não cobre o preço contratado."
 	for lift in session.transport.lifts:
 		for id in lift.queue.members + lift.passengers:
 			var actor: ActorState = session.actors.get(id)
@@ -204,3 +223,26 @@ static func _integer(value: Variant, minimum: int, maximum: int) -> bool:
 
 static func _error(message: String) -> Dictionary:
 	return {"session": null, "error": message}
+
+static func _migrate_v1(original: Dictionary) -> Dictionary:
+	var data := original.duplicate(true)
+	if not data.get("rooms") is Array or not data.get("actors") is Array:
+		return {}
+	var definitions: Dictionary = {}
+	for room: Variant in data.rooms:
+		if not room is Dictionary:
+			return {}
+		room["level"] = 1
+		if room.get("definition_id") is String:
+			definitions[room.get("id")] = HotelCatalog.room(room.definition_id)
+	for actor: Variant in data.actors:
+		if not actor is Dictionary:
+			return {}
+		actor["preferred_room"] = -1
+		actor["preferred_floor"] = -1
+		actor["agreed_price"] = 0
+		var definition: RoomDefinition = definitions.get(actor.get("target_room"))
+		if actor.get("state") == "using" and definition != null and definition.category == &"service":
+			actor["agreed_price"] = definition.price
+	data.version = VERSION
+	return data

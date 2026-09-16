@@ -4,6 +4,7 @@ extends RefCounted
 var room_id: int
 var column: float
 var capacity: int = 4
+var speed_multiplier: float = 1.0
 var floor_position: float = 0.0
 var target_floor: int = 0
 var door_timer: float = 0.0

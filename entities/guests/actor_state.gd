@@ -28,6 +28,9 @@ var speed: float = 1.9
 var skill: float = 1.0
 var assignment: int = -1
 var workload: float = 0.0
+var agreed_price: int = 0
+var preferred_room: int = -1
+var preferred_floor: int = -1
 
 func travel_to(column: float, level: int, arrival: StringName) -> void:
 	target_x = column

@@ -15,3 +15,4 @@ extends Resource
 @export var need: StringName
 @export var relief: float = 60.0
 @export var color: Color = Color.WHITE
+@export var upgrades: Array[UpgradeDefinition] = []

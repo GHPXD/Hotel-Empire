@@ -82,11 +82,20 @@ func demolish(id: int) -> String:
 	if room == null:
 		return "Selecione uma sala."
 	for actor: ActorState in actors.values():
+		if actor.assignment == id and actor.in_transit():
+			return "Um funcionário está a caminho. Aguarde sua chegada."
 		if actor.target_room == id and actor.state != &"exit":
 			return "Há alguém usando ou indo para esta sala."
 		if room.definition().category == &"transport" and (actor.floor_index > 0 or actor.in_transit()):
 			return "Aguarde todos descerem antes de remover o elevador."
 	var result := hotel.demolish(id)
+	if result.is_empty():
+		for actor: ActorState in actors.values():
+			if actor.preferred_room == id:
+				actor.preferred_room = -1
+			if actor.assignment == id:
+				actor.assignment = -1
+				actor.state = &"idle"
 	transport.sync(hotel)
 	return result
 
@@ -120,15 +129,53 @@ func alerts() -> String:
 	return "Operação estável. Observe a ocupação antes de expandir." if opened else "Hotel fechado para novas chegadas. Construa, contrate e abra as portas."
 
 func _pay_daily_expenses() -> void:
+	var costs := recurring_costs()
+	if costs.maintenance > 0:
+		economy.transact(-costs.maintenance, "Manutenção diária", time)
+	if costs.salaries > 0:
+		economy.transact(-costs.salaries, "Salários diários", time)
+
+func recurring_costs() -> Dictionary:
 	var maintenance: int = 0
 	for room in hotel.rooms:
-		maintenance += room.definition().maintenance
-	if maintenance > 0:
-		economy.transact(-maintenance, "Manutenção diária", time)
+		maintenance += room.maintenance()
 	var salaries: int = 0
 	for actor: ActorState in actors.values():
 		for definition in EMPLOYEES:
 			if actor.role == definition.id:
 				salaries += definition.salary
-	if salaries > 0:
-		economy.transact(-salaries, "Salários diários", time)
+	return {"maintenance": maintenance, "salaries": salaries, "total": maintenance + salaries}
+
+func upgrade_room(id: int) -> String:
+	var room := hotel.by_id(id)
+	if room == null:
+		return "Selecione uma sala."
+	var next := room.next_upgrade()
+	if next == null:
+		return "Nível máximo atingido."
+	if not economy.purchase(next.cost, "Melhoria: %s N%d" % [room.definition().display_name, room.level + 1], time):
+		return "Caixa insuficiente para a melhoria."
+	room.level += 1
+	hotel.changed.emit()
+	return ""
+
+func configure_employee(id: int, destination: int) -> String:
+	var actor: ActorState = actors.get(id)
+	if actor == null or actor.role == &"guest":
+		return "Selecione um funcionário."
+	if destination < -1:
+		return "Destino inválido."
+	if actor.role == &"receptionist":
+		if destination >= 0:
+			var room := hotel.by_id(destination)
+			if room == null or room.definition().category != &"reception":
+				return "Recepcionistas precisam de uma recepção."
+			for other: ActorState in actors.values():
+				if other.id != id and other.role == &"receptionist" and (other.preferred_room == destination or other.assignment == destination):
+					return "Esta recepção já possui um recepcionista."
+		actor.preferred_room = destination
+	else:
+		if destination >= hotel.floors or (destination >= 0 and not transport.accessible(actor.floor_index, destination)):
+			return "Andar inexistente ou sem acesso por elevador."
+		actor.preferred_floor = destination
+	return ""

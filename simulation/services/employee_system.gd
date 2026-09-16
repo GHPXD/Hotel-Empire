@@ -26,18 +26,22 @@ func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, del
 				actor.state = &"idle"
 		elif actor.state == &"working":
 			actor.workload += delta
-			if hotel.by_id(actor.assignment) == null:
+			if hotel.by_id(actor.assignment) == null or (actor.preferred_room >= 0 and actor.assignment != actor.preferred_room):
 				actor.assignment = -1
 				actor.state = &"idle"
 
 func _assign(actor: ActorState, actors: Dictionary, hotel: HotelModel, transport: TransportSystem) -> void:
 	for room in hotel.rooms:
+		if actor.preferred_room >= 0 and room.id != actor.preferred_room:
+			continue
+		if actor.preferred_floor >= 0 and room.floor_index != actor.preferred_floor:
+			continue
 		if not transport.accessible(actor.floor_index, room.floor_index):
 			continue
 		if actor.role == &"receptionist" and room.definition().category == &"reception":
 			var assigned: bool = false
 			for other: ActorState in actors.values():
-				if other.id != actor.id and other.role == &"receptionist" and other.assignment == room.id:
+				if other.id != actor.id and other.role == &"receptionist" and (other.assignment == room.id or other.preferred_room == room.id):
 					assigned = true
 			if not assigned:
 				actor.assignment = room.id

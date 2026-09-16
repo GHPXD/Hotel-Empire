@@ -11,6 +11,31 @@ var cleaning_by: int = -1
 var users: Array[int] = []
 var queue := ServiceQueue.new()
 var income: int = 0
+var level: int = 1
+
+func upgrade() -> UpgradeDefinition:
+	return null if level == 1 else definition().upgrades[level - 2]
+
+func next_upgrade() -> UpgradeDefinition:
+	return null if level > definition().upgrades.size() else definition().upgrades[level - 1]
+
+func capacity() -> int:
+	return definition().capacity + (upgrade().capacity_bonus if upgrade() != null else 0)
+
+func price() -> int:
+	return definition().price + (upgrade().price_bonus if upgrade() != null else 0)
+
+func maintenance() -> int:
+	return definition().maintenance + (upgrade().maintenance_bonus if upgrade() != null else 0)
+
+func duration() -> float:
+	return definition().service_duration * (upgrade().duration_multiplier if upgrade() != null else 1.0)
+
+func speed_multiplier() -> float:
+	return upgrade().speed_multiplier if upgrade() != null else 1.0
+
+func satisfaction_bonus() -> float:
+	return upgrade().satisfaction_bonus if upgrade() != null else 0.0
 
 func definition() -> RoomDefinition:
 	return HotelCatalog.room(definition_id)
