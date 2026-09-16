@@ -34,3 +34,11 @@ antes/depois. `ui_management.gd` compra upgrade por mouse, abre Equipe, selecion
 funcionário/andar pelo teclado e aplica; confere custos fixos em Finanças.
 PopupMenus recebem `Input.parse_input_event` com window_id; demais controles usam
 `Viewport.push_input`. Capturas são inspecionadas; isso não cobre todo o teclado/controller.
+
+M4: `progression_test.gd` testa limites exatos, combinação de requisitos, persistência
+da conquista após queda de reputação, compra bloqueada sem efeitos, reset de partida,
+continuidade após load, dados inválidos e migração de fixtures reais v1/v2. Vinte e cinco
+hóspedes sequenciais em hotel pequeno com caixa inicial normal verificam viabilidade.
+Stress exige os dois desbloqueios N3 em até cinco dias no template padrão/5 seeds.
+`ui_progression.gd` testa bloqueio visível, painel vivo, Esc, compra liberada, save/load
+pela toolbar e fechamento/reset do painel ao trocar sessão. Captura topo e fim da rolagem.

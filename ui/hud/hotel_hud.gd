@@ -15,6 +15,7 @@ signal debug_requested
 signal finances_requested
 signal staff_requested
 signal upgrade_requested
+signal objectives_requested
 
 var stats: Label
 var message: Label
@@ -25,6 +26,7 @@ var open_button: Button
 var debug_label: Label
 var upgrade_button: Button
 var upgrade_preview: Label
+var objectives_button: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -65,6 +67,11 @@ func _ready() -> void:
 	_button(session_bar, "Carregar", func() -> void: load_requested.emit())
 	_button(session_bar, "Finanças", func() -> void: finances_requested.emit())
 	_button(session_bar, "Equipe", func() -> void: staff_requested.emit())
+	objectives_button = Button.new()
+	objectives_button.text = "Objetivos 0/%d" % HotelProgression.OBJECTIVES.size()
+	objectives_button.custom_minimum_size.y = 42
+	objectives_button.pressed.connect(func() -> void: objectives_requested.emit())
+	session_bar.add_child(objectives_button)
 	_button(session_bar, "Debug • F3", func() -> void: debug_requested.emit())
 	debug_label = Label.new()
 	debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -152,6 +159,8 @@ func _button(parent: Control, text: String, action: Callable) -> void:
 	parent.add_child(button)
 
 func refresh_simulation(session: HotelSession, actor_id: int) -> void:
+	objectives_button.text = "Objetivos %d/%d" % [session.progression.completed.size(), HotelProgression.OBJECTIVES.size()]
+	objectives_button.tooltip_text = session.progression.summary()
 	stats.text = "$ %d   |   Reputação %.0f   |   Hóspedes %d   |   Lucro $ %d   |   Dia %d • %dx" % [session.economy.cash, session.guests.reputation, session.guest_count(), session.economy.profit(), session.day + 1, session.speed]
 	open_button.text = "Fechar chegadas" if session.opened else "Abrir hotel"
 	operations.text = session.alerts()
@@ -165,6 +174,17 @@ func refresh_simulation(session: HotelSession, actor_id: int) -> void:
 	var actor: ActorState = session.actors.get(actor_id)
 	if actor != null:
 		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %d\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d\n\nUtilidades:\n%s" % [actor.display_name, actor.role, actor.state, actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, actor.bedroom, actor.age, actor.waiting, actor.target_floor, str(actor.utility_scores)]
+
+func refresh_unlock(session: HotelSession, room: RoomState) -> void:
+	upgrade_button.tooltip_text = ""
+	if room == null or room.next_upgrade() == null:
+		return
+	var locked := session.progression.upgrade_error(room)
+	if not locked.is_empty():
+		upgrade_button.disabled = true
+		upgrade_button.text = "N3 bloqueado • veja Objetivos"
+		upgrade_button.tooltip_text = locked
+		upgrade_preview.text += "\n\n" + locked
 
 func _build_theme() -> void:
 	theme = Theme.new()

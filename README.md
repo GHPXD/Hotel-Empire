@@ -1,7 +1,7 @@
 # Hotel Empire
 
 Tycoon 2D original em Godot **4.7.2**, GDScript tipado, renderer Compatibility.
-Estado: **M0–M3**, validados: construção, simulação e gestão. Protótipo, ainda sem arte final
+Estado: **M0–M4**, validados: construção, simulação, gestão e progressão. Protótipo, ainda sem arte final
 ou balanceamento de produção.
 
 Abra `project.godot` no Godot e execute F6 na cena principal ou F5 no projeto.
@@ -23,15 +23,21 @@ custos fixos diários de manutenção e salários.
 Selecione uma sala ou elevador para comparar e comprar upgrades até N3 no inspetor
 (role a lateral para baixo). Equipe permite fixar recepcionistas em recepções e
 camareiros em andares, ou voltar ao automático. Uma nova preferência não cancela
-viagem ou limpeza em andamento. Saves usam schema v2 e migram arquivos v1;
+viagem ou limpeza em andamento. Saves usam schema v3 e migram arquivos v1/v2;
 o nome `hotel-v1.json` foi mantido para encontrar partidas anteriores.
+
+Objetivos mostra requisitos e recompensas. Três reservas liberam N3 de quartos e
+recepções; dez reservas, cinco refeições e cinco limpezas liberam N3 de bistrôs e
+elevadores. Depois, vinte visitas concluídas e reputação 65 concedem o título
+Hotel de referência. Desbloqueios são permanentes, mas upgrades continuam pagos.
+N2 e construção básica são livres. Partidas anteriores mantêm o acesso a N3.
 
 Sugestão inicial: recepção e bistrô no térreo, elevador em coluna livre, outro andar
 com vários quartos. Contrate os dois tipos de funcionário antes de abrir chegadas.
 Poucos quartos criam fila na recepção; expansão excessiva pressiona transporte e limpeza.
 
 No Windows deste ambiente: `powershell -File tools/test.ps1 -Visual` executa import,
-cinco suítes headless e três testes gráficos. Passe `-GodotPath` para outro engine.
+seis suítes headless e quatro testes gráficos. Passe `-GodotPath` para outro engine.
 Testes isolam dados em `.runtime/`; não sobrescrevem seu save normal.
 Acrescente `-Stress` para cinco seeds, 20 checkpoints de save e transporte com
 100/250/500/1000 agentes. Evidências: [benchmarks](docs/benchmarks/README.md).
@@ -50,10 +56,11 @@ Zero hóspedes significa chegadas contínuas; valor positivo cria um burst inici
 e fecha novas chegadas. O relatório distingue pico de população média. A pasta de
 saída precisa existir. Templates de teste custam dinheiro e podem ser recusados.
 O JSON inclui receitas, despesas, ocupação, satisfação, esperas, rotas, tempo de tick,
-memória do processo e falhas. Medidas headless não equivalem a FPS com renderização.
+memória do processo, objetivos concluídos, tick de cada conquista e falhas.
+Medidas headless não equivalem a FPS com renderização.
 
 Limitações atuais: placeholders procedurais, uma categoria de hóspede, sem áudio,
-desbloqueios/objetivos e sem export validado. Testes
+eventos e novos serviços além do slice, e sem export validado. Testes
 multi-seed são regressões, não balanceamento final. UI desktop testada; mobile/Web futuros.
 
 Consulte [ROADMAP.md](ROADMAP.md), [ARCHITECTURE.md](ARCHITECTURE.md) e

@@ -18,3 +18,9 @@ Upgrades até N3 aumentam manutenção além do investimento inicial. Preços j�
 são preservados. Atribuir limpeza a um andar prioriza esse andar e pode deixar outro
 sem cobertura; modo automático distribui trabalho disponível. Hipóteses e critérios
 numéricos estão em [M3_BALANCE](docs/M3_BALANCE.md).
+
+M4 usa uma sequência curta de três objetivos: primeiras reservas, operação com
+alimentação/limpeza e reconhecimento por reputação. Construção básica e N2 continuam
+livres para que o jogador possa resolver gargalos antes de ganhar N3. Recompensas
+liberam compras ou um título, sem injetar dinheiro. Saves anteriores preservam acesso.
+Novos tipos de serviço entram em M5. Critérios e medições: [M4_PROGRESSION](docs/M4_PROGRESSION.md).

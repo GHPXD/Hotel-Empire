@@ -13,6 +13,7 @@ var save_path: String = SaveStore.DEFAULT_PATH
 var new_dialog: ConfirmationDialog
 var finances_dialog: AcceptDialog
 var staff_panel: StaffPanel
+var progression_panel: ProgressionPanel
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -43,6 +44,10 @@ func _ready() -> void:
 	hud.finances_requested.connect(_show_finances)
 	hud.staff_requested.connect(_show_staff)
 	hud.upgrade_requested.connect(_upgrade_selected)
+	hud.objectives_requested.connect(_show_objectives)
+	progression_panel = ProgressionPanel.new()
+	progression_panel.theme = hud.theme
+	add_child(progression_panel)
 	staff_panel = StaffPanel.new()
 	staff_panel.theme = hud.theme
 	staff_panel.assignment_changed.connect(_refresh)
@@ -62,9 +67,13 @@ func _process(delta: float) -> void:
 	if hud == null:
 		return
 	accumulator += minf(delta, 0.25) * session.speed
+	var previous_objectives: int = session.progression.completed.size()
 	while accumulator >= session.rules.tick:
 		session.tick(session.rules.tick)
 		accumulator -= session.rules.tick
+	if session.progression.completed.size() > previous_objectives:
+		var latest: ObjectiveDefinition = HotelProgression.OBJECTIVES[session.progression.completed.size() - 1]
+		hud.message.text = "Objetivo concluído: %s. %s" % [latest.display_name, latest.reward_text]
 	ui_timer += delta
 	view.queue_redraw()
 	if ui_timer >= 0.2:
@@ -122,6 +131,9 @@ func _refresh() -> void:
 	view.queue_redraw()
 	hud.refresh(hotel, hotel.by_id(selection))
 	hud.refresh_simulation(session, selected_actor)
+	hud.refresh_unlock(session, hotel.by_id(selection))
+	if progression_panel.visible:
+		progression_panel.refresh(session)
 	var lift := session.transport.lift_by_id(selection)
 	if lift != null:
 		hud.inspector.text = "ELEVADOR #%d • N%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, hotel.by_id(selection).level, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
@@ -137,6 +149,7 @@ func _select_actor(id: int) -> void:
 	_refresh()
 
 func _replace_session(value: HotelSession) -> void:
+	progression_panel.hide()
 	staff_panel.hide()
 	staff_panel.session = null
 	if hotel.changed.is_connected(_refresh):
@@ -186,6 +199,9 @@ func _show_finances() -> void:
 
 func _show_staff() -> void:
 	staff_panel.open_for(session)
+
+func _show_objectives() -> void:
+	progression_panel.open_for(session)
 
 func _upgrade_selected() -> void:
 	var error := session.upgrade_room(selection)

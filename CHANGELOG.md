@@ -1,5 +1,13 @@
 # Changelog
 
+## M4 — progressão
+- Três objetivos orientados a dados, com requisitos visíveis, N3 por desempenho e título final.
+- Construção básica/N2 livres; desbloqueios permanentes, sem prêmio monetário repetível.
+- Painel Objetivos com progresso atual, aviso de conclusão e motivo de bloqueio no inspetor.
+- Snapshot v3 com migrações v1/v2 e preservação do acesso prévio a N3.
+- Relatório headless registra conquistas e ticks; doze suítes aprovadas, incluindo migração
+  real M3, fluxo gráfico e progressão com caixa inicial de $12.000.
+
 ## M3 — gestão do hotel
 - Upgrades N2/N3 em quatro instalações, com comparação, custos e manutenção efetivos.
 - Equipe com recepções/andares preferidos e modo automático, preservando tarefas em curso.

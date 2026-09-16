@@ -98,3 +98,24 @@
   `.runtime/m3-staff.png` e `.runtime/m3-upgrade.png`.
 - Economia segue como hipótese de protótipo; contrato e próximo experimento em
   `docs/M3_BALANCE.md`. Navegação integral por teclado/controller permanece pendente.
+
+## M4 — objetivos e desbloqueios
+- Runner completo `tools/test.ps1 -Stress -Visual`: doze suítes passaram, sem erros
+  ou leaks reportados pelo engine. Novas classes exigiram import antes do primeiro teste.
+- Três objetivos com fronteiras exatas, múltiplos requisitos, bloqueio transacional
+  de compra, permanência após queda de reputação e reset em nova sessão verificados.
+- Snapshots v3 preservam progresso parcial/concluído; rejeitam IDs desconhecidos,
+  duplicados, sequência inválida, flags malformadas e N3 instalado sem autorização.
+- Fixtures reais M2/v1 e M3/v2 migram; v2 continua 600 ticks e salva em v3. Migração
+  não modifica o dicionário de entrada e mantém acesso legado às melhorias N3 do M3.
+- Hotel de dois quartos, caixa inicial $12.000, seed 99: 25 visitas sequenciais
+  concluíram os três objetivos; caixa final $8.972. Continuidade de 600 ticks após
+  save/load sem divergência. Não representa comportamento ou ritmo de jogadores reais.
+- Cinco seeds do template padrão liberaram N3 entre ticks 1661–1795; quatro também
+  conquistaram o título nos cinco dias. Evidência: `benchmarks/m4-progression.json`.
+- UI: N2 comprado por mouse, motivo do bloqueio N3, painel que atualiza aberto,
+  fechamento por Esc, compra após desbloquear, salvar/carregar pela toolbar e reset
+  ao trocar partida. Capturas topo/fim da rolagem inspecionadas.
+- Resolução padrão e teste adicional solicitado em 1024×720 passaram; captura menor
+  efetiva 1024×640. Arquivos locais `.runtime/m4-locked.png`, `m4-objectives.png` e
+  `m4-objectives-bottom.png`. Nenhuma declaração de QA integral de acessibilidade.

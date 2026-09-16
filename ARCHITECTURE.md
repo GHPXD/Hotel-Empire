@@ -23,11 +23,12 @@ IDs estáveis ligam ActorState, RoomState e ElevatorState. IA/transporte rodam a
 render redesenha os placeholders a cada frame. Relógio vem de ticks inteiros para evitar
 deriva acumulada. O RNG é exclusivo da sessão, nunca o gerador global.
 
-`SessionSnapshot` v2 define campos explicitamente e valida tipos, limites, geometria,
+`SessionSnapshot` v3 define campos explicitamente e valida tipos, limites, geometria,
 catálogo e referências antes de retornar uma sessão nova. Seed/state do RNG são strings
 decimais para preservar 64 bits no JSON. `SaveStore` escreve temporário e mantém `.bak`
 do save anterior. Saves v1 migram para nível 1 e preferências automáticas, reconstruindo
-o preço de serviços já iniciados. Outras versões desconhecidas são rejeitadas.
+o preço de serviços já iniciados. V1 e v2 recebem o acesso legado às quatro melhorias
+N3 existentes no M3. Outras versões desconhecidas são rejeitadas.
 `Main` troca a sessão apenas após sucesso; nova partida descarta os modelos anteriores.
 
 Elevadores atendem o passageiro embarcado mais antigo, depois a chamada mais antiga.
@@ -45,3 +46,16 @@ Preferências de equipe (`preferred_room`/`preferred_floor`) são separadas da t
 atual (`assignment`). Mudanças aguardam sua conclusão; postos fixos são reservados
 contra atribuições automáticas. Snapshots validam capacidades efetivas, níveis,
 referências e exclusividade de postos. Demolição limpa preferências obsoletas.
+
+## Progressão M4
+
+`HotelProgression` pertence à sessão e avalia contadores dos sistemas ao final do tick.
+`ObjectiveDefinition` contém requisitos, pré-requisito e IDs de upgrades liberados;
+Resources não guardam progresso. Conclusões são permanentes e ordenadas. Reputação
+pode cair após uma conquista; isso não revoga o título nem os desbloqueios.
+
+Snapshot v3 guarda IDs concluídos e acesso legado; progresso parcial vem dos contadores
+já persistidos. Restore valida IDs, duplicação, ordem e autorização de salas N3 antes
+de retornar a sessão. Migração avalia métricas existentes sem cobrar/pagar recompensas.
+Nova sessão começa vazia. UI lê o modelo, a compra é protegida em `HotelSession`,
+e o painel de objetivos não retém referência à sessão após fechá-lo ou trocar a partida.
