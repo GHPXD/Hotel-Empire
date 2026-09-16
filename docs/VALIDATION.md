@@ -150,3 +150,28 @@
   efetiva 1024×640 inspecionada em `.runtime/m5-content.png`, com café/lazer, perfil
   e faixa de evento legíveis. A versão padrão também foi inspecionada. Navegação
   integral por teclado/controller e acessibilidade assistiva continuam pendentes.
+
+## M6 — filtros, indicadores e leitura
+- Bateria completa `tools/test.ps1 -Stress -Visual`: dezesseis suítes passaram sem
+  erros/leaks. São oito suítes headless básicas, duas de stress/continuidade e seis
+  gráficas. Analytics também passou pelo gda `--strict`.
+- Métricas verificadas com hotel vazio e estado conhecido: ocupação 1/2 = 50%,
+  satisfação média 70 de três hóspedes (sem equipe), filas 1+1, maior espera 12,5s,
+  custo igual à cobrança diária. Filtros combinados, poço por andar e desempate por
+  ID conferidos. Captura antes/depois comprova ausência de mutação na partida.
+- Teclado: digitação “cafe” encontra Café Brisa, consulta sem resultados mostra
+  explicação, F2 abre/foca filtro, PopupMenu filtra limpeza, Enter seleciona/centraliza,
+  atualização remove sala que deixou de estar suja, Esc fecha e devolve foco. F4
+  altera fonte/preferência; nova partida reseta filtros e mantém preferência.
+- Equipe e Finanças abrem e fecham por teclado, com retorno de foco. Finanças tem
+  extrato rolável. Dados de utilidade aparecem apenas no debug; estados em português.
+- Capturas normais/ampliadas inspecionadas. A imagem revelou altura excessiva de
+  Equipe causada por wrap_controls; corrigido para conteúdo rolável com altura
+  controlada. Após a correção, ui_management e ui_operations foram reexecutados em
+  janela menor; ui_operations também foi reexecutado na resolução padrão.
+- Janela menor solicitada: 1024×720; captura do HUD efetiva: 1024×640. Verificações
+  de dimensões comparam unidades lógicas equivalentes de Window e viewport. Arquivos:
+  `.runtime/m6-operations.png`, `m6-large-panel.png`, `m6-large-hud.png`,
+  `m6-large-staff.png`, `m6-large-finances.png`.
+- Sem alteração de regras, RNG, economia, save v4 ou balanceamento. Sem declaração
+  de QA de controller, touch, leitores de tela, DPI variados ou construção só por teclado.

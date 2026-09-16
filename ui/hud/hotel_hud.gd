@@ -16,6 +16,8 @@ signal finances_requested
 signal staff_requested
 signal upgrade_requested
 signal objectives_requested
+signal operations_requested
+signal text_size_requested
 
 var stats: Label
 var message: Label
@@ -29,6 +31,14 @@ var upgrade_preview: Label
 var objectives_button: Button
 var build_buttons: Dictionary = {}
 var event_label: Label
+var operations_button: Button
+var text_size_button: Button
+var build_search: LineEdit
+var build_category: OptionButton
+var catalog_count: Label
+var sidebar_scroll: ScrollContainer
+var session_buttons: Dictionary = {}
+const BUILD_CATEGORIES: Array[StringName] = [&"", &"lodging", &"service", &"infrastructure"]
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -62,13 +72,15 @@ func _ready() -> void:
 	operations.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	operations.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toolbar.add_child(operations)
-	var session_bar := HBoxContainer.new()
+	var session_bar := HFlowContainer.new()
 	layout.add_child(session_bar)
 	_button(session_bar, "Novo hotel", func() -> void: new_requested.emit())
 	_button(session_bar, "Salvar", func() -> void: save_requested.emit())
 	_button(session_bar, "Carregar", func() -> void: load_requested.emit())
 	_button(session_bar, "Finanças", func() -> void: finances_requested.emit())
 	_button(session_bar, "Equipe", func() -> void: staff_requested.emit())
+	operations_button = _button(session_bar, "Operação • F2", func() -> void: operations_requested.emit())
+	text_size_button = _button(session_bar, "Texto + • F4", func() -> void: text_size_requested.emit())
 	objectives_button = Button.new()
 	objectives_button.text = "Objetivos 0/%d" % HotelProgression.OBJECTIVES.size()
 	objectives_button.custom_minimum_size.y = 42
@@ -95,6 +107,8 @@ func _ready() -> void:
 	sidebar.custom_minimum_size.x = 265
 	content.add_child(sidebar)
 	var scroll := ScrollContainer.new()
+	sidebar_scroll = scroll
+	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sidebar.add_child(scroll)
 	var tools := VBoxContainer.new()
@@ -104,6 +118,22 @@ func _ready() -> void:
 	var build_title := Label.new()
 	build_title.text = "CONSTRUIR"
 	tools.add_child(build_title)
+	var search_label := Label.new()
+	search_label.text = "Buscar construção • Ctrl+F"
+	tools.add_child(search_label)
+	build_search = LineEdit.new()
+	build_search.placeholder_text = "Nome da sala"
+	build_search.clear_button_enabled = true
+	build_search.text_changed.connect(func(_text: String) -> void: _filter_catalog())
+	tools.add_child(build_search)
+	build_category = OptionButton.new()
+	for label in ["Todas as categorias", "Quartos", "Serviços", "Infraestrutura"]:
+		build_category.add_item(label)
+	build_category.item_selected.connect(func(_index: int) -> void: _filter_catalog())
+	tools.add_child(build_category)
+	catalog_count = Label.new()
+	catalog_count.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tools.add_child(catalog_count)
 	for definition in HotelCatalog.ROOMS:
 		var button := Button.new()
 		button.text = "%s\n$ %d   •   %d células" % [definition.display_name, definition.build_cost, definition.width]
@@ -157,14 +187,39 @@ func refresh(hotel: HotelModel, selected: RoomState) -> void:
 	else:
 		inspector.text = "SEU PRIMEIRO HOTEL\n\n1. Recepção no térreo\n2. Quartos para hospedar\n3. Bistrô para refeições\n4. Elevador para expandir\n\nPoços ocupam a mesma coluna em todos os andares."
 
-func _button(parent: Control, text: String, action: Callable) -> void:
+func _button(parent: Control, text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.custom_minimum_size.y = 42
 	button.pressed.connect(action)
 	parent.add_child(button)
+	session_buttons[text] = button
+	return button
+
+func _filter_catalog() -> void:
+	var count: int = 0
+	var category: StringName = BUILD_CATEGORIES[build_category.selected]
+	var query := UILabels.search_key(build_search.text)
+	for definition in HotelCatalog.ROOMS:
+		var matches: bool = category.is_empty() or definition.category == category or (category == &"infrastructure" and definition.category in [&"reception", &"transport"])
+		var button: Button = build_buttons[definition.id]
+		button.visible = matches and (query.is_empty() or UILabels.search_key(definition.display_name).contains(query))
+		if button.visible:
+			count += 1
+	catalog_count.text = "%d construção(ões)" % count if count > 0 else "Nenhuma construção encontrada. Limpe a busca ou troque a categoria."
+
+func reset_catalog() -> void:
+	build_search.text = ""
+	build_category.select(0)
+	_filter_catalog()
+
+func set_large_text(enabled: bool) -> void:
+	theme.default_font_size = 20 if enabled else 16
+	text_size_button.text = "Texto − • F4" if enabled else "Texto + • F4"
+	sidebar_scroll.get_parent().custom_minimum_size.x = 320 if enabled else 265
 
 func refresh_simulation(session: HotelSession, actor_id: int) -> void:
+	_filter_catalog()
 	for definition in HotelCatalog.ROOMS:
 		var button: Button = build_buttons[definition.id]
 		var locked := session.progression.build_error(definition)
@@ -188,9 +243,11 @@ func refresh_simulation(session: HotelSession, actor_id: int) -> void:
 		debug_label.text = "FPS %d | Agentes %d | Elevador: fila %d, bordo %d | Rotas %d | Tick %d" % [Engine.get_frames_per_second(), session.actors.size(), waiting, riding, session.transport.path_requests, session.tick_count]
 	var actor: ActorState = session.actors.get(actor_id)
 	if actor != null:
-		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %d\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d\n\nUtilidades:\n%s" % [actor.display_name, actor.role, actor.state, actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, actor.bedroom, actor.age, actor.waiting, actor.target_floor, str(actor.utility_scores)]
+		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %s\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d" % [actor.display_name, UILabels.role(actor.role), UILabels.state(actor.state), actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, "Sem reserva" if actor.bedroom < 0 else str(actor.bedroom), actor.age, actor.waiting, actor.target_floor]
 		if actor.role == &"guest":
 			inspector.text += "\n\nPerfil: %s\n%s\nLazer: %.0f\nServiços usados: %d" % [actor.archetype().display_name, actor.archetype().description, actor.needs.entertainment, actor.service_uses]
+		if debug_label.visible:
+			inspector.text += "\n\nUtilidades (debug):\n%s" % str(actor.utility_scores)
 
 func refresh_unlock(session: HotelSession, room: RoomState) -> void:
 	upgrade_button.tooltip_text = ""
@@ -225,3 +282,6 @@ func _build_theme() -> void:
 			box.set_border_width_all(2)
 		theme.set_stylebox(state, "Button", box)
 	theme.set_color("font_color", "Label", Color("eef1e5"))
+	theme.set_color("font_disabled_color", "Button", Color("acbdbc"))
+	for control_type in ["LineEdit", "OptionButton", "ItemList"]:
+		theme.set_stylebox("focus", control_type, theme.get_stylebox("focus", "Button"))

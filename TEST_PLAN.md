@@ -50,3 +50,13 @@ Valida fronteiras de eventos, efeito real nas chegadas, hotel fechado e continui
 atravessando fim e início de eventos. Fixture M4/v3 migra sem mutação; perfis e
 contadores inválidos são rejeitados. `ui_content.gd` testa construção pelo viewport,
 inspeção de hóspede, calendário pausado e save/load com evento ativo pela toolbar.
+
+M6: `analytics_test.gd` verifica hotel vazio, ocupação/limpeza, média dos hóspedes
+presentes, filas separadas, custos reconciliados, filtros combinados, elevador por
+andar, ordenação estável e ausência de mutação. Preferência de texto tem roundtrip
+separado e fallback para valor inválido.
+`ui_operations.gd` digita busca com/sem resultados, opera filtros pelo teclado,
+inspeciona com Enter, confirma centralização, atualiza lista quando a situação muda,
+fecha com Esc e verifica retorno de foco. F4 amplia texto, persiste preferência sem
+alterar snapshot e a mantém ao trocar partida, resetando filtros. Equipe e Finanças
+também abrem/fecham pelo teclado. Capturas normais/ampliadas e janela menor são inspecionadas.

@@ -80,3 +80,17 @@ O acesso legado a upgrades não desbloqueia café/lazer. Novas salas são N1 nes
 O multiplicador modifica o consumo do temporizador de chegadas, sem contornar hotel
 fechado ou limite de hóspedes. Pausa funciona porque não avança ticks. Salvar o tick
 preserva a fase do calendário; a interface apenas apresenta esse estado.
+
+## Interface operacional M6
+
+`HotelAnalytics` calcula projeções somente de leitura: resumo atual e salas filtradas.
+`OperationsPanel` mantém filtros/seleção por ID, sem reter a sessão. Main atualiza o
+painel visível a cada 0,2s; selecionar uma sala cancela o blueprint e centraliza a vista.
+As métricas não ganham um segundo contador autoritativo nem entram no save.
+
+Busca/categoria do catálogo e filtros de operação são estado da interface; troca de
+partida os reseta. `UIPreferences` persiste somente texto ampliado em ConfigFile separado,
+com padrão seguro para arquivo ausente/inválido. A Theme compartilhada ajusta fontes;
+containers reorganizam a barra e o financeiro rola o extrato dentro de uma janela.
+`UILabels` centraliza rótulos portugueses e normalização de busca. Modais recebem foco
+inicial e devolvem foco ao abridor quando fecham. Schema v4 e regras de simulação não mudam.

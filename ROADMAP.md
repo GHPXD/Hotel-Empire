@@ -14,7 +14,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M3 Hotel Management: upgrades, atribuições e finanças.
 - [x] M4 Progression: desbloqueios e objetivos.
 - [x] M5 Content Expansion: novos serviços, perfis e eventos.
-- [ ] M6 UI/UX Polish: filtros, analytics, acessibilidade.
+- [x] M6 UI/UX Polish: filtros, analytics e melhorias de leitura/foco no desktop.
 - [ ] M7 Art & Animation: substituir placeholders, áudio original.
 - [ ] M8 Optimization: perfis 100/250/500/1000 agentes.
 - [ ] M9 QA: regressões, cenários e balanceamento.
@@ -22,6 +22,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
-Próximo incremento: M6, filtros, analytics e melhorias de acessibilidade/interface.
+Próximo incremento: M7, arte, animação e áudio originais.
+M6 não conclui suporte integral a teclado/controller, leitores de tela ou touch.
 M2 mediu transporte isolado até 1000 agentes e burst integrado;
 isso não conclui M8 nem comprova 1000 hóspedes simultâneos sustentados com render a 60 FPS.

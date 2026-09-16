@@ -31,3 +31,10 @@ visita; a utilidade considera alívio efetivo, distância, fila, preço e rapide
 Os serviços são opcionais e dependem da localização/demanda. Eventos previsíveis
 alternam pressão de chegada e baixa procura, mantendo custos fixos. Parâmetros,
 evidências e limites estão em [M5_CONTENT](docs/M5_CONTENT.md).
+
+M6 facilita observar antes de investir: Operação organiza salas por fila e permite
+isolar quartos sujos, salas em uso e andares. Indicadores têm escopo explícito
+(estado atual do hotel ou resultado acumulado), sem estimativas de tendência.
+Busca de construção, texto ampliado, foco visível e estados em português reduzem
+barreiras de leitura. Construção no terreno ainda exige mouse; acessibilidade completa
+e suporte a controller não são declarados concluídos.

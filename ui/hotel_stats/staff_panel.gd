@@ -12,17 +12,22 @@ var apply_button: Button
 func _ready() -> void:
 	hide()
 	title = "Gestão da equipe"
-	size = Vector2i(620, 330)
-	min_size = Vector2i(500, 300)
+	size = Vector2i(620, 420)
+	min_size = Vector2i(500, 360)
 	close_requested.connect(hide)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "top", "right", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 18)
 	add_child(margin)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	margin.add_child(scroll)
 	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_theme_constant_override("separation", 12)
-	margin.add_child(column)
+	scroll.add_child(column)
 	var label := Label.new()
 	label.text = "FUNCIONÁRIO"
 	column.add_child(label)
@@ -81,7 +86,12 @@ func _refresh_destinations() -> void:
 	for definition in HotelSession.EMPLOYEES:
 		if definition.id == actor.role:
 			salary = definition.salary
-	details.text = "Estado: %s • Tarefa: sala #%d\nSalário: $ %d/dia • Trabalho acumulado: %.0fs" % [actor.state, actor.assignment, salary, actor.workload]
+	details.text = "Estado: %s • %s\nSalário: $ %d/dia • Trabalho acumulado: %.0fs" % [UILabels.state(actor.state), "Sem tarefa" if actor.assignment < 0 else "Tarefa: sala #%d" % actor.assignment, salary, actor.workload]
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		hide()
+		set_input_as_handled()
 
 func _apply() -> void:
 	if employee_choice.selected < 0 or destination_choice.selected < 0:

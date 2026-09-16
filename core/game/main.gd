@@ -11,9 +11,11 @@ var accumulator: float = 0.0
 var ui_timer: float = 0.0
 var save_path: String = SaveStore.DEFAULT_PATH
 var new_dialog: ConfirmationDialog
-var finances_dialog: AcceptDialog
+var finances_dialog: FinancePanel
 var staff_panel: StaffPanel
 var progression_panel: ProgressionPanel
+var operations_panel: OperationsPanel
+var large_text: bool = false
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -45,6 +47,13 @@ func _ready() -> void:
 	hud.staff_requested.connect(_show_staff)
 	hud.upgrade_requested.connect(_upgrade_selected)
 	hud.objectives_requested.connect(_show_objectives)
+	hud.operations_requested.connect(_show_operations)
+	hud.text_size_requested.connect(_toggle_text_size)
+	operations_panel = OperationsPanel.new()
+	operations_panel.theme = hud.theme
+	operations_panel.filters_changed.connect(_refresh)
+	operations_panel.room_requested.connect(_inspect_room)
+	add_child(operations_panel)
 	progression_panel = ProgressionPanel.new()
 	progression_panel.theme = hud.theme
 	add_child(progression_panel)
@@ -53,15 +62,25 @@ func _ready() -> void:
 	staff_panel.assignment_changed.connect(_refresh)
 	add_child(staff_panel)
 	new_dialog = ConfirmationDialog.new()
+	new_dialog.theme = hud.theme
 	new_dialog.title = "Novo hotel"
 	new_dialog.dialog_text = "Começar do zero? Progresso não salvo será perdido.\nSeu arquivo salvo será preservado."
 	new_dialog.confirmed.connect(func() -> void: _replace_session(HotelSession.new()))
 	add_child(new_dialog)
-	finances_dialog = AcceptDialog.new()
+	finances_dialog = FinancePanel.new()
+	finances_dialog.theme = hud.theme
 	finances_dialog.title = "Finanças do hotel"
 	add_child(finances_dialog)
+	_bind_popup(operations_panel, hud.operations_button)
+	_bind_popup(progression_panel, hud.objectives_button)
+	_bind_popup(staff_panel, hud.session_buttons["Equipe"])
+	_bind_popup(finances_dialog, hud.session_buttons["Finanças"])
+	_bind_popup(new_dialog, hud.session_buttons["Novo hotel"])
+	large_text = UIPreferences.load_large_text()
+	hud.set_large_text(large_text)
 	hotel.changed.connect(_refresh)
 	_refresh()
+	hud.open_button.grab_focus()
 
 func _process(delta: float) -> void:
 	if hud == null:
@@ -92,6 +111,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_save()
 	elif event.is_action_pressed("pause_hotel"):
 		session.speed = 1 if session.speed == 0 else 0
+	elif event.is_action_pressed("show_operations"):
+		_show_operations()
+	elif event.is_action_pressed("large_text"):
+		_toggle_text_size()
+	elif event.is_action_pressed("search_build"):
+		hud.build_search.grab_focus()
 
 func _on_build_requested(definition: RoomDefinition) -> void:
 	view.blueprint = definition
@@ -137,6 +162,8 @@ func _refresh() -> void:
 	hud.refresh_unlock(session, hotel.by_id(selection))
 	if progression_panel.visible:
 		progression_panel.refresh(session)
+	if operations_panel.visible:
+		operations_panel.refresh(session)
 	var lift := session.transport.lift_by_id(selection)
 	if lift != null:
 		hud.inspector.text = "ELEVADOR #%d • N%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, hotel.by_id(selection).level, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
@@ -152,6 +179,9 @@ func _select_actor(id: int) -> void:
 	_refresh()
 
 func _replace_session(value: HotelSession) -> void:
+	operations_panel.hide()
+	operations_panel.reset_filters()
+	hud.reset_catalog()
 	progression_panel.hide()
 	staff_panel.hide()
 	staff_panel.session = null
@@ -198,7 +228,8 @@ func _show_finances() -> void:
 		var item: Dictionary = economy.ledger[index]
 		lines += "%+d  %s\n" % [item.amount, item.reason]
 	finances_dialog.dialog_text = lines
-	finances_dialog.popup_centered(Vector2i(480, 420))
+	finances_dialog.popup_centered(Vector2i(600, 520))
+	finances_dialog.details.grab_focus()
 
 func _show_staff() -> void:
 	staff_panel.open_for(session)
@@ -206,13 +237,45 @@ func _show_staff() -> void:
 func _show_objectives() -> void:
 	progression_panel.open_for(session)
 
+func _show_operations() -> void:
+	operations_panel.open_for(session)
+
+func _inspect_room(id: int) -> void:
+	var room := hotel.by_id(id)
+	if room == null:
+		hud.message.text = "Esta sala não existe mais."
+		return
+	view.blueprint = null
+	selection = id
+	selected_actor = -1
+	view.pan += view.size / 2.0 - view.room_rect(room.column, room.floor_index, room.definition().width).get_center()
+	_refresh()
+	hud.sidebar_scroll.ensure_control_visible(hud.inspector)
+
+func _toggle_text_size() -> void:
+	large_text = not large_text
+	hud.set_large_text(large_text)
+	var error := UIPreferences.save_large_text(large_text)
+	hud.message.text = "Texto ampliado." if large_text else "Texto padrão."
+	if error != OK:
+		hud.message.text += " Não foi possível salvar a preferência."
+
+func _bind_popup(window: Window, opener: Control) -> void:
+	window.transient = true
+	window.exclusive = true
+	window.visibility_changed.connect(_popup_visibility.bind(window, opener))
+
+func _popup_visibility(window: Window, opener: Control) -> void:
+	if not window.visible:
+		opener.grab_focus()
+
 func _upgrade_selected() -> void:
 	var error := session.upgrade_room(selection)
 	hud.message.text = "Melhoria aplicada. Serviços em curso mantêm o preço combinado." if error.is_empty() else error
 	_refresh()
 
 func _register_input() -> void:
-	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}]:
+	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}, {"name": "show_operations", "key": KEY_F2}, {"name": "large_text", "key": KEY_F4}, {"name": "search_build", "key": KEY_F, "ctrl": true}]:
 		if InputMap.has_action(binding.name):
 			continue
 		InputMap.add_action(binding.name)

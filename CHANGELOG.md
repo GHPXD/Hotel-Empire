@@ -1,5 +1,14 @@
 # Changelog
 
+## M6 — interface operacional
+- Painel Operação (F2): métricas atuais, filtros por tipo/andar/situação e inspeção
+  de salas com centralização da câmera, incluindo navegação por teclado.
+- Busca de construção sem distinção de acentos, categorias e feedback sem resultados.
+- Texto ampliado (F4) com preferência separada do save; foco visível/retorno dos modais,
+  barra que reorganiza controles e Finanças com rolagem.
+- Estados de hóspedes/equipe em português; utilidades técnicas aparecem apenas no debug.
+- Testes de projeções sem mutação, preferências, busca, filtros e fluxos de teclado.
+
 ## M5 — serviços, hóspedes e eventos
 - Café Brisa e Sala Horizonte liberados pelos objetivos existentes, com construção
   protegida no modelo e serviços integrados a fila, pagamento e necessidades.
