@@ -4,12 +4,12 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 `docs/PRODUCT_VISION.md` permanece como destino do produto, sem exigir conteúdo antecipado.
 
 - [x] M0 Foundation: projeto, dados, economia, fila, testes, boot validado.
-- [ ] M1 Vertical Slice: construção, câmera, hóspedes, serviços, transporte, funcionários,
+- [x] M1 Vertical Slice: construção, câmera, hóspedes, serviços, transporte, funcionários,
   satisfação, save/load, HUD, debug e ciclo integrado validado.
   - [x] M1a construção/andares/seleção/demolição.
   - [x] M1b hóspedes/check-in/decisão/serviços/economia.
   - [x] M1c elevadores/filas/funcionários/limpeza/reputação.
-  - [ ] M1d save/load/UI/diagnóstico/QA integrado.
+  - [x] M1d save/load/UI/diagnóstico/QA integrado.
 - [ ] M2 Simulation Core: robustez, stress, métricas e múltiplas seeds.
 - [ ] M3 Hotel Management: upgrades, atribuições e finanças.
 - [ ] M4 Progression: desbloqueios e objetivos.
@@ -21,3 +21,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [ ] M10 Release Preparation: exports, compatibilidade e distribuição.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
+
+Próximo incremento: M2, cenário headless parametrizado, validação de invariantes em
+múltiplas seeds, save em estados variados e medidas de custo com 100/250/500/1000
+agentes. Não expandir conteúdo enquanto essas medições revelarem defeitos estruturais.

@@ -13,6 +13,7 @@ var actors: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var next_actor_id: int = 1
 var time: float = 0.0
+var tick_count: int = 0
 var arrival_timer: float = 0.0
 var day: int = 0
 var opened: bool = false
@@ -20,9 +21,15 @@ var speed: int = 1
 
 func _init(seed_value: int = 123456) -> void:
 	rng.seed = seed_value
+	hotel.changed.connect(_sync_transport)
+
+func _sync_transport() -> void:
+	transport.sync(hotel)
 
 func tick(delta: float) -> void:
-	time += delta
+	assert(is_equal_approx(delta, rules.tick), "Simulation requires a fixed tick")
+	tick_count += 1
+	time = tick_count * rules.tick
 	transport.sync(hotel)
 	employees.step(actors, hotel, transport, delta)
 	transport.step(actors, delta)
@@ -84,6 +91,17 @@ func demolish(id: int) -> String:
 	return result
 
 func alerts() -> String:
+	if opened:
+		var reception_exists: bool = false
+		var staff_exists: bool = false
+		for room in hotel.rooms:
+			reception_exists = reception_exists or room.definition().category == &"reception"
+		for actor: ActorState in actors.values():
+			staff_exists = staff_exists or actor.role == &"receptionist"
+		if not reception_exists:
+			return "Falta recepção: visitantes irão embora. Construa no térreo."
+		if not staff_exists:
+			return "Recepção sem equipe. Contrate um recepcionista para atender."
 	var dirty: int = 0
 	var queued: int = 0
 	for room in hotel.rooms:

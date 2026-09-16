@@ -15,6 +15,8 @@ func _init(wallet: HotelEconomy) -> void:
 	economy = wallet
 
 func room_at(column: int, floor_index: int) -> RoomState:
+	if floor_index < 0 or floor_index >= floors or column < 0 or column >= COLUMNS:
+		return null
 	for room in rooms:
 		var definition := room.definition()
 		var same_floor: bool = room.floor_index == floor_index or definition.category == &"transport"

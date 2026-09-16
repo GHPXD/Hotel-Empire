@@ -37,3 +37,22 @@
   pausar. Zero falhas. Largura estável do botão de chegadas evita deslocar a pausa.
 - Conteúdo de simulação segue provisório; métricas acima demonstram funcionamento,
   não balanceamento final. Multi-seeds/stress e save/load aguardam próximo marco.
+
+## M1d — persistência e aceite do slice
+- `tools/test.ps1 -Visual` passou integralmente: foundation, construction (16 checks),
+  simulation, save, ui_smoke e ui_resume. Logs em `.runtime/`; runner rejeita erros
+  de script, erros de engine e vazamento de objetos, além de exit code não zero.
+- Save test: gravação/backup, ida e volta completa, viagem de elevador em curso,
+  continuidade idêntica por 2.400 ticks; rejeição de versão desconhecida, catálogo
+  inexistente, tipo inválido, overlap, passageiro inexistente, arquivo truncado/ausente.
+- Corrigidos dois defeitos descobertos pelo teste: lambda em signal retinha sessão;
+  substituída por método ligado. Relógio acumulava floats; agora deriva de tick inteiro.
+- Fluxo gráfico: construir quatro tipos em dois andares, contratar, abrir chegadas,
+  gerar receita, pausar, salvar, zerar sessão, carregar estado idêntico, zoom, pan e F3.
+- Processo gráfico independente carregou o save e avançou 71 ticks sem erros.
+- Capturas inspecionadas em 1280×800 e 1024×640. O comando solicitou 1024×720,
+  mas o viewport capturado manteve proporção 16:10; não declarar 1024×720 validado.
+  Sidebar tem rolagem e controles utilizados permaneceram acessíveis.
+- Não validados ainda: navegação integral por teclado/controller, touch, leitores de
+  tela, DPI variados, exports, stress 500–1000 agentes e balanceamento multi-seed.
+  Essas limitações não são apresentadas como features prontas.

@@ -1,0 +1,206 @@
+class_name SessionSnapshot
+extends RefCounted
+## Schema v1 stores primitive values and stable IDs, never Nodes or Resources.
+
+const VERSION: int = 1
+const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income"]
+const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload"]
+const LIFT_FIELDS: Array[String] = ["room_id", "column", "capacity", "floor_position", "target_floor", "door_timer", "boarded", "delivered", "wait_total", "wait_max", "busy_seconds"]
+const SESSION_FIELDS: Array[String] = ["next_actor_id", "time", "tick_count", "arrival_timer", "day", "opened", "speed"]
+const ECONOMY_FIELDS: Array[String] = ["cash", "revenue", "expenses", "capital_spent"]
+const GUEST_FIELDS: Array[String] = ["completed", "meals_served", "bookings", "score_total", "reputation"]
+const STATES: Array[StringName] = [&"arriving", &"walking", &"lift_queue", &"riding", &"checkin", &"deciding", &"service_queue", &"using", &"exit", &"idle", &"working", &"cleaning"]
+
+static func capture(session: HotelSession) -> Dictionary:
+	var rooms: Array[Dictionary] = []
+	for room in session.hotel.rooms:
+		var item := _read(room, ROOM_FIELDS)
+		item["users"] = room.users.duplicate()
+		item["queue"] = room.queue.members.duplicate()
+		rooms.append(item)
+	var actors: Array[Dictionary] = []
+	for actor: ActorState in session.actors.values():
+		var item := _read(actor, ACTOR_FIELDS)
+		item["needs"] = actor.needs.duplicate(true)
+		item["utility_scores"] = actor.utility_scores.duplicate(true)
+		actors.append(item)
+	var lifts: Array[Dictionary] = []
+	for lift in session.transport.lifts:
+		var item := _read(lift, LIFT_FIELDS)
+		item["queue"] = lift.queue.members.duplicate()
+		item["passengers"] = lift.passengers.duplicate()
+		lifts.append(item)
+	return {"version": VERSION, "session": _read(session, SESSION_FIELDS), "economy": _read(session.economy, ECONOMY_FIELDS), "ledger": session.economy.ledger.duplicate(true), "floors": session.hotel.floors, "next_room_id": session.hotel.next_room_id, "rooms": rooms, "actors": actors, "lifts": lifts, "guests": _read(session.guests, GUEST_FIELDS), "cleaned": session.employees.cleaned, "path_requests": session.transport.path_requests, "rng_seed": str(session.rng.seed), "rng_state": str(session.rng.state)}
+
+static func restore(data: Variant) -> Dictionary:
+	if not data is Dictionary or data.get("version") != VERSION:
+		return _error("Versão de save desconhecida ou formato inválido.")
+	var session := HotelSession.new()
+	if not _write(session, data.get("session"), SESSION_FIELDS) or not _write(session.economy, data.get("economy"), ECONOMY_FIELDS) or not _write(session.guests, data.get("guests"), GUEST_FIELDS):
+		return _error("Estado de sessão/economia inválido.")
+	if not _integer(data.get("floors"), 1, HotelModel.MAX_FLOORS) or not _integer(data.get("next_room_id"), 1, 10000000) or not _integer(data.get("cleaned"), 0, 100000000) or not _integer(data.get("path_requests"), 0, 100000000):
+		return _error("Contadores inválidos.")
+	if session.time < 0 or session.tick_count < 0 or not is_equal_approx(session.time, session.tick_count * session.rules.tick) or session.day != floori(session.time / session.rules.day_seconds) or session.speed < 0 or session.speed > 3 or session.next_actor_id < 1:
+		return _error("Relógio ou IDs inválidos.")
+	session.time = session.tick_count * session.rules.tick
+	if session.guests.reputation < 0 or session.guests.reputation > 100:
+		return _error("Reputação inválida.")
+	for key in ["rooms", "actors", "lifts", "ledger"]:
+		if not data.get(key) is Array:
+			return _error("Lista ausente: " + key)
+	if data.rooms.size() > HotelModel.MAX_FLOORS * HotelModel.COLUMNS or data.actors.size() > 5000 or data.lifts.size() > HotelModel.COLUMNS or data.ledger.size() > HotelEconomy.LEDGER_LIMIT:
+		return _error("Save excede limites suportados.")
+	session.hotel.floors = int(data.floors)
+	session.hotel.next_room_id = int(data.next_room_id)
+	session.employees.cleaned = int(data.cleaned)
+	session.transport.path_requests = int(data.path_requests)
+	for item: Variant in data.rooms:
+		var room := RoomState.new()
+		if not _write(room, item, ROOM_FIELDS) or room.definition() == null or room.id < 1 or room.id >= session.hotel.next_room_id or session.hotel.by_id(room.id) != null:
+			return _error("Sala desconhecida ou ID inválido.")
+		var previous_cash: int = session.economy.cash
+		session.economy.cash = 100000000
+		var geometry_error := session.hotel.build_error(room.definition(), room.column, room.floor_index)
+		session.economy.cash = previous_cash
+		if not geometry_error.is_empty() or (room.definition().category == &"transport" and room.floor_index != 0):
+			return _error("Geometria inválida: " + geometry_error)
+		room.queue.capacity = room.definition().queue_capacity
+		if not _ids(item.get("queue"), room.queue.members, room.queue.capacity) or not _ids(item.get("users"), room.users, room.definition().capacity):
+			return _error("Ocupação inválida.")
+		session.hotel.rooms.append(room)
+	for item: Variant in data.actors:
+		var actor := ActorState.new()
+		if not _write(actor, item, ACTOR_FIELDS) or actor.id < 1 or actor.id >= session.next_actor_id or session.actors.has(actor.id):
+			return _error("Agente inválido ou duplicado.")
+		if actor.role not in [&"guest", &"receptionist", &"cleaner"] or actor.state not in STATES or actor.destination_state not in STATES:
+			return _error("Papel ou estado de agente desconhecido.")
+		if actor.floor_index < 0 or actor.floor_index >= session.hotel.floors or actor.target_floor < 0 or actor.target_floor >= session.hotel.floors or actor.x < -2 or actor.x > HotelModel.COLUMNS or actor.target_x < -2 or actor.target_x > HotelModel.COLUMNS or actor.speed <= 0 or actor.speed > 10 or actor.skill <= 0 or actor.skill > 10 or actor.money < 0 or actor.happiness < 0 or actor.happiness > 100 or actor.age < 0 or actor.waiting < 0:
+			return _error("Atributos de agente fora dos limites.")
+		if not item.get("needs") is Dictionary or not item.get("utility_scores") is Dictionary:
+			return _error("Necessidades inválidas.")
+		for need in actor.needs:
+			if not _number(item.needs.get(need)) or float(item.needs[need]) < 0 or float(item.needs[need]) > 100:
+				return _error("Necessidade fora dos limites.")
+			actor.needs[need] = float(item.needs[need])
+		for key: Variant in item.utility_scores:
+			if not key is String or not _number(item.utility_scores[key]):
+				return _error("Utilidade inválida.")
+		actor.utility_scores = item.utility_scores.duplicate(true)
+		session.actors[actor.id] = actor
+	session.transport.sync(session.hotel)
+	if session.transport.lifts.size() != data.lifts.size():
+		return _error("Elevadores inconsistentes.")
+	var lift_ids: Array[int] = []
+	for item: Variant in data.lifts:
+		var lift := ElevatorState.new()
+		if not _write(lift, item, LIFT_FIELDS) or lift_ids.has(lift.room_id):
+			return _error("Elevador inválido ou duplicado.")
+		var room := session.hotel.by_id(lift.room_id)
+		if room == null or room.definition().category != &"transport" or lift.column != room.center() or lift.capacity != room.definition().capacity or lift.floor_position < 0 or lift.floor_position > session.hotel.floors - 1 or lift.target_floor < 0 or lift.target_floor >= session.hotel.floors or lift.door_timer < 0:
+			return _error("Geometria do elevador inválida.")
+		if not _ids(item.get("queue"), lift.queue.members, 2000) or not _ids(item.get("passengers"), lift.passengers, lift.capacity):
+			return _error("Fila do elevador inválida.")
+		lift_ids.append(lift.room_id)
+		var index: int = session.transport.lifts.find(session.transport.lift_by_id(lift.room_id))
+		session.transport.lifts[index] = lift
+	var relation_error := _validate_relations(session)
+	if not relation_error.is_empty():
+		return _error(relation_error)
+	for item: Variant in data.ledger:
+		if not item is Dictionary or not _integer(item.get("amount"), -1000000000, 1000000000) or not item.get("reason") is String or not _number(item.get("time")):
+			return _error("Extrato inválido.")
+		session.economy.ledger.append({"amount": int(item.amount), "reason": item.reason, "time": float(item.time)})
+	for key in ["rng_seed", "rng_state"]:
+		if not data.get(key) is String or not data[key].is_valid_int() or str(int(data[key])) != data[key]:
+			return _error("Estado aleatório inválido.")
+	session.rng.seed = int(data.rng_seed)
+	session.rng.state = int(data.rng_state)
+	return {"session": session, "error": ""}
+
+static func _validate_relations(session: HotelSession) -> String:
+	for room in session.hotel.rooms:
+		for id in room.queue.members + room.users:
+			var actor: ActorState = session.actors.get(id)
+			if actor == null or actor.target_room != room.id:
+				return "Referência de fila/sala inválida."
+		if room.occupant >= 0:
+			var actor: ActorState = session.actors.get(room.occupant)
+			if actor == null or actor.bedroom != room.id or room.definition().category != &"lodging":
+				return "Reserva de quarto inválida."
+		if room.cleaning_by >= 0:
+			var actor: ActorState = session.actors.get(room.cleaning_by)
+			if actor == null or actor.role != &"cleaner" or actor.assignment != room.id:
+				return "Atribuição de limpeza inválida."
+	for actor: ActorState in session.actors.values():
+		if actor.target_room >= 0 and session.hotel.by_id(actor.target_room) == null:
+			return "Destino inexistente."
+		if actor.bedroom >= 0 and session.hotel.by_id(actor.bedroom) == null:
+			return "Quarto inexistente."
+		if actor.state in [&"riding", &"lift_queue"]:
+			var lift := session.transport.lift_by_id(actor.elevator_id)
+			if lift == null or (actor.state == &"riding" and not lift.passengers.has(actor.id)) or (actor.state == &"lift_queue" and not lift.queue.members.has(actor.id)):
+				return "Passageiro sem transporte."
+		if actor.state == &"using":
+			var room := session.hotel.by_id(actor.target_room)
+			if room == null or not room.users.has(actor.id):
+				return "Uso de serviço inconsistente."
+	for lift in session.transport.lifts:
+		for id in lift.queue.members + lift.passengers:
+			var actor: ActorState = session.actors.get(id)
+			var expected: StringName = &"riding" if lift.passengers.has(id) else &"lift_queue"
+			if actor == null or actor.elevator_id != lift.room_id or actor.state != expected or (lift.queue.members.has(id) and lift.passengers.has(id)):
+				return "Referência de passageiro inválida."
+	return ""
+
+static func _read(object: Object, fields: Array[String]) -> Dictionary:
+	var result: Dictionary = {}
+	for field in fields:
+		var value: Variant = object.get(field)
+		result[field] = String(value) if value is StringName else value
+	return result
+
+static func _write(object: Object, data: Variant, fields: Array[String]) -> bool:
+	if not data is Dictionary:
+		return false
+	for field in fields:
+		if not data.has(field):
+			return false
+		var value: Variant = data[field]
+		match typeof(object.get(field)):
+			TYPE_INT:
+				if not _integer(value, -1000000000000, 1000000000000):
+					return false
+				object.set(field, int(value))
+			TYPE_FLOAT:
+				if not _number(value):
+					return false
+				object.set(field, float(value))
+			TYPE_BOOL:
+				if not value is bool:
+					return false
+				object.set(field, value)
+			TYPE_STRING, TYPE_STRING_NAME:
+				if not value is String or value.length() > 512:
+					return false
+				object.set(field, value)
+			_:
+				return false
+	return true
+
+static func _ids(data: Variant, target: Array[int], limit: int) -> bool:
+	if not data is Array or data.size() > limit:
+		return false
+	for value: Variant in data:
+		if not _integer(value, 1, 1000000000) or target.has(int(value)):
+			return false
+		target.append(int(value))
+	return true
+
+static func _number(value: Variant) -> bool:
+	return (value is int or value is float) and is_finite(float(value))
+
+static func _integer(value: Variant, minimum: int, maximum: int) -> bool:
+	return _number(value) and float(value) == floorf(float(value)) and float(value) >= minimum and float(value) <= maximum
+
+static func _error(message: String) -> Dictionary:
+	return {"session": null, "error": message}

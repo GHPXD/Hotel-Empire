@@ -49,6 +49,7 @@ func _arrive(actor: ActorState, hotel: HotelModel) -> void:
 			actor.target_room = room.id
 			actor.travel_to(room.center(), room.floor_index, &"checkin")
 			return
+	actor.happiness = minf(actor.happiness, 25)
 	actor.travel_to(-0.8, 0, &"exit")
 
 func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transport: TransportSystem, delta: float, time: float) -> void:
@@ -60,6 +61,7 @@ func _check_in(actor: ActorState, actors: Dictionary, hotel: HotelModel, transpo
 	actor.happiness = maxf(0, actor.happiness - delta * rules.waiting_penalty)
 	if actor.waiting > rules.patience_seconds:
 		reception.queue.leave(actor.id)
+		actor.happiness = minf(actor.happiness, 35)
 		actor.travel_to(-0.8, 0, &"exit")
 		return
 	if reception.queue.members.is_empty() or reception.queue.members[0] != actor.id:
@@ -169,3 +171,4 @@ func _release_room(actor: ActorState, hotel: HotelModel) -> void:
 	if room != null and room.occupant == actor.id:
 		room.occupant = -1
 		room.dirty = true
+	actor.bedroom = -1

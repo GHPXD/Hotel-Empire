@@ -19,6 +19,7 @@ func _initialize() -> void:
 	check(hotel.build(elevator, 5, 0) == null, "shaft collision upstairs")
 	var shaft := hotel.build(elevator, 15, 1)
 	check(shaft != null and hotel.room_at(15, 0) == shaft, "shaft spans all floors")
+	check(hotel.room_at(15, -1) == null and hotel.room_at(15, 5) == null, "shaft cannot be selected beyond hotel")
 	check(hotel.add_floor().is_empty() and hotel.room_at(15, 2) == shaft, "shaft extends on expansion")
 	var before: int = wallet.cash
 	check(hotel.demolish(shaft.id).is_empty() and wallet.cash == before, "demolition no refund")
@@ -28,7 +29,7 @@ func _initialize() -> void:
 	var occupied := hotel.rooms[0]
 	occupied.occupant = 23
 	check(not hotel.demolish(occupied.id).is_empty(), "busy demolition rejected")
-	print(JSON.stringify({"suite": "construction", "checks": 15, "failures": failures}))
+	print(JSON.stringify({"suite": "construction", "checks": 16, "failures": failures}))
 	quit(1 if failures else 0)
 
 func check(condition: bool, message: String) -> void:

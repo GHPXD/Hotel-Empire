@@ -1,0 +1,28 @@
+param(
+    [string]$GodotPath = 'C:\Program Files (x86)\Godot\Godot_v4.7.2-stable_win64.exe',
+    [switch]$Visual
+)
+$ErrorActionPreference = 'Stop'
+$projectRoot = Split-Path $PSScriptRoot -Parent
+$runtimeRoot = Join-Path $projectRoot '.runtime'
+New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
+$previousAppData = $env:APPDATA
+try {
+    $env:APPDATA = $runtimeRoot
+    $importLog = Join-Path $runtimeRoot 'import.log'
+    $run = Start-Process -FilePath $GodotPath -ArgumentList @('--headless', '--editor', '--path', $projectRoot, '--log-file', $importLog, '--quit') -WindowStyle Hidden -PassThru -Wait
+    if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $importLog -Pattern 'SCRIPT ERROR:|^ERROR:' -Quiet)) { throw 'Godot import failed; inspect .runtime/import.log' }
+    $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test')
+    if ($Visual) { $suites += @('ui_smoke', 'ui_resume') }
+    foreach ($suite in $suites) {
+        $testLog = Join-Path $runtimeRoot ($suite + '.log')
+        $arguments = @('--path', $projectRoot, '--script', ('res://tests/' + $suite + '.gd'), '--log-file', $testLog)
+        if ($suite -notlike 'ui_*') { $arguments += '--headless' }
+        $run = Start-Process -FilePath $GodotPath -ArgumentList $arguments -WindowStyle Hidden -PassThru -Wait
+        Get-Content -LiteralPath $testLog | Select-String -Pattern '^\{|^\[SAVE\]'
+        if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $testLog -Pattern 'SCRIPT ERROR:|^ERROR:|leaked at exit|resources still in use' -Quiet)) { throw "Suite failed: $suite. Inspect $testLog" }
+    }
+    Write-Output 'All requested suites passed.'
+} finally {
+    $env:APPDATA = $previousAppData
+}

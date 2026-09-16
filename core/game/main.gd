@@ -9,8 +9,12 @@ var selection: int = -1
 var selected_actor: int = -1
 var accumulator: float = 0.0
 var ui_timer: float = 0.0
+var save_path: String = SaveStore.DEFAULT_PATH
+var new_dialog: ConfirmationDialog
+var finances_dialog: AcceptDialog
 
 func _ready() -> void:
+	_register_input()
 	hud = HotelHUD.new()
 	add_child(hud)
 	view = HotelView.new()
@@ -28,6 +32,19 @@ func _ready() -> void:
 	hud.hire_requested.connect(_hire)
 	hud.speed_requested.connect(func(value: int) -> void: session.speed = value)
 	hud.open_requested.connect(func() -> void: session.opened = not session.opened)
+	hud.save_requested.connect(_save)
+	hud.load_requested.connect(_load)
+	hud.new_requested.connect(_confirm_new)
+	hud.debug_requested.connect(_toggle_debug)
+	hud.finances_requested.connect(_show_finances)
+	new_dialog = ConfirmationDialog.new()
+	new_dialog.title = "Novo hotel"
+	new_dialog.dialog_text = "Começar do zero? Progresso não salvo será perdido.\nSeu arquivo salvo será preservado."
+	new_dialog.confirmed.connect(func() -> void: _replace_session(HotelSession.new()))
+	add_child(new_dialog)
+	finances_dialog = AcceptDialog.new()
+	finances_dialog.title = "Finanças do hotel"
+	add_child(finances_dialog)
 	hotel.changed.connect(_refresh)
 	_refresh()
 
@@ -45,6 +62,12 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		_cancel()
+	elif event.is_action_pressed("toggle_debug"):
+		_toggle_debug()
+	elif event.is_action_pressed("save_hotel"):
+		_save()
+	elif event.is_action_pressed("pause_hotel"):
+		session.speed = 1 if session.speed == 0 else 0
 
 func _on_build_requested(definition: RoomDefinition) -> void:
 	view.blueprint = definition
@@ -52,6 +75,7 @@ func _on_build_requested(definition: RoomDefinition) -> void:
 	view.queue_redraw()
 
 func _on_cell_clicked(column: int, floor_index: int) -> void:
+	selected_actor = -1
 	if view.blueprint != null:
 		var error := hotel.build_error(view.blueprint, column, floor_index)
 		if not error.is_empty():
@@ -86,6 +110,9 @@ func _refresh() -> void:
 	view.queue_redraw()
 	hud.refresh(hotel, hotel.by_id(selection))
 	hud.refresh_simulation(session, selected_actor)
+	var lift := session.transport.lift_by_id(selection)
+	if lift != null:
+		hud.inspector.text = "ELEVADOR #%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
 
 func _hire(definition: EmployeeDefinition) -> void:
 	var error := session.hire(definition)
@@ -96,3 +123,57 @@ func _select_actor(id: int) -> void:
 	selected_actor = id
 	selection = -1
 	_refresh()
+
+func _replace_session(value: HotelSession) -> void:
+	if hotel.changed.is_connected(_refresh):
+		hotel.changed.disconnect(_refresh)
+	session = value
+	economy = value.economy
+	hotel = value.hotel
+	view.hotel = hotel
+	view.session = session
+	view.blueprint = null
+	view.pan = Vector2.ZERO
+	view.zoom_factor = 1
+	selection = -1
+	selected_actor = -1
+	accumulator = 0
+	hotel.changed.connect(_refresh)
+	_refresh()
+
+func _save() -> void:
+	var error := SaveStore.save_session(session, save_path)
+	hud.message.text = "Hotel salvo. Você pode fechar e continuar depois." if error.is_empty() else error
+
+func _load() -> void:
+	var result := SaveStore.load_session(save_path)
+	if not result.error.is_empty():
+		hud.message.text = result.error
+		return
+	_replace_session(result.session)
+	hud.message.text = "Hotel carregado: quartos, hóspedes, filas e finanças restaurados."
+
+func _confirm_new() -> void:
+	new_dialog.popup_centered(Vector2i(450, 170))
+
+func _toggle_debug() -> void:
+	hud.debug_label.visible = not hud.debug_label.visible
+	_refresh()
+
+func _show_finances() -> void:
+	var lines: String = "Caixa: $ %d\nReceita: $ %d\nDespesas operacionais: $ %d\nLucro operacional: $ %d\nInvestimento: $ %d\n\nÚLTIMAS TRANSAÇÕES\n" % [economy.cash, economy.revenue, economy.expenses, economy.profit(), economy.capital_spent]
+	for index in range(maxi(0, economy.ledger.size() - 10), economy.ledger.size()):
+		var item: Dictionary = economy.ledger[index]
+		lines += "%+d  %s\n" % [item.amount, item.reason]
+	finances_dialog.dialog_text = lines
+	finances_dialog.popup_centered(Vector2i(480, 420))
+
+func _register_input() -> void:
+	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}]:
+		if InputMap.has_action(binding.name):
+			continue
+		InputMap.add_action(binding.name)
+		var event := InputEventKey.new()
+		event.physical_keycode = binding.key
+		event.ctrl_pressed = binding.get("ctrl", false)
+		InputMap.action_add_event(binding.name, event)

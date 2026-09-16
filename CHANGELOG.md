@@ -10,3 +10,8 @@
 - M1b–c: tick fixo, hóspedes/utility simples, atendimento, receita, despesas,
   filas, elevadores FIFO com capacidade, contratação, limpeza e reputação.
 - Inspeção de agentes, diagnóstico de filas e controles de operação/tempo.
+- M1d: snapshots v1, backup, validação transacional, restauração de viagens e RNG,
+  novo hotel, finanças, debug F3, save Ctrl+S e pausa por Espaço.
+- Corrigidos ciclo de referências, deriva do relógio, satisfação de visitantes
+  recusados e seleção de elevador fora dos limites do hotel.
+- Bateria completa e retomada em outro processo aprovadas.

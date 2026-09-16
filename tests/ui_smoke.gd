@@ -53,6 +53,54 @@ func run() -> void:
 		if button.text == "Pausa":
 			await click(button.get_global_rect().get_center())
 	check(game.session.speed == 0, "pause button")
+	game.save_path = "user://ui-smoke.json"
+	for button: Node in game.hud.find_children("*", "Button", true, false):
+		if button.text == "Salvar":
+			await click(button.get_global_rect().get_center())
+	check(FileAccess.file_exists(game.save_path), "save button writes file")
+	var snapshot: String = JSON.stringify(SessionSnapshot.capture(game.session))
+	game._replace_session(HotelSession.new())
+	check(game.session.actors.is_empty() and game.hotel.rooms.is_empty(), "new session clears run state")
+	for button: Node in game.hud.find_children("*", "Button", true, false):
+		if button.text == "Carregar":
+			await click(button.get_global_rect().get_center())
+	check(JSON.stringify(SessionSnapshot.capture(game.session)) == snapshot, "load button restores entire paused session")
+	var world_center: Vector2 = game.view.global_position + game.view.size / 2
+	var zoom_before: float = game.view.zoom_factor
+	var wheel := InputEventMouseButton.new()
+	wheel.position = world_center
+	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
+	wheel.pressed = true
+	root.push_input(wheel, true)
+	await process_frame
+	check(game.view.zoom_factor > zoom_before, "wheel zoom")
+	var pan_before: Vector2 = game.view.pan
+	var middle := InputEventMouseButton.new()
+	middle.position = world_center
+	middle.button_index = MOUSE_BUTTON_MIDDLE
+	middle.pressed = true
+	root.push_input(middle, true)
+	await process_frame
+	var movement := InputEventMouseMotion.new()
+	movement.position = world_center + Vector2(25, 15)
+	movement.relative = Vector2(25, 15)
+	movement.button_mask = MOUSE_BUTTON_MASK_MIDDLE
+	root.push_input(movement, true)
+	await process_frame
+	middle.pressed = false
+	root.push_input(middle, true)
+	check(game.view.pan != pan_before, "middle button pan")
+	game.view.pan = Vector2.ZERO
+	game.view.zoom_factor = 1
+	var debug_key := InputEventKey.new()
+	debug_key.physical_keycode = KEY_F3
+	debug_key.pressed = true
+	root.push_input(debug_key, true)
+	await process_frame
+	check(game.hud.debug_label.visible, "keyboard debug toggle")
+	debug_key.pressed = false
+	root.push_input(debug_key, true)
+	game.hud.debug_label.visible = false
 	await RenderingServer.frame_post_draw
 	var path: String = "res://.runtime/construction-ui.png"
 	root.get_texture().get_image().save_png(path)

@@ -8,6 +8,11 @@ signal cancel_requested
 signal hire_requested(definition: EmployeeDefinition)
 signal speed_requested(value: int)
 signal open_requested
+signal save_requested
+signal load_requested
+signal new_requested
+signal debug_requested
+signal finances_requested
 
 var stats: Label
 var message: Label
@@ -15,6 +20,7 @@ var inspector: Label
 var world_slot: Control
 var operations: Label
 var open_button: Button
+var debug_label: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -33,6 +39,7 @@ func _ready() -> void:
 	header_row.add_child(title)
 	stats = Label.new()
 	stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	header_row.add_child(stats)
 	var toolbar := HBoxContainer.new()
 	layout.add_child(toolbar)
@@ -47,6 +54,18 @@ func _ready() -> void:
 	operations.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	operations.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toolbar.add_child(operations)
+	var session_bar := HBoxContainer.new()
+	layout.add_child(session_bar)
+	_button(session_bar, "Novo hotel", func() -> void: new_requested.emit())
+	_button(session_bar, "Salvar", func() -> void: save_requested.emit())
+	_button(session_bar, "Carregar", func() -> void: load_requested.emit())
+	_button(session_bar, "Finanças", func() -> void: finances_requested.emit())
+	_button(session_bar, "Debug • F3", func() -> void: debug_requested.emit())
+	debug_label = Label.new()
+	debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	debug_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	debug_label.visible = false
+	session_bar.add_child(debug_label)
 	var content := HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 0)
@@ -114,6 +133,13 @@ func refresh_simulation(session: HotelSession, actor_id: int) -> void:
 	stats.text = "$ %d   |   Reputação %.0f   |   Hóspedes %d   |   Lucro $ %d   |   Dia %d • %dx" % [session.economy.cash, session.guests.reputation, session.guest_count(), session.economy.profit(), session.day + 1, session.speed]
 	open_button.text = "Fechar chegadas" if session.opened else "Abrir hotel"
 	operations.text = session.alerts()
+	if debug_label.visible:
+		var waiting: int = 0
+		var riding: int = 0
+		for lift in session.transport.lifts:
+			waiting += lift.queue.members.size()
+			riding += lift.passengers.size()
+		debug_label.text = "FPS %d | Agentes %d | Elevador: fila %d, bordo %d | Rotas %d | Tick %d" % [Engine.get_frames_per_second(), session.actors.size(), waiting, riding, session.transport.path_requests, session.tick_count]
 	var actor: ActorState = session.actors.get(actor_id)
 	if actor != null:
 		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %d\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d\n\nUtilidades:\n%s" % [actor.display_name, actor.role, actor.state, actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, actor.bedroom, actor.age, actor.waiting, actor.target_floor, str(actor.utility_scores)]
