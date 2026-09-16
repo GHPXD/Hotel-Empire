@@ -56,10 +56,14 @@ static func run(options: Dictionary) -> Dictionary:
 	var memory_start: int = OS.get_static_memory_usage()
 	var peak_memory: int = memory_start
 	var ticks: int = roundi(options.days * session.rules.day_seconds / session.rules.tick)
+	var objective_ticks: Dictionary = {}
 	for index in ticks:
 		var started: int = Time.get_ticks_usec()
 		session.tick(session.rules.tick)
 		durations.append(Time.get_ticks_usec() - started)
+		for objective: StringName in session.progression.completed:
+			if not objective_ticks.has(objective):
+				objective_ticks[objective] = session.tick_count
 		queue_metrics.observe(session)
 		peak_agents = maxi(peak_agents, session.actors.size())
 		peak_guests = maxi(peak_guests, session.guest_count())
@@ -96,7 +100,7 @@ static func run(options: Dictionary) -> Dictionary:
 	for duration in durations:
 		total_usec += duration
 	durations.sort()
-	return {"mode": "continuous_arrivals" if options.guests == 0 else "initial_burst", "seed": options.seed, "template": options.template, "days": options.days, "ticks": session.tick_count, "peak_guests": peak_guests, "peak_agents": peak_agents, "mean_agents": float(actor_samples) / maxi(1, samples), "cash": session.economy.cash, "revenue": session.economy.revenue, "expenses": session.economy.expenses, "profit": session.economy.profit(), "bookings": session.guests.bookings, "departures": session.guests.completed, "meals": session.guests.meals_served, "cleaned": session.employees.cleaned, "average_satisfaction": session.guests.score_total / maxi(1, session.guests.completed), "occupancy_ratio": float(occupied_samples) / maxi(1, samples * beds), "queues": queue_metrics.summary(), "elevator_average_wait_seconds": wait_total / maxi(1, boarded), "elevator_max_wait_seconds": wait_max, "elevator_peak_queue": peak_queue, "elevator_delivered": delivered, "path_requests": session.transport.path_requests, "simulation_total_ms": total_usec / 1000.0, "tick_mean_ms": total_usec / (1000.0 * maxi(1, durations.size())), "tick_p95_ms": durations[int((durations.size() - 1) * 0.95)] / 1000.0, "tick_max_ms": durations.back() / 1000.0, "process_memory_start_bytes": memory_start, "process_memory_peak_bytes": peak_memory, "failures": failures}
+	return {"progression": session.progression.snapshot(), "objective_ticks": objective_ticks, "mode": "continuous_arrivals" if options.guests == 0 else "initial_burst", "seed": options.seed, "template": options.template, "days": options.days, "ticks": session.tick_count, "peak_guests": peak_guests, "peak_agents": peak_agents, "mean_agents": float(actor_samples) / maxi(1, samples), "cash": session.economy.cash, "revenue": session.economy.revenue, "expenses": session.economy.expenses, "profit": session.economy.profit(), "bookings": session.guests.bookings, "departures": session.guests.completed, "meals": session.guests.meals_served, "cleaned": session.employees.cleaned, "average_satisfaction": session.guests.score_total / maxi(1, session.guests.completed), "occupancy_ratio": float(occupied_samples) / maxi(1, samples * beds), "queues": queue_metrics.summary(), "elevator_average_wait_seconds": wait_total / maxi(1, boarded), "elevator_max_wait_seconds": wait_max, "elevator_peak_queue": peak_queue, "elevator_delivered": delivered, "path_requests": session.transport.path_requests, "simulation_total_ms": total_usec / 1000.0, "tick_mean_ms": total_usec / (1000.0 * maxi(1, durations.size())), "tick_p95_ms": durations[int((durations.size() - 1) * 0.95)] / 1000.0, "tick_max_ms": durations.back() / 1000.0, "process_memory_start_bytes": memory_start, "process_memory_peak_bytes": peak_memory, "failures": failures}
 
 static func invariant_error(session: HotelSession, starting_money: int) -> String:
 	if session.economy.cash != starting_money + session.economy.revenue - session.economy.expenses - session.economy.capital_spent:

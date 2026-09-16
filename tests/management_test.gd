@@ -17,6 +17,7 @@ func _initialize() -> void:
 
 func _test_upgrades() -> void:
 	var session := SimulationRunner.make_hotel(44, "standard", 250000)
+	_unlock_management(session)
 	for room in session.hotel.rooms:
 		var definition := room.definition()
 		var original_capacity: int = definition.capacity
@@ -174,6 +175,7 @@ func _booking_ticks(upgraded: bool) -> int:
 	session.hotel.build(HotelCatalog.room(&"bedroom"), 4, 0)
 	session.hire(HotelSession.EMPLOYEES[0])
 	if upgraded:
+		_unlock_management(session)
 		session.upgrade_room(room.id)
 		session.upgrade_room(room.id)
 	var guest := session.spawn_guest()
@@ -188,6 +190,7 @@ func _transport_ticks(upgraded: bool) -> int:
 	session.hotel.add_floor()
 	var room := session.hotel.build(HotelCatalog.room(&"elevator"), 5, 0)
 	if upgraded:
+		_unlock_management(session)
 		session.upgrade_room(room.id)
 		session.upgrade_room(room.id)
 	for id in range(1, 21):
@@ -206,3 +209,6 @@ func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
+func _unlock_management(session: HotelSession) -> void:
+	session.progression.evaluate({"bookings": 10, "meals": 5, "cleaned": 5})

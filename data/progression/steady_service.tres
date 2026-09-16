@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ObjectiveDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://progression/objectives/objective_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"steady_service"
+display_name = "Operação completa"
+description = "Combine hospedagem, alimentação e limpeza para melhorar a infraestrutura."
+prerequisite = &"first_stays"
+requirements = {"bookings": 10, "meals": 5, "cleaned": 5}
+unlocks = Array[StringName]([&"restaurant_3", &"elevator_3"])
+reward_text = "Libera N3 de bistrôs e elevadores."

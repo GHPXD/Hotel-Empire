@@ -10,6 +10,7 @@ func _initialize() -> void:
 			continue
 		check(not report.has("error") and report.get("failures", ["missing"]).is_empty(), "hotel seed %d: %s" % [seed_value, report.get("failures", report.get("error", ""))])
 		check(report.bookings > 0 and report.meals > 0 and report.cleaned > 0, "productive loop across seeds")
+		check(report.progression.completed.has(&"steady_service") and report.objective_ticks.steady_service <= 6000, "N3 available within five days across seeds")
 		check(report.queues.checkin.completed_episodes > 0 and report.queues.checkin.mean_seconds >= 4.0, "check-in duration metrics")
 		check(report.queues.service_queue.completed_episodes > 0, "service queue metrics")
 		print(JSON.stringify(report))

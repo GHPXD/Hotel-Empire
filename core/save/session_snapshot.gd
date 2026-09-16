@@ -1,8 +1,8 @@
 class_name SessionSnapshot
 extends RefCounted
-## Schema v2 adds room levels, locked service prices and staff preferences.
+## Schema v3 adds persistent objectives and legacy upgrade access.
 
-const VERSION: int = 2
+const VERSION: int = 3
 const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income", "level"]
 const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload", "agreed_price", "preferred_room", "preferred_floor"]
 const LIFT_FIELDS: Array[String] = ["room_id", "column", "capacity", "floor_position", "target_floor", "door_timer", "boarded", "delivered", "wait_total", "wait_max", "busy_seconds"]
@@ -30,14 +30,21 @@ static func capture(session: HotelSession) -> Dictionary:
 		item["queue"] = lift.queue.members.duplicate()
 		item["passengers"] = lift.passengers.duplicate()
 		lifts.append(item)
-	return {"version": VERSION, "session": _read(session, SESSION_FIELDS), "economy": _read(session.economy, ECONOMY_FIELDS), "ledger": session.economy.ledger.duplicate(true), "floors": session.hotel.floors, "next_room_id": session.hotel.next_room_id, "rooms": rooms, "actors": actors, "lifts": lifts, "guests": _read(session.guests, GUEST_FIELDS), "cleaned": session.employees.cleaned, "path_requests": session.transport.path_requests, "rng_seed": str(session.rng.seed), "rng_state": str(session.rng.state)}
+	return {"version": VERSION, "progression": session.progression.snapshot(), "session": _read(session, SESSION_FIELDS), "economy": _read(session.economy, ECONOMY_FIELDS), "ledger": session.economy.ledger.duplicate(true), "floors": session.hotel.floors, "next_room_id": session.hotel.next_room_id, "rooms": rooms, "actors": actors, "lifts": lifts, "guests": _read(session.guests, GUEST_FIELDS), "cleaned": session.employees.cleaned, "path_requests": session.transport.path_requests, "rng_seed": str(session.rng.seed), "rng_state": str(session.rng.state)}
 
 static func restore(data: Variant) -> Dictionary:
 	if data is Dictionary and data.get("version") == 1:
 		data = _migrate_v1(data)
+	var legacy: bool = data is Dictionary and data.get("version") == 2
+	if legacy:
+		data = data.duplicate(true)
+		data.version = VERSION
+		data["progression"] = {"completed": [], "legacy_access": true}
 	if not data is Dictionary or data.get("version") != VERSION:
 		return _error("Versão de save desconhecida ou formato inválido.")
 	var session := HotelSession.new()
+	if not session.progression.restore(data.get("progression")):
+		return _error("Progressão inválida.")
 	if not _write(session, data.get("session"), SESSION_FIELDS) or not _write(session.economy, data.get("economy"), ECONOMY_FIELDS) or not _write(session.guests, data.get("guests"), GUEST_FIELDS):
 		return _error("Estado de sessão/economia inválido.")
 	if not _integer(data.get("floors"), 1, HotelModel.MAX_FLOORS) or not _integer(data.get("next_room_id"), 1, 10000000) or not _integer(data.get("cleaned"), 0, 100000000) or not _integer(data.get("path_requests"), 0, 100000000):
@@ -132,6 +139,16 @@ static func restore(data: Variant) -> Dictionary:
 			return _error("Estado aleatório inválido.")
 	session.rng.seed = int(data.rng_seed)
 	session.rng.state = int(data.rng_state)
+	if legacy:
+		session.progression.evaluate(session.progression_metrics())
+	for room in session.hotel.rooms:
+		if room.level == 3:
+			# Check the entitlement to the installed level, without mutating the room.
+			var previous := RoomState.new()
+			previous.definition_id = room.definition_id
+			previous.level = 2
+			if not session.progression.upgrade_error(previous).is_empty():
+				return _error("Nível de sala sem desbloqueio.")
 	return {"session": session, "error": ""}
 
 static func _validate_relations(session: HotelSession) -> String:
@@ -244,5 +261,5 @@ static func _migrate_v1(original: Dictionary) -> Dictionary:
 		var definition: RoomDefinition = definitions.get(actor.get("target_room"))
 		if actor.get("state") == "using" and definition != null and definition.category == &"service":
 			actor["agreed_price"] = definition.price
-	data.version = VERSION
+	data.version = 2
 	return data

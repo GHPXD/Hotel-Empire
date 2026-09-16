@@ -9,6 +9,7 @@ var hotel := HotelModel.new(economy)
 var transport := TransportSystem.new(rules)
 var guests := GuestSystem.new(rules)
 var employees := EmployeeSystem.new(rules)
+var progression := HotelProgression.new()
 var actors: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var next_actor_id: int = 1
@@ -44,6 +45,10 @@ func tick(delta: float) -> void:
 	if current_day > day:
 		day = current_day
 		_pay_daily_expenses()
+	progression.evaluate(progression_metrics())
+
+func progression_metrics() -> Dictionary:
+	return {"bookings": guests.bookings, "meals": guests.meals_served, "cleaned": employees.cleaned, "completed": guests.completed, "reputation": guests.reputation}
 
 func hire(definition: EmployeeDefinition) -> String:
 	if not economy.purchase(definition.hire_cost, "Contratação: " + definition.display_name, time):
@@ -153,6 +158,9 @@ func upgrade_room(id: int) -> String:
 	var next := room.next_upgrade()
 	if next == null:
 		return "Nível máximo atingido."
+	var locked := progression.upgrade_error(room)
+	if not locked.is_empty():
+		return locked
 	if not economy.purchase(next.cost, "Melhoria: %s N%d" % [room.definition().display_name, room.level + 1], time):
 		return "Caixa insuficiente para a melhoria."
 	room.level += 1

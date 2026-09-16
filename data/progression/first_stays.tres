@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ObjectiveDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://progression/objectives/objective_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"first_stays"
+display_name = "Primeiras estadias"
+description = "Receba três reservas para investir no conforto e na recepção."
+requirements = {"bookings": 3}
+unlocks = Array[StringName]([&"bedroom_3", &"reception_3"])
+reward_text = "Libera N3 de quartos e recepções."
