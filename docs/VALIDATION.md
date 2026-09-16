@@ -119,3 +119,34 @@
 - Resolução padrão e teste adicional solicitado em 1024×720 passaram; captura menor
   efetiva 1024×640. Arquivos locais `.runtime/m4-locked.png`, `m4-objectives.png` e
   `m4-objectives-bottom.png`. Nenhuma declaração de QA integral de acessibilidade.
+
+## M5 — conteúdo, perfis e calendário
+- Quatorze suítes aprovadas: nove headless (incluindo stress/continuidade) e cinco
+  gráficas. Após a última validação de contadores, headless passou; a comparação
+  textual do save no ui_smoke falhou intermitentemente. Foi substituída pelo mesmo
+  comparador de campos/tolerância 1e-8 já usado no M2; as cinco suítes gráficas passaram
+  novamente. Sem erros/leaks nos resultados finais.
+- Novas salas: bloqueio sem cobrança, acesso legado sem liberar conteúdo futuro,
+  construção após objetivos, capacidade/fila, pagamento único, alívio da necessidade
+  correta, continuidade por 1.500 ticks. Uso de lazer não incrementa refeições.
+- Mesmas necessidades/posição produzem escolhas distintas nos três perfis; fome alta
+  favorece refeição completa; falta de saldo exclui serviços pagos.
+- Três seeds com demanda controlada usaram café e lazer, respeitando invariantes.
+  O café teve uso baixo ou nulo com chegadas contínuas; ajuste temporário de rapidez
+  foi revertido por não alterar esse resultado. Limitação de balanceamento explicitada
+  em `M5_CONTENT.md`; não equivale a retorno econômico ou escolha humana validada.
+- Fronteiras do calendário nos ticks 3599/3600/4799/4800/7200/8400/10800 verificadas.
+  Hotel fechado não recebe chegadas; comparação de 30s mediu 5/7/4 chegadas em
+  condição normal/feira/dias tranquilos. Save ativo continua por 5.000 ticks,
+  atravessando fim e próximo evento sem divergência.
+- Fixture real M4/v3 migra sem mutação de entrada, mantém dinheiro e atribui perfil
+  equilibrado aos atores existentes. Perfis desconhecidos e contadores inválidos são
+  rejeitados. Migrações antigas v1/v2 e 20 checkpoints/5 seeds continuam aprovados.
+- UI: construção de café/lazer pelo viewport, bloqueios e requisitos, seleção de
+  hóspede com perfil visível, evento de 150% e calendário congelado em pausa, save/load
+  pela toolbar com salas/perfil/evento preservados. Novos controles permanecem na
+  rolagem existente; o teste antigo agora rola até o botão antes de clicar.
+- Teste adicional `ui_content` com resolução solicitada 1024×720 passou. Captura
+  efetiva 1024×640 inspecionada em `.runtime/m5-content.png`, com café/lazer, perfil
+  e faixa de evento legíveis. A versão padrão também foi inspecionada. Navegação
+  integral por teclado/controller e acessibilidade assistiva continuam pendentes.

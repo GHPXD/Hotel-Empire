@@ -42,3 +42,11 @@ hóspedes sequenciais em hotel pequeno com caixa inicial normal verificam viabil
 Stress exige os dois desbloqueios N3 em até cinco dias no template padrão/5 seeds.
 `ui_progression.gd` testa bloqueio visível, painel vivo, Esc, compra liberada, save/load
 pela toolbar e fechamento/reset do painel ao trocar sessão. Captura topo e fim da rolagem.
+
+M5: `content_test.gd` verifica construção bloqueada, exceção legada restrita a N3,
+escolhas diferentes de perfis na mesma situação, refeição versus lanche com fome alta,
+saldo, alívio, caixa, filas/capacidade e uso em três seeds de operação controlada.
+Valida fronteiras de eventos, efeito real nas chegadas, hotel fechado e continuidade
+atravessando fim e início de eventos. Fixture M4/v3 migra sem mutação; perfis e
+contadores inválidos são rejeitados. `ui_content.gd` testa construção pelo viewport,
+inspeção de hóspede, calendário pausado e save/load com evento ativo pela toolbar.

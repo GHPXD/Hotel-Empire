@@ -1,5 +1,15 @@
 # Changelog
 
+## M5 — serviços, hóspedes e eventos
+- Café Brisa e Sala Horizonte liberados pelos objetivos existentes, com construção
+  protegida no modelo e serviços integrados a fila, pagamento e necessidades.
+- Três GuestArchetype: equilibrado, negócios e lazer; escolhas por alívio efetivo,
+  orçamento e preferências. Inspeção mostra perfil e contagem de serviços.
+- Feira da cidade e Dias tranquilos: calendário determinístico, previsão no HUD,
+  alterações temporárias de procura, pausa e fechamento de chegadas respeitados.
+- Snapshot v4 migra perfis/contadores de v1–v3; refeições separadas de lazer.
+- Suítes de conteúdo e interface, cenários com três seeds e limites documentados.
+
 ## M4 — progressão
 - Três objetivos orientados a dados, com requisitos visíveis, N3 por desempenho e título final.
 - Construção básica/N2 livres; desbloqueios permanentes, sem prêmio monetário repetível.

@@ -16,23 +16,23 @@ func run() -> void:
 	for button: Node in game.hud.find_children("*", "Button", true, false):
 		if button.text.contains("células") or button.text.begins_with("+ Andar") or button.text in ["Selecionar / cancelar", "Demolir seleção"]:
 			buttons.append(button)
-	await click(buttons[0].get_global_rect().get_center())
+	await press_button(buttons[0])
 	check(game.view.blueprint != null, "build button via input")
 	var cell: Vector2 = game.view.room_rect(0, 0).get_center() + game.view.global_position
 	await click(cell)
 	check(game.hotel.rooms.size() == 1, "construction via viewport input")
 	await click(cell)
 	check(game.hotel.rooms.size() == 1, "overlap rejected through UI")
-	await click(buttons[4].get_global_rect().get_center())
+	await press_button(buttons[4])
 	check(game.hotel.floors == 2, "floor button via input")
-	await click(buttons[1].get_global_rect().get_center())
+	await press_button(buttons[1])
 	await click(game.view.room_rect(3, 1).get_center() + game.view.global_position)
-	await click(buttons[2].get_global_rect().get_center())
+	await press_button(buttons[2])
 	await click(game.view.room_rect(5, 0).get_center() + game.view.global_position)
-	await click(buttons[3].get_global_rect().get_center())
+	await press_button(buttons[3])
 	await click(game.view.room_rect(12, 0).get_center() + game.view.global_position)
 	check(game.hotel.rooms.size() == 4, "four room types built")
-	await click(buttons[5].get_global_rect().get_center())
+	await press_button(buttons[5])
 	check(game.view.blueprint == null, "cancel construction")
 	for button: Node in game.hud.find_children("*", "Button", true, false):
 		if button.text.begins_with("+ Recepcionista") or button.text.begins_with("+ Camareiro"):
@@ -58,13 +58,15 @@ func run() -> void:
 		if button.text == "Salvar":
 			await click(button.get_global_rect().get_center())
 	check(FileAccess.file_exists(game.save_path), "save button writes file")
-	var snapshot: String = JSON.stringify(SessionSnapshot.capture(game.session))
+	var snapshot := SessionSnapshot.capture(game.session)
 	game._replace_session(HotelSession.new())
 	check(game.session.actors.is_empty() and game.hotel.rooms.is_empty(), "new session clears run state")
 	for button: Node in game.hud.find_children("*", "Button", true, false):
 		if button.text == "Carregar":
 			await click(button.get_global_rect().get_center())
-	check(JSON.stringify(SessionSnapshot.capture(game.session)) == snapshot, "load button restores entire paused session")
+	var restored := SessionSnapshot.capture(game.session)
+	var mismatch: String = preload("res://tests/snapshot_comparison.gd").difference(snapshot, restored, "ui-load")
+	check(mismatch.is_empty(), "load button restores entire paused session: " + mismatch)
 	var world_center: Vector2 = game.view.global_position + game.view.size / 2
 	var zoom_before: float = game.view.zoom_factor
 	var wheel := InputEventMouseButton.new()
@@ -127,3 +129,10 @@ func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
+func press_button(button: Button) -> void:
+	var scroll: ScrollContainer = button.get_parent().get_parent()
+	scroll.ensure_control_visible(button)
+	for frame in 3:
+		await process_frame
+	await click(button.get_global_rect().get_center())

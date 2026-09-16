@@ -48,6 +48,9 @@ func refresh(session: HotelSession) -> void:
 			var format: String = "%s: %.1f / %.1f\n" if metric == "reputation" else "%s: %.0f / %.0f\n"
 			lines += format % [HotelProgression.METRIC_LABELS[metric], metrics[metric], objective.requirements[metric]]
 		lines += objective.reward_text + "\n"
+		for definition in HotelCatalog.ROOMS:
+			if definition.required_objective == objective.id:
+				lines += "Libera construção: %s • $ %d\n" % [definition.display_name, definition.build_cost]
 	if details.text != lines:
 		details.text = lines
 

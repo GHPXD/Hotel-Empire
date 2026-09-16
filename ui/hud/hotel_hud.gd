@@ -27,6 +27,8 @@ var debug_label: Label
 var upgrade_button: Button
 var upgrade_preview: Label
 var objectives_button: Button
+var build_buttons: Dictionary = {}
+var event_label: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -78,6 +80,9 @@ func _ready() -> void:
 	debug_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	debug_label.visible = false
 	session_bar.add_child(debug_label)
+	event_label = Label.new()
+	event_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	layout.add_child(event_label)
 	var content := HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 0)
@@ -106,6 +111,7 @@ func _ready() -> void:
 		button.custom_minimum_size.y = 58
 		button.pressed.connect(func() -> void: build_requested.emit(definition))
 		tools.add_child(button)
+		build_buttons[definition.id] = button
 	_button(tools, "+ Andar   •   $ 750", func() -> void: floor_requested.emit())
 	_button(tools, "Selecionar / cancelar", func() -> void: cancel_requested.emit())
 	_button(tools, "Demolir seleção", func() -> void: demolish_requested.emit())
@@ -159,6 +165,15 @@ func _button(parent: Control, text: String, action: Callable) -> void:
 	parent.add_child(button)
 
 func refresh_simulation(session: HotelSession, actor_id: int) -> void:
+	for definition in HotelCatalog.ROOMS:
+		var button: Button = build_buttons[definition.id]
+		var locked := session.progression.build_error(definition)
+		button.disabled = not locked.is_empty()
+		button.text = "%s\n%s" % [definition.display_name, "Bloqueado • veja Objetivos" if button.disabled else "$ %d   •   %d células" % [definition.build_cost, definition.width]]
+		button.tooltip_text = locked if button.disabled else "Manutenção: $ %d/dia • Capacidade: %d\nTarifa: $ %d • Atendimento: %.1fs" % [definition.maintenance, definition.capacity, definition.price, definition.service_duration]
+	var event := HotelEvents.state(session.tick_count, session.rules)
+	event_label.text = "  %s • %.0fs %s" % [event.name, event.remaining, "restantes • procura %.0f%%" % (event.multiplier * 100) if event.active else "para começar"]
+	event_label.tooltip_text = event.description
 	objectives_button.text = "Objetivos %d/%d" % [session.progression.completed.size(), HotelProgression.OBJECTIVES.size()]
 	objectives_button.tooltip_text = session.progression.summary()
 	stats.text = "$ %d   |   Reputação %.0f   |   Hóspedes %d   |   Lucro $ %d   |   Dia %d • %dx" % [session.economy.cash, session.guests.reputation, session.guest_count(), session.economy.profit(), session.day + 1, session.speed]
@@ -174,6 +189,8 @@ func refresh_simulation(session: HotelSession, actor_id: int) -> void:
 	var actor: ActorState = session.actors.get(actor_id)
 	if actor != null:
 		inspector.text = "%s\n%s • %s\n\nSatisfação: %.0f\nFome: %.0f\nCansaço: %.0f\nDinheiro: $ %d\nQuarto: %d\nTempo: %.0fs\nEspera: %.1fs\nDestino: andar %d\n\nUtilidades:\n%s" % [actor.display_name, actor.role, actor.state, actor.happiness, actor.needs.hunger, actor.needs.energy, actor.money, actor.bedroom, actor.age, actor.waiting, actor.target_floor, str(actor.utility_scores)]
+		if actor.role == &"guest":
+			inspector.text += "\n\nPerfil: %s\n%s\nLazer: %.0f\nServiços usados: %d" % [actor.archetype().display_name, actor.archetype().description, actor.needs.entertainment, actor.service_uses]
 
 func refresh_unlock(session: HotelSession, room: RoomState) -> void:
 	upgrade_button.tooltip_text = ""

@@ -23,12 +23,14 @@ IDs estáveis ligam ActorState, RoomState e ElevatorState. IA/transporte rodam a
 render redesenha os placeholders a cada frame. Relógio vem de ticks inteiros para evitar
 deriva acumulada. O RNG é exclusivo da sessão, nunca o gerador global.
 
-`SessionSnapshot` v3 define campos explicitamente e valida tipos, limites, geometria,
+`SessionSnapshot` v4 define campos explicitamente e valida tipos, limites, geometria,
 catálogo e referências antes de retornar uma sessão nova. Seed/state do RNG são strings
 decimais para preservar 64 bits no JSON. `SaveStore` escreve temporário e mantém `.bak`
 do save anterior. Saves v1 migram para nível 1 e preferências automáticas, reconstruindo
 o preço de serviços já iniciados. V1 e v2 recebem o acesso legado às quatro melhorias
 N3 existentes no M3. Outras versões desconhecidas são rejeitadas.
+V3 migra perfis existentes para equilibrado e inicia uso de serviços pela contagem
+anterior de refeições. RNG e relógio continuam persistidos; novas chegadas usam perfis M5.
 `Main` troca a sessão apenas após sucesso; nova partida descarta os modelos anteriores.
 
 Elevadores atendem o passageiro embarcado mais antigo, depois a chamada mais antiga.
@@ -59,3 +61,22 @@ já persistidos. Restore valida IDs, duplicação, ordem e autorização de sala
 de retornar a sessão. Migração avalia métricas existentes sem cobrar/pagar recompensas.
 Nova sessão começa vazia. UI lê o modelo, a compra é protegida em `HotelSession`,
 e o painel de objetivos não retém referência à sessão após fechá-lo ou trocar a partida.
+
+## Conteúdo M5
+
+`HotelCatalog` inclui seis `RoomDefinition` e três `GuestArchetype`. O perfil é escolhido
+pelo RNG da sessão ao nascer; `ActorState` guarda seu ID, dinheiro corrente e contadores.
+Recursos definem orçamento inicial, pesos de utilidade, ritmo de entretenimento,
+duração de estadia e paciência de atendimento. Transporte mantém sua penalidade de
+espera comum. `GuestSystem` aplica uma regra genérica por necessidade; serviço de lazer
+nunca incrementa refeições. `service_uses` inclui todos os serviços pagos, sem hospedagem.
+
+`HotelModel` compartilha a mesma instância de `HotelProgression` da sessão e verifica
+`required_objective` antes de construir, inclusive no preview e na validação de saves.
+O acesso legado a upgrades não desbloqueia café/lazer. Novas salas são N1 nesta etapa.
+
+`HotelEvents.state` deriva evento e tempo restante de ticks inteiros, do intervalo em
+`SimulationRules` e de `EventDefinition`. Não há segundo relógio nem RNG de eventos.
+O multiplicador modifica o consumo do temporizador de chegadas, sem contornar hotel
+fechado ou limite de hóspedes. Pausa funciona porque não avança ticks. Salvar o tick
+preserva a fase do calendário; a interface apenas apresenta esse estado.

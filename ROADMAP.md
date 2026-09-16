@@ -13,7 +13,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M2 Simulation Core: robustez, stress, métricas e múltiplas seeds.
 - [x] M3 Hotel Management: upgrades, atribuições e finanças.
 - [x] M4 Progression: desbloqueios e objetivos.
-- [ ] M5 Content Expansion: novos serviços, perfis e eventos.
+- [x] M5 Content Expansion: novos serviços, perfis e eventos.
 - [ ] M6 UI/UX Polish: filtros, analytics, acessibilidade.
 - [ ] M7 Art & Animation: substituir placeholders, áudio original.
 - [ ] M8 Optimization: perfis 100/250/500/1000 agentes.
@@ -22,6 +22,6 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
-Próximo incremento: M5, novos serviços, perfis de hóspedes e eventos.
+Próximo incremento: M6, filtros, analytics e melhorias de acessibilidade/interface.
 M2 mediu transporte isolado até 1000 agentes e burst integrado;
 isso não conclui M8 nem comprova 1000 hóspedes simultâneos sustentados com render a 60 FPS.

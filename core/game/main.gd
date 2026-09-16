@@ -74,6 +74,9 @@ func _process(delta: float) -> void:
 	if session.progression.completed.size() > previous_objectives:
 		var latest: ObjectiveDefinition = HotelProgression.OBJECTIVES[session.progression.completed.size() - 1]
 		hud.message.text = "Objetivo concluído: %s. %s" % [latest.display_name, latest.reward_text]
+		for definition in HotelCatalog.ROOMS:
+			if definition.required_objective == latest.id:
+				hud.message.text += " Libera %s." % definition.display_name
 	ui_timer += delta
 	view.queue_redraw()
 	if ui_timer >= 0.2:

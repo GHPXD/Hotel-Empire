@@ -126,8 +126,12 @@ func _draw_room(room: RoomState) -> void:
 			draw_rect(Rect2(base + Vector2(5, 10) * zoom_factor, Vector2(115, 25) * zoom_factor), Color("566c59"))
 			draw_circle(base + Vector2(55, 0) * zoom_factor, 9 * zoom_factor, Color("eed5b3"))
 		else:
-			for i in 3:
-				draw_circle(base + Vector2(22 + i * 48, 15) * zoom_factor, 15 * zoom_factor, Color("f8e6bc"))
+			if definition.id == &"lounge":
+				for i in 2:
+					draw_rect(Rect2(base + Vector2(8 + i * 72, 8) * zoom_factor, Vector2(58, 26) * zoom_factor), Color("b6b1da"))
+			else:
+				for i in definition.width:
+					draw_circle(base + Vector2(22 + i * 48, 15) * zoom_factor, 15 * zoom_factor, Color("f8e6bc"))
 		if zoom_factor >= 0.65:
 			_text(rectangle.position + Vector2(7, 19) * zoom_factor, definition.display_name + (" N%d" % room.level if room.level > 1 else ""), Color.WHITE, int(13 * zoom_factor))
 	if room.id == selected:
@@ -163,7 +167,7 @@ func _draw_simulation() -> void:
 			_text(box.position + Vector2(8, 65) * zoom_factor, "Fila: %d" % room.queue.members.size(), Color("693e27"), int(13 * zoom_factor))
 	for actor: ActorState in session.actors.values():
 		var point := actor_screen_position(actor)
-		var shirt := Color("e6a84d") if actor.role == &"guest" else Color("526c98")
+		var shirt := actor.archetype().color if actor.role == &"guest" else Color("526c98")
 		if actor.role == &"cleaner":
 			shirt = Color("b16573")
 		if actor.state == &"using":

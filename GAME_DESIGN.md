@@ -24,3 +24,10 @@ alimentação/limpeza e reconhecimento por reputação. Construção básica e N
 livres para que o jogador possa resolver gargalos antes de ganhar N3. Recompensas
 liberam compras ou um título, sem injetar dinheiro. Saves anteriores preservam acesso.
 Novos tipos de serviço entram em M5. Critérios e medições: [M4_PROGRESSION](docs/M4_PROGRESSION.md).
+
+M5: Café Brisa oferece alimentação rápida e barata, com menos alívio que uma refeição.
+Sala Horizonte atende lazer. Os três perfis alteram escolhas, orçamento e duração da
+visita; a utilidade considera alívio efetivo, distância, fila, preço e rapidez.
+Os serviços são opcionais e dependem da localização/demanda. Eventos previsíveis
+alternam pressão de chegada e baixa procura, mantendo custos fixos. Parâmetros,
+evidências e limites estão em [M5_CONTENT](docs/M5_CONTENT.md).
