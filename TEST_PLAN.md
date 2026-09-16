@@ -20,3 +20,9 @@ somente os testes headless. Os testes gráficos usam `Viewport.push_input` com
 coordenadas locais, não invocação direta dos callbacks dos botões de gameplay.
 O teste de nova sessão usa a API interna de troca; diálogo de confirmação ainda
 precisa de cobertura dedicada. Save/load também tem teste em outro processo.
+
+`-Stress` adiciona continuidade em 20 checkpoints/5 seeds e verificações de conservação
+de agentes, reconciliação do caixa, capacidade, geometria, referências, ocupação e
+snapshots periódicos. Transporte isolado deve entregar exatamente uma vez cada agente
+e drenar as filas para 100/250/500/1000 passageiros. Resultados de tempo são informativos,
+sem limiar dependente da máquina; FPS renderizado continua no plano de M8.

@@ -15,3 +15,13 @@
 - Corrigidos ciclo de referências, deriva do relógio, satisfação de visitantes
   recusados e seleção de elevador fora dos limites do hotel.
 - Bateria completa e retomada em outro processo aprovadas.
+
+## M2 — robustez e medição
+- Comando `--simulate` com templates, seed, duração, orçamento e chegadas configuráveis;
+  JSON de economia, satisfação, ocupação, filas, transporte, memória e tempo de tick.
+- Cinco seeds, 20 checkpoints de save e stress isolado de 100/250/500/1000 passageiros.
+- Corrigida divergência após load em limites temporais: resíduo decimal na porta do
+  elevador atrasava o transporte em um tick; demais temporizadores usam a mesma tolerância.
+- JSON de save utiliza precisão completa. Comparações de estado mantêm estados/contagens
+  exatos e tolerância absoluta 1e-8 para resíduos de floats.
+- Relatórios reproduzíveis de 30 dias e burst de 1000 hóspedes registrados em docs/benchmarks.

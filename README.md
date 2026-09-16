@@ -1,7 +1,7 @@
 # Hotel Empire
 
 Tycoon 2D original em Godot **4.7.2**, GDScript tipado, renderer Compatibility.
-Estado: **M0 + M1 vertical slice jogável**, validados. Protótipo, ainda sem arte final
+Estado: **M0 + M1 vertical slice + M2 simulação**, validados. Protótipo, ainda sem arte final
 ou balanceamento de produção.
 
 Abra `project.godot` no Godot e execute F6 na cena principal ou F5 no projeto.
@@ -26,12 +26,28 @@ Poucos quartos criam fila na recepção; expansão excessiva pressiona transport
 No Windows deste ambiente: `powershell -File tools/test.ps1 -Visual` executa import,
 quatro suítes headless e dois testes gráficos. Passe `-GodotPath` para outro engine.
 Testes isolam dados em `.runtime/`; não sobrescrevem seu save normal.
+Acrescente `-Stress` para cinco seeds, 20 checkpoints de save e transporte com
+100/250/500/1000 agentes. Evidências: [benchmarks](docs/benchmarks/README.md).
 
 Teste integrado: `godot --headless --path . --script res://tests/simulation_test.gd`.
 
+Simulação sem interface:
+
+```sh
+godot --headless --path . -- --simulate --days=30 --seed=123 --template=standard --output=res://.runtime/report.json
+```
+
+Opções: `--days=1..60`, `--seed=inteiro`, `--starting-money=250000`,
+`--template=standard|tower`, `--guests=0..1000`, `--output=caminho`.
+Zero hóspedes significa chegadas contínuas; valor positivo cria um burst inicial
+e fecha novas chegadas. O relatório distingue pico de população média. A pasta de
+saída precisa existir. Templates de teste custam dinheiro e podem ser recusados.
+O JSON inclui receitas, despesas, ocupação, satisfação, esperas, rotas, tempo de tick,
+memória do processo e falhas. Medidas headless não equivalem a FPS com renderização.
+
 Limitações atuais: placeholders procedurais, atribuição automática de equipe, uma
-categoria de hóspede, sem áudio/upgrades/progressão e sem export validado. Stress e
-balanceamento multi-seed são o próximo marco. UI desktop testada; mobile/Web futuros.
+categoria de hóspede, sem áudio/upgrades/progressão e sem export validado. Testes
+multi-seed são regressões, não balanceamento final. UI desktop testada; mobile/Web futuros.
 
 Consulte [ROADMAP.md](ROADMAP.md), [ARCHITECTURE.md](ARCHITECTURE.md) e
 [visão permanente](docs/PRODUCT_VISION.md). Os gráficos iniciais serão placeholders originais.

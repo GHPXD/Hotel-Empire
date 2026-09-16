@@ -1,6 +1,7 @@
 param(
     [string]$GodotPath = 'C:\Program Files (x86)\Godot\Godot_v4.7.2-stable_win64.exe',
-    [switch]$Visual
+    [switch]$Visual,
+    [switch]$Stress
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
@@ -13,6 +14,7 @@ try {
     $run = Start-Process -FilePath $GodotPath -ArgumentList @('--headless', '--editor', '--path', $projectRoot, '--log-file', $importLog, '--quit') -WindowStyle Hidden -PassThru -Wait
     if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $importLog -Pattern 'SCRIPT ERROR:|^ERROR:' -Quiet)) { throw 'Godot import failed; inspect .runtime/import.log' }
     $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test')
+    if ($Stress) { $suites += @('save_multiseed_test', 'stress_test') }
     if ($Visual) { $suites += @('ui_smoke', 'ui_resume') }
     foreach ($suite in $suites) {
         $testLog = Join-Path $runtimeRoot ($suite + '.log')

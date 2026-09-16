@@ -56,3 +56,24 @@
 - Não validados ainda: navegação integral por teclado/controller, touch, leitores de
   tela, DPI variados, exports, stress 500–1000 agentes e balanceamento multi-seed.
   Essas limitações não são apresentadas como features prontas.
+
+## M2 — simulação, stress e correção de continuidade
+- Runner completo `tools/test.ps1 -Stress -Visual`: oito suítes passaram sem erro/leak.
+  Métricas de filas foram acrescentadas depois e `stress_test.gd --strict` passou novamente.
+- Nova suíte de saves encontrou 7 divergências em 20 checkpoints antes da correção.
+  Primeiro desvio reproduzido: seed 1, tick 1012, elevador em 1.07 versus 1.0.
+  Causa: resíduo positivo no door_timer após JSON alterava a transição de estado.
+  Comparações de limites usam TIME_EPSILON=1e-8, menor que 1/1.000.000 do tick.
+- Após correção: 20 checkpoints passaram, cobrindo working/idle/walking/checkin/riding/
+  using/lift_queue/cleaning. Cada um continuou 600 ticks comparando todos os campos.
+  Estados/contagens iguais; somente floats admitem erro absoluto <=1e-8. O teste de
+  disco inicialmente comparava texto JSON e detectou diferença de arredondamento em
+  atributos de atores; agora compara campos com o mesmo critério explícito.
+- Cinco seeds de 5 dias: zero falhas de invariantes e ciclo produtivo em todas.
+- 100/250/500/1000 agentes no transporte: entrega de todos exatamente uma vez, destinos
+  corretos, capacidade respeitada e filas drenadas. Máximo observado com 1000: 3,599 ms
+  por passo do transporte, sem renderização. Não extrapolar para jogo inteiro.
+- CLI real: cenário padrão 30 dias, 36.000 ticks, 374 reservas, 488 saídas e 930 viagens;
+  tower burst 1000: 20 andares, 1000 saídas, apenas 24 reservas. Zero falhas nos dois.
+- Tempos e resultados completos preservados em `docs/benchmarks/`. Sem ajustes arbitrários
+  de custos/preços: esta etapa mede e corrige comportamento, não declara economia final.

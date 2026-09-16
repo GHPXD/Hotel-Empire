@@ -14,6 +14,9 @@ var new_dialog: ConfirmationDialog
 var finances_dialog: AcceptDialog
 
 func _ready() -> void:
+	if OS.get_cmdline_user_args().has("--simulate"):
+		call_deferred("_run_headless")
+		return
 	_register_input()
 	hud = HotelHUD.new()
 	add_child(hud)
@@ -49,6 +52,8 @@ func _ready() -> void:
 	_refresh()
 
 func _process(delta: float) -> void:
+	if hud == null:
+		return
 	accumulator += minf(delta, 0.25) * session.speed
 	while accumulator >= session.rules.tick:
 		session.tick(session.rules.tick)
@@ -177,3 +182,22 @@ func _register_input() -> void:
 		event.physical_keycode = binding.key
 		event.ctrl_pressed = binding.get("ctrl", false)
 		InputMap.action_add_event(binding.name, event)
+
+func _run_headless() -> void:
+	var options := SimulationRunner.parse(OS.get_cmdline_user_args())
+	if options.has("error"):
+		print(JSON.stringify(options))
+		get_tree().quit(2)
+		return
+	var result := SimulationRunner.run(options)
+	var encoded := JSON.stringify(result, "\t")
+	print(encoded)
+	if not options.output.is_empty():
+		var file := FileAccess.open(options.output, FileAccess.WRITE)
+		if file == null:
+			push_error("Could not write simulation report: " + options.output)
+			get_tree().quit(2)
+			return
+		file.store_string(encoded)
+		file.close()
+	get_tree().quit(1 if result.has("error") or not result.get("failures", []).is_empty() else 0)

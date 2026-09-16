@@ -10,7 +10,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] M1b hóspedes/check-in/decisão/serviços/economia.
   - [x] M1c elevadores/filas/funcionários/limpeza/reputação.
   - [x] M1d save/load/UI/diagnóstico/QA integrado.
-- [ ] M2 Simulation Core: robustez, stress, métricas e múltiplas seeds.
+- [x] M2 Simulation Core: robustez, stress, métricas e múltiplas seeds.
 - [ ] M3 Hotel Management: upgrades, atribuições e finanças.
 - [ ] M4 Progression: desbloqueios e objetivos.
 - [ ] M5 Content Expansion: novos serviços, perfis e eventos.
@@ -22,6 +22,6 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
-Próximo incremento: M2, cenário headless parametrizado, validação de invariantes em
-múltiplas seeds, save em estados variados e medidas de custo com 100/250/500/1000
-agentes. Não expandir conteúdo enquanto essas medições revelarem defeitos estruturais.
+Próximo incremento: M3, upgrades de salas/elevadores e gestão de atribuições com custos
+e efeitos observáveis. M2 mediu transporte isolado até 1000 agentes e burst integrado;
+isso não conclui M8 nem comprova 1000 hóspedes simultâneos sustentados com render a 60 FPS.
