@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RoomDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://hotel/rooms/room_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"reception"
+display_name = "Recepção"
+category = &"reception"
+width = 3
+build_cost = 800
+maintenance = 12
+capacity = 1
+service_duration = 4.0
+price = 0
+color = Color(0.3, 0.63, 0.6, 1)

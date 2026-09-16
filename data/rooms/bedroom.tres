@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RoomDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://hotel/rooms/room_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"bedroom"
+display_name = "Quarto jardim"
+category = &"lodging"
+width = 2
+build_cost = 600
+maintenance = 8
+capacity = 1
+service_duration = 14.0
+price = 140
+need = &"energy"
+relief = 70.0
+color = Color(0.5, 0.64, 0.81, 1)
