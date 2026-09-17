@@ -16,14 +16,19 @@ var staff_panel: StaffPanel
 var progression_panel: ProgressionPanel
 var operations_panel: OperationsPanel
 var large_text: bool = false
+var audio: HotelAudio
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
 		call_deferred("_run_headless")
 		return
 	_register_input()
+	audio = HotelAudio.new()
+	add_child(audio)
 	hud = HotelHUD.new()
 	add_child(hud)
+	hud.audio_requested.connect(_toggle_audio)
+	hud.audio_button.text = "Som: ligado" if audio.enabled else "Som: desligado"
 	view = HotelView.new()
 	view.hotel = hotel
 	view.session = session
@@ -91,6 +96,7 @@ func _process(delta: float) -> void:
 		session.tick(session.rules.tick)
 		accumulator -= session.rules.tick
 	if session.progression.completed.size() > previous_objectives:
+		audio.play(&"objective")
 		var latest: ObjectiveDefinition = HotelProgression.OBJECTIVES[session.progression.completed.size() - 1]
 		hud.message.text = "Objetivo concluído: %s. %s" % [latest.display_name, latest.reward_text]
 		for definition in HotelCatalog.ROOMS:
@@ -132,6 +138,7 @@ func _on_cell_clicked(column: int, floor_index: int) -> void:
 			return
 		var room := hotel.build(view.blueprint, column, floor_index)
 		selection = room.id
+		audio.play(&"build")
 		hud.message.text = "%s construído. Continue construindo ou pressione Esc." % room.definition().display_name
 	else:
 		var room := hotel.room_at(column, floor_index)
@@ -271,8 +278,14 @@ func _popup_visibility(window: Window, opener: Control) -> void:
 
 func _upgrade_selected() -> void:
 	var error := session.upgrade_room(selection)
+	if error.is_empty():
+		audio.play(&"upgrade")
 	hud.message.text = "Melhoria aplicada. Serviços em curso mantêm o preço combinado." if error.is_empty() else error
 	_refresh()
+
+func _toggle_audio() -> void:
+	audio.toggle()
+	hud.audio_button.text = "Som: ligado" if audio.enabled else "Som: desligado"
 
 func _register_input() -> void:
 	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}, {"name": "show_operations", "key": KEY_F2}, {"name": "large_text", "key": KEY_F4}, {"name": "search_build", "key": KEY_F, "ctrl": true}]:

@@ -60,3 +60,9 @@ inspeciona com Enter, confirma centralização, atualiza lista quando a situaç�
 fecha com Esc e verifica retorno de foco. F4 amplia texto, persiste preferência sem
 alterar snapshot e a mantém ao trocar partida, resetando filtros. Equipe e Finanças
 também abrem/fecham pelo teclado. Capturas normais/ampliadas e janela menor são inspecionadas.
+
+
+M7: `ui_art.gd` monta todos os ambientes e cinco personagens, verifica alpha real,
+recortes dentro das texturas, avanço/loop da caminhada, render em zoom 0,35/0,9/1,8
+sem mutação da sessão e botão Som com persistência. WAVs devem carregar com duração
+válida. Capturas são inspecionadas no jogo. Bateria completa: 17 suítes com Stress/Visual.

@@ -1,5 +1,13 @@
 # Changelog
 
+## M7 — arte raster e animação
+- 15 PNGs originais: cinco interiores, elevador modular, corredor, cidade, passeio
+  e cinco spritesheets transparentes de hóspedes/equipe.
+- Caminhada de quatro poses, espelhamento, âncora dos pés, mipmaps e miniaturas.
+- Três efeitos sonoros originais, botão Som e preferência independente do save.
+- Teste visual dedicado, alpha/recortes/ciclo/zoom e proveniência dos assets.
+- Poses específicas de serviço e trilha musical permanecem fora desta entrega.
+
 ## M6 — interface operacional
 - Painel Operação (F2): métricas atuais, filtros por tipo/andar/situação e inspeção
   de salas com centralização da câmera, incluindo navegação por teclado.

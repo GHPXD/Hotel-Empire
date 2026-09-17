@@ -1,0 +1,137 @@
+[
+  {
+    "path": "assets/art/characters/balanced.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 1017432,
+    "sha256": "96c1af2658d60a8f946c6327a3f0b8a4a0cffb8471e2b702429bbc22e8396ad0",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/business.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 960132,
+    "sha256": "0de3d6a0fb34cf2aad45cb7e445d8911fe2b9b2ddaf0dee144f9450967051638",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/cleaner.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 1003400,
+    "sha256": "d7239f4886c9f3a6186fd0471640ed3b095aa80d2f3fb2fca4277f4e430c706a",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/leisure.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 1152909,
+    "sha256": "21197b7559ba897eee979b215043e6b4bbfe25f40e6643dca83b196269514cea",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/receptionist.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 939846,
+    "sha256": "369b53b9c9be3b66a090e6f22e39575f758da2395d045f7499528f5a02d4237a",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/cabin.png",
+    "width": 1024,
+    "height": 1536,
+    "mode": "RGBA",
+    "bytes": 2219107,
+    "sha256": "30cc9af05b5ec887c54841a96f37be7026980bfd69af663759e61eb85a4213cd",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/city.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGB",
+    "bytes": 2054802,
+    "sha256": "1a5808b300b6fd24d631f0decfcff2a9953f5b0d8c8bf31179ec7063de77ae9e",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/corridor.png",
+    "width": 948,
+    "height": 1659,
+    "mode": "RGB",
+    "bytes": 1653862,
+    "sha256": "ade584c97c99fb8688cdda2a462f1434f789b0d683981e6050c9e37f1b8798bf",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/elevator.png",
+    "width": 949,
+    "height": 1657,
+    "mode": "RGB",
+    "bytes": 1757640,
+    "sha256": "e03619e3a8910f71ca0e2273fb813d0bd4219263aaebf152a4d16910cde9f350",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/ground.png",
+    "width": 2172,
+    "height": 724,
+    "mode": "RGB",
+    "bytes": 1925809,
+    "sha256": "2ece5b737c98f57255212e432a990a65c450a9ab369271a837cbdac439d96d2f",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/bedroom.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGB",
+    "bytes": 2138393,
+    "sha256": "3d54dc9fdec18cdd10790921fa593e0190f64b9b59216b527d2002f94cd751c7",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/cafe.png",
+    "width": 1344,
+    "height": 1170,
+    "mode": "RGB",
+    "bytes": 2188588,
+    "sha256": "ab4fedf2b93a337f40d400c7cbfc8838b513afe29cc6904a1fb36ea9d9aeb14d",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/lounge.png",
+    "width": 1625,
+    "height": 968,
+    "mode": "RGB",
+    "bytes": 2103491,
+    "sha256": "ff90557d4e735cfa801bd7e1e834bceaab69a6318c84a702b24fed7f6ce5171b",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/reception.png",
+    "width": 1625,
+    "height": 968,
+    "mode": "RGB",
+    "bytes": 2047396,
+    "sha256": "c227472c48079de91a5d9f4df447a419daf138a6085130c6694027840415c750",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/restaurant.png",
+    "width": 1624,
+    "height": 968,
+    "mode": "RGB",
+    "bytes": 2175861,
+    "sha256": "c6c32ecd371bf7e5ca7687271f31a62491354517d89d3026b7f7518a6075f696",
+    "generator": "built-in image_gen"
+  }
+]

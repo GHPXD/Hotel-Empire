@@ -1,6 +1,7 @@
 class_name HotelView
 extends Control
-## Original procedural placeholders. This view never changes simulation data.
+## Original raster art; shared textures and deterministic visual animation.
+## This view never changes simulation data.
 
 signal cell_clicked(column: int, floor_index: int)
 signal cancelled
@@ -33,6 +34,7 @@ func room_rect(column: int, floor_index: int, width: int = 1) -> Rect2:
 
 func _ready() -> void:
 	clip_contents = true
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	resized.connect(queue_redraw)
 
@@ -66,18 +68,18 @@ func _gui_input(event: InputEvent) -> void:
 			queue_redraw()
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), Color("d7e6e4"))
-	_draw_skyline()
+	draw_texture_rect(HotelArt.CITY, Rect2(Vector2.ZERO, size), false)
 	if hotel == null:
 		return
 	var ground: Vector2 = origin()
-	draw_rect(Rect2(Vector2(0, ground.y + 8), Vector2(size.x, maxf(0, size.y - ground.y))), Color("7b9a7e"))
-	draw_line(Vector2(0, ground.y + 6), Vector2(size.x, ground.y + 6), Color("bdc9b2"), 12)
+	if ground.y < size.y:
+		draw_texture_rect(HotelArt.GROUND, Rect2(Vector2(0, ground.y), Vector2(size.x, maxf(95, size.y - ground.y))), false)
 	for level in hotel.floors:
 		var floor_rect := room_rect(0, level, HotelModel.COLUMNS)
-		draw_rect(floor_rect, Color("edf0e7"))
 		for column in HotelModel.COLUMNS:
-			draw_rect(room_rect(column, level), Color("c7d3cc"), false, 1)
+			draw_texture_rect(HotelArt.CORRIDOR, room_rect(column, level), false)
+			if blueprint != null:
+				draw_rect(room_rect(column, level), Color(1, 1, 1, 0.3), false, 1)
 		draw_line(floor_rect.end, Vector2(floor_rect.position.x, floor_rect.end.y), Color("576b68"), 5 * zoom_factor)
 		_text(floor_rect.position + Vector2(-35, 25), "T" if level == 0 else str(level), Color("455d5c"), 16)
 	for room in hotel.rooms:
@@ -93,47 +95,22 @@ func _draw() -> void:
 		draw_rect(preview, tint.lightened(0.2), false, 3)
 		_text(preview.position + Vector2(8, 22), "+" if valid else "×", Color.WHITE, 20)
 	_text(Vector2(22, 30), "SEU HOTEL, UM ANDAR DE CADA VEZ", Color("55716e"), 14)
+	draw_rect(Rect2(12, size.y - 46, minf(610, size.x - 24), 34), Color(0.06, 0.14, 0.14, 0.86))
 	_text(Vector2(22, size.y - 22), "Scroll: zoom   •   Botão do meio: mover   •   Clique direito / Esc: cancelar", Color("f1f5e9"), 14)
-
-func _draw_skyline() -> void:
-	for index in 12:
-		var height: float = 100.0 + float((index * 47) % 140)
-		var rectangle := Rect2(index * 125.0 - 15.0, size.y - height - 90, 88, height)
-		draw_rect(rectangle, Color("c1d5d1"))
-		for row in int(height / 25):
-			for col in 3:
-				draw_rect(Rect2(rectangle.position + Vector2(12 + col * 24, 12 + row * 25), Vector2(10, 12)), Color("d1e0d9"))
 
 func _draw_room(room: RoomState) -> void:
 	var definition := room.definition()
-	var rectangle := room_rect(room.column, room.floor_index, definition.width).grow(-3 * zoom_factor)
+	var rectangle := room_rect(room.column, room.floor_index, definition.width).grow(-2 * zoom_factor)
 	if definition.category == &"transport":
 		rectangle = room_rect(room.column, hotel.floors - 1, 1)
 		rectangle.size.y = hotel.floors * FLOOR_HEIGHT * zoom_factor
-		draw_rect(rectangle.grow(-3), Color("788691"))
 		for level in hotel.floors:
-			var door := room_rect(room.column, level).grow(-12 * zoom_factor)
-			draw_rect(door, Color("aebdc5"))
-			draw_line(door.get_center() - Vector2(0, door.size.y / 2), door.get_center() + Vector2(0, door.size.y / 2), Color("566773"), 2)
+			draw_texture_rect(HotelArt.room(definition.id), room_rect(room.column, level), false)
 	else:
-		draw_rect(rectangle, definition.color.lightened(0.35))
-		draw_rect(Rect2(rectangle.position, Vector2(rectangle.size.x, 26 * zoom_factor)), definition.color.darkened(0.25))
-		var base: Vector2 = rectangle.position + Vector2(14, 48) * zoom_factor
-		if definition.category == &"lodging":
-			draw_rect(Rect2(base, Vector2(65, 32) * zoom_factor), Color("fff7de"))
-			draw_rect(Rect2(base + Vector2(20, 0) * zoom_factor, Vector2(45, 32) * zoom_factor), definition.color)
-		elif definition.category == &"reception":
-			draw_rect(Rect2(base + Vector2(5, 10) * zoom_factor, Vector2(115, 25) * zoom_factor), Color("566c59"))
-			draw_circle(base + Vector2(55, 0) * zoom_factor, 9 * zoom_factor, Color("eed5b3"))
-		else:
-			if definition.id == &"lounge":
-				for i in 2:
-					draw_rect(Rect2(base + Vector2(8 + i * 72, 8) * zoom_factor, Vector2(58, 26) * zoom_factor), Color("b6b1da"))
-			else:
-				for i in definition.width:
-					draw_circle(base + Vector2(22 + i * 48, 15) * zoom_factor, 15 * zoom_factor, Color("f8e6bc"))
+		draw_texture_rect(HotelArt.room(definition.id), rectangle, false)
 		if zoom_factor >= 0.65:
-			_text(rectangle.position + Vector2(7, 19) * zoom_factor, definition.display_name + (" N%d" % room.level if room.level > 1 else ""), Color.WHITE, int(13 * zoom_factor))
+			draw_rect(Rect2(rectangle.position, Vector2(rectangle.size.x, 22 * zoom_factor)), Color(0.06, 0.14, 0.14, 0.88))
+			_text(rectangle.position + Vector2(7, 17) * zoom_factor, definition.display_name + (" N%d" % room.level if room.level > 1 else ""), Color("fff1cc"), int(13 * zoom_factor))
 	if room.id == selected:
 		draw_rect(rectangle, Color("f9cd69"), false, 4)
 
@@ -154,27 +131,31 @@ func actor_screen_position(actor: ActorState) -> Vector2:
 func _draw_simulation() -> void:
 	for lift in session.transport.lifts:
 		var cabin := Rect2(world_to_screen(Vector2((lift.column - 0.37) * CELL, -(lift.floor_position + 0.72) * FLOOR_HEIGHT)), Vector2(CELL * 0.74, FLOOR_HEIGHT * 0.65) * zoom_factor)
-		draw_rect(cabin, Color("536c81"))
-		draw_rect(cabin, Color("e9d8a8"), false, 2)
+		draw_texture_rect(HotelArt.CABIN, cabin, false)
 		if zoom_factor > 0.65:
 			_text(cabin.position + Vector2(8, 24) * zoom_factor, "%d/%d" % [lift.passengers.size(), lift.capacity], Color.WHITE, int(13 * zoom_factor))
 	for room in hotel.rooms:
 		if room.dirty:
 			var box := room_rect(room.column, room.floor_index, room.definition().width)
-			_text(box.position + Vector2(8, 42) * zoom_factor, "LIMPAR", Color("754827"), int(13 * zoom_factor))
+			_status_badge(box.position + Vector2(7, 29) * zoom_factor, "LIMPAR")
 		if not room.queue.members.is_empty():
 			var box := room_rect(room.column, room.floor_index, room.definition().width)
-			_text(box.position + Vector2(8, 65) * zoom_factor, "Fila: %d" % room.queue.members.size(), Color("693e27"), int(13 * zoom_factor))
+			_status_badge(box.position + Vector2(7, 51) * zoom_factor, "Fila: %d" % room.queue.members.size())
 	for actor: ActorState in session.actors.values():
 		var point := actor_screen_position(actor)
-		var shirt := actor.archetype().color if actor.role == &"guest" else Color("526c98")
-		if actor.role == &"cleaner":
-			shirt = Color("b16573")
-		if actor.state == &"using":
-			shirt = shirt.lightened(0.2)
-		draw_line(point + Vector2(-3, 5) * zoom_factor, point + Vector2(-4, 17) * zoom_factor, Color("324859"), 3 * zoom_factor)
-		draw_line(point + Vector2(3, 5) * zoom_factor, point + Vector2(5, 17) * zoom_factor, Color("324859"), 3 * zoom_factor)
-		draw_rect(Rect2(point + Vector2(-6, -6) * zoom_factor, Vector2(12, 16) * zoom_factor), shirt)
-		draw_circle(point + Vector2(0, -12) * zoom_factor, 6 * zoom_factor, Color("e8be98"))
+		var texture := HotelArt.character(actor)
+		var region := HotelArt.character_region(actor, session.tick_count)
+		var sprite_size := region.size * HotelArt.character_scale(actor) * zoom_factor
+		var destination := Rect2(point + Vector2(-sprite_size.x / 2.0, 17 * zoom_factor - sprite_size.y), sprite_size)
+		if actor.target_x < actor.x and actor.state == &"walking":
+			destination.position.x += destination.size.x
+			destination.size.x = -destination.size.x
+		draw_texture_rect_region(texture, destination, region)
 		if actor.state in [&"lift_queue", &"checkin", &"service_queue"]:
-			_text(point + Vector2(-4, -24) * zoom_factor, "…", Color("664334"), int(18 * zoom_factor))
+			_status_badge(point + Vector2(-7, -42) * zoom_factor, "…")
+
+func _status_badge(at: Vector2, label: String) -> void:
+	var font_size := maxi(9, int(12 * zoom_factor))
+	var text_size := ThemeDB.fallback_font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	draw_rect(Rect2(at, Vector2(text_size.x + 8, text_size.y + 2)), Color(0.12, 0.18, 0.17, 0.94))
+	_text(at + Vector2(4, text_size.y - 3), label, Color("ffe0a0"), font_size)

@@ -13,14 +13,14 @@ Dependências: apresentação → sessão → sistemas/modelos → definições.
 simulação depende de Control, sprites ou SceneTree. Transporte hierárquico por andar e
 elevador; sem navmesh ou AStar global. Autoload só quando a vida útil exigir.
 
-Implementar somente interfaces necessárias ao marco atual. Pooling, áudio e frameworks
+Implementar somente interfaces necessárias ao marco atual. Pooling e frameworks
 de eventos/conquistas aguardam necessidade demonstrada.
 
 ## Implementado no slice
 
 `HotelSession` possui Economy, HotelModel, TransportSystem, GuestSystem e EmployeeSystem.
 IDs estáveis ligam ActorState, RoomState e ElevatorState. IA/transporte rodam a 10 Hz;
-render redesenha os placeholders a cada frame. Relógio vem de ticks inteiros para evitar
+render usa texturas raster compartilhadas e recortes de animação a cada frame. Relógio vem de ticks inteiros para evitar
 deriva acumulada. O RNG é exclusivo da sessão, nunca o gerador global.
 
 `SessionSnapshot` v4 define campos explicitamente e valida tipos, limites, geometria,
@@ -94,3 +94,12 @@ com padrão seguro para arquivo ausente/inválido. A Theme compartilhada ajusta 
 containers reorganizam a barra e o financeiro rola o extrato dentro de uma janela.
 `UILabels` centraliza rótulos portugueses e normalização de busca. Modais recebem foco
 inicial e devolvem foco ao abridor quando fecham. Schema v4 e regras de simulação não mudam.
+
+
+## Apresentação M7
+HotelArt mapeia IDs de salas/perfis/funções para PNGs e regiões verificadas. HotelView
+renderiza ambientes/cabine e anima caminhada pelo tick, sem escrever no modelo.
+Escala por personagem e âncora inferior evitam variação de altura entre frames.
+HotelAudio pertence à cena principal; reproduz cues de comandos bem-sucedidos e
+objetivos novos, sem observar snapshots nem tocar sons históricos no load.
+Preferência sonora é local em audio.cfg, separada da sessão. Sem mudança do save v4.

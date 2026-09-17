@@ -1,11 +1,26 @@
 # Assets
 
-Código, nomes e visuais devem ser originais. Nenhum asset do jogo de referência.
-Placeholder inicial: desenho vetorial procedural em código, identificado como tal.
-Assets raster temporários, quando necessários, em `assets/placeholders/`.
-Não gerar biblioteca de arte antes de validar gameplay. Recursos finais devem ter
-origem/licença registrada e silhuetas legíveis no zoom mínimo suportado.
+M7 usa 15 PNGs originais produzidos pelo **image_gen integrado ao chat** em
+16/09/2026. Sem CLI/API alternativa, SVG ou imagens copiadas de jogos de referência.
+Não são assets feitos manualmente por um ilustrador. Prompts completos e referências
+em `docs/art/*.txt` e `docs/art/characters.json`; dimensões/hashes em
+`docs/art/manifest.json`. Não atribuir licença de terceiros inexistente.
 
-M5 mantém os novos serviços em desenho procedural: mesas do café e sofás da sala
-de lazer. Perfis de hóspedes usam cores distintas e identificação textual no inspetor;
-a cor não é a única forma de identificação. Não foram importados assets externos.
+| Pasta | Conteúdo |
+|---|---|
+| `assets/art/rooms/` | Recepção, quarto, bistrô, café e lounge |
+| `assets/art/environment/` | Poço, cabine, corredor, cidade e passeio |
+| `assets/art/characters/` | Cinco faixas RGBA de quatro poses e coordenadas |
+| `assets/audio/` | Três WAVs originais sintetizados localmente |
+
+O projeto consome cópias locais versionadas; não depende de `.codex/generated_images`.
+PNGs fonte preservados. Recorte, escala e espelhamento acontecem no Godot;
+transparência preservada. Texturas compartilhadas, mipmaps e filtragem linear.
+`assets/art/art_catalog.gd` centraliza o mapeamento visual por ID.
+
+Sons gerados pelo código original `tools/generate_audio.py`, sem samples externos:
+PCM mono 16 bits/22050 Hz, envelope de ataque/decay e volume moderado na reprodução.
+
+Ver `docs/M7_ART.md` para direção, dimensões, animação, limites e validação.
+Manter IDs estáveis, verificar recortes e conferir novas artes no zoom de jogo.
+Registrar origem/condições de uso; não extrair material de Theme Hotel.

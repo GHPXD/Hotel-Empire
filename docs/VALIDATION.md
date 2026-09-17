@@ -175,3 +175,24 @@
   `m6-large-staff.png`, `m6-large-finances.png`.
 - Sem alteração de regras, RNG, economia, save v4 ou balanceamento. Sem declaração
   de QA de controller, touch, leitores de tela, DPI variados ou construção só por teclado.
+
+
+## M7 — apresentação raster
+- 15 PNGs (25.338.668 bytes de fontes) gerados pelo image_gen integrado; cinco
+  interiores, cinco componentes/cenário e cinco spritesheets RGBA. Prompts,
+  dimensões/hashes e referência visual versionados em docs/art.
+- Bateria `tools/test.ps1 -Stress -Visual`: 17 suítes passaram, sem erros ou leaks.
+  Oito básicas, duas de stress/save e sete gráficas. Nova ui_art cobre transparência,
+  recortes, ciclo de caminhada, render sem mutar snapshot, zoom e preferência sonora.
+- Após habilitar mipmaps do passeio, import final e ui_art/ui_operations reexecutados
+  com janela solicitada 1024x720 (viewport capturado 1024x640), ambos passaram.
+- Inspeção visual de zoom 0,35, 0,9 e 1,8: materiais/silhuetas, recorte, pés no chão,
+  cabine e badges. Evidência padrão: docs/art/hotel-m7.png. Textos permanecem nativos.
+- Seis scripts passaram em gda script validate com caminhos canônicos res://.
+  A primeira tentativa por caminhos relativos retornou falso conflito de classes no
+  Windows; repetir por res:// validou todos. Import e execução também confirmaram.
+- Três WAVs PCM originais carregam; acionamento por construção/melhoria/objetivo e
+  botão Som. Não houve avaliação auditiva humana; música/ambiente contínuo ausentes.
+- Sem mudança na simulação, RNG, economia ou formato v4. Caminhada não equivale a
+  animações específicas de atendimento, sono e limpeza, que seguem como expansão.
+- M8 ainda pendente: estes testes não comprovam 1000 atores renderizados a 60 FPS.

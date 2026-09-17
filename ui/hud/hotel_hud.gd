@@ -18,6 +18,7 @@ signal upgrade_requested
 signal objectives_requested
 signal operations_requested
 signal text_size_requested
+signal audio_requested
 
 var stats: Label
 var message: Label
@@ -38,6 +39,7 @@ var build_category: OptionButton
 var catalog_count: Label
 var sidebar_scroll: ScrollContainer
 var session_buttons: Dictionary = {}
+var audio_button: Button
 const BUILD_CATEGORIES: Array[StringName] = [&"", &"lodging", &"service", &"infrastructure"]
 
 func _ready() -> void:
@@ -87,6 +89,7 @@ func _ready() -> void:
 	objectives_button.pressed.connect(func() -> void: objectives_requested.emit())
 	session_bar.add_child(objectives_button)
 	_button(session_bar, "Debug • F3", func() -> void: debug_requested.emit())
+	audio_button = _button(session_bar, "Som: ligado", func() -> void: audio_requested.emit())
 	debug_label = Label.new()
 	debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	debug_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -139,6 +142,9 @@ func _ready() -> void:
 		button.text = "%s\n$ %d   •   %d células" % [definition.display_name, definition.build_cost, definition.width]
 		button.tooltip_text = "Manutenção: $ %d/dia • Capacidade: %d\nDisponível desde o início" % [definition.maintenance, definition.capacity]
 		button.custom_minimum_size.y = 58
+		button.icon = HotelArt.room(definition.id)
+		button.expand_icon = true
+		button.add_theme_constant_override("icon_max_width", 36)
 		button.pressed.connect(func() -> void: build_requested.emit(definition))
 		tools.add_child(button)
 		build_buttons[definition.id] = button
