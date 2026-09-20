@@ -66,3 +66,7 @@ M7: `ui_art.gd` monta todos os ambientes e cinco personagens, verifica alpha rea
 recortes dentro das texturas, avanço/loop da caminhada, render em zoom 0,35/0,9/1,8
 sem mutação da sessão e botão Som com persistência. WAVs devem carregar com duração
 válida. Capturas são inspecionadas no jogo. Bateria completa: 17 suítes com Stress/Visual.
+
+M8a: `ui_culling.gd` compara pixel a pixel nove câmeras com/sem descarte de desenho
+e confirma snapshot inalterado. Bateria atual: 18 suítes com Stress/Visual;
+benchmark de desempenho separado em debug/performance_profile.gd.

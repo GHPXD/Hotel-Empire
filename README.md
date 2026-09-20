@@ -59,7 +59,7 @@ com vários quartos. Contrate os dois tipos de funcionário antes de abrir chega
 Poucos quartos criam fila na recepção; expansão excessiva pressiona transporte e limpeza.
 
 No Windows deste ambiente: `powershell -File tools/test.ps1 -Visual` executa import,
-oito suítes headless e sete testes gráficos. Passe `-GodotPath` para outro engine.
+oito suítes headless e oito testes gráficos. Passe `-GodotPath` para outro engine.
 Testes isolam dados em `.runtime/`; não sobrescrevem seu save normal.
 Acrescente `-Stress` para cinco seeds, 20 checkpoints de save e transporte com
 100/250/500/1000 agentes. Evidências: [benchmarks](docs/benchmarks/README.md).
@@ -88,3 +88,5 @@ multi-seed são regressões, não balanceamento final. UI desktop testada; mobil
 
 Consulte [ROADMAP.md](ROADMAP.md), [ARCHITECTURE.md](ARCHITECTURE.md) e
 [visão permanente](docs/PRODUCT_VISION.md). Arte raster original, animações e sons: [guia de assets](ASSET_GUIDE.md).
+
+M8 em andamento: perfil e otimização de visibilidade em [benchmarks M8](docs/benchmarks/m8/README.md).

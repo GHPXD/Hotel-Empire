@@ -1,5 +1,11 @@
 # Changelog
 
+## M8a — visibilidade e perfil inicial
+- Descarte conservador de desenhos fora da câmera, preservando simulação e arte.
+- Perfil de render para 100/250/500/1000 hóspedes e sobrecarga de chegadas.
+- Comparação pixel a pixel em nove câmeras; resultados/limites documentados.
+- M8 continua pendente de picos de simulação e perfil integrado com HUD.
+
 ## M7 — arte raster e animação
 - 15 PNGs originais: cinco interiores, elevador modular, corredor, cidade, passeio
   e cinco spritesheets transparentes de hóspedes/equipe.

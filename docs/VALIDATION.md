@@ -196,3 +196,19 @@
 - Sem mudança na simulação, RNG, economia ou formato v4. Caminhada não equivale a
   animações específicas de atendimento, sono e limpeza, que seguem como expansão.
 - M8 ainda pendente: estes testes não comprovam 1000 atores renderizados a 60 FPS.
+
+
+## M8a — visibilidade (20/09/2026)
+- Perfil inicial antes/depois para 100/250/500/1000 hóspedes: resultados brutos e
+  método em docs/benchmarks/m8. Render isolado, não FPS integrado.
+- 1000 distribuídos: média 12,02 → 8,42 ms, draw calls 1090 → 443. Todos visíveis
+  não melhorou; limites registrados. Sobrecarga de chegadas atingiu P95 83,35 ms.
+- ui_culling: nove comparações byte a byte de imagens com/sem otimização passaram;
+  nenhuma mutação do snapshot. Preserva espelhamento, espera e aviso de limpeza.
+- tools/test.ps1 -Visual: 16 suítes passaram (oito básicas e oito gráficas), sem
+  erros/leaks. Suites de stress não repetidas: regras/simulação não foram alteradas.
+- gda validou HotelView, performance_profile e ui_culling com caminhos res://.
+- Um erro de tipagem do array vazio no harness render-only foi corrigido; processo
+  do benchmark falho encerrado por PID identificado, execução repetida e concluída.
+- M8 permanece incompleto: perfil por sistema e teste integrado com ocupação real
+  necessários antes de concluir o marco. project.godot anterior permanece fora do commit.

@@ -17,6 +17,8 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M6 UI/UX Polish: filtros, analytics e melhorias de leitura/foco no desktop.
 - [x] M7 Art & Animation: 15 PNGs originais, caminhada e efeitos sonoros.
 - [ ] M8 Optimization: perfis 100/250/500/1000 agentes.
+  - [x] M8a perfil inicial, descarte de render fora da câmera e equivalência visual.
+  - [ ] M8b picos de simulação, população atendida e perfil integrado com HUD.
 - [ ] M9 QA: regressões, cenários e balanceamento.
 - [ ] M10 Release Preparation: exports, compatibilidade e distribuição.
 

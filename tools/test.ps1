@@ -15,7 +15,7 @@ try {
     if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $importLog -Pattern 'SCRIPT ERROR:|^ERROR:' -Quiet)) { throw 'Godot import failed; inspect .runtime/import.log' }
     $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test', 'management_test', 'progression_test', 'content_test', 'analytics_test')
     if ($Stress) { $suites += @('save_multiseed_test', 'stress_test') }
-    if ($Visual) { $suites += @('ui_smoke', 'ui_resume', 'ui_management', 'ui_progression', 'ui_content', 'ui_operations', 'ui_art') }
+    if ($Visual) { $suites += @('ui_smoke', 'ui_resume', 'ui_management', 'ui_progression', 'ui_content', 'ui_operations', 'ui_art', 'ui_culling') }
     foreach ($suite in $suites) {
         $testLog = Join-Path $runtimeRoot ($suite + '.log')
         $arguments = @('--path', $projectRoot, '--script', ('res://tests/' + $suite + '.gd'), '--log-file', $testLog)

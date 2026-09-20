@@ -18,6 +18,11 @@ var pan: Vector2 = Vector2.ZERO
 var pointer: Vector2 = Vector2(-1000, -1000)
 var drag: bool = false
 var hovered_cell := Vector2i(-1, -1)
+# Reference switch for visual equivalence tests and profiling.
+var cull_offscreen: bool = true
+
+func _in_view(rectangle: Rect2) -> bool:
+	return not cull_offscreen or Rect2(Vector2.ZERO, size).intersects(rectangle.grow(4))
 
 func origin() -> Vector2:
 	return Vector2((size.x - HotelModel.COLUMNS * CELL * zoom_factor) / 2.0, size.y - 95) + pan
@@ -76,7 +81,11 @@ func _draw() -> void:
 		draw_texture_rect(HotelArt.GROUND, Rect2(Vector2(0, ground.y), Vector2(size.x, maxf(95, size.y - ground.y))), false)
 	for level in hotel.floors:
 		var floor_rect := room_rect(0, level, HotelModel.COLUMNS)
+		if not _in_view(floor_rect.grow(40)):
+			continue
 		for column in HotelModel.COLUMNS:
+			if not _in_view(room_rect(column, level)):
+				continue
 			draw_texture_rect(HotelArt.CORRIDOR, room_rect(column, level), false)
 			if blueprint != null:
 				draw_rect(room_rect(column, level), Color(1, 1, 1, 0.3), false, 1)
@@ -105,8 +114,12 @@ func _draw_room(room: RoomState) -> void:
 		rectangle = room_rect(room.column, hotel.floors - 1, 1)
 		rectangle.size.y = hotel.floors * FLOOR_HEIGHT * zoom_factor
 		for level in hotel.floors:
+			if not _in_view(room_rect(room.column, level)):
+				continue
 			draw_texture_rect(HotelArt.room(definition.id), room_rect(room.column, level), false)
 	else:
+		if not _in_view(rectangle):
+			return
 		draw_texture_rect(HotelArt.room(definition.id), rectangle, false)
 		if zoom_factor >= 0.65:
 			draw_rect(Rect2(rectangle.position, Vector2(rectangle.size.x, 22 * zoom_factor)), Color(0.06, 0.14, 0.14, 0.88))
@@ -131,6 +144,8 @@ func actor_screen_position(actor: ActorState) -> Vector2:
 func _draw_simulation() -> void:
 	for lift in session.transport.lifts:
 		var cabin := Rect2(world_to_screen(Vector2((lift.column - 0.37) * CELL, -(lift.floor_position + 0.72) * FLOOR_HEIGHT)), Vector2(CELL * 0.74, FLOOR_HEIGHT * 0.65) * zoom_factor)
+		if not _in_view(cabin):
+			continue
 		draw_texture_rect(HotelArt.CABIN, cabin, false)
 		if zoom_factor > 0.65:
 			_text(cabin.position + Vector2(8, 24) * zoom_factor, "%d/%d" % [lift.passengers.size(), lift.capacity], Color.WHITE, int(13 * zoom_factor))
@@ -143,6 +158,9 @@ func _draw_simulation() -> void:
 			_status_badge(box.position + Vector2(7, 51) * zoom_factor, "Fila: %d" % room.queue.members.size())
 	for actor: ActorState in session.actors.values():
 		var point := actor_screen_position(actor)
+		# Include the entire sprite, waiting badge and antialiased edge at every zoom.
+		if not _in_view(Rect2(point - Vector2(36, 60) * zoom_factor, Vector2(72, 88) * zoom_factor).grow(16)):
+			continue
 		var texture := HotelArt.character(actor)
 		var region := HotelArt.character_region(actor, session.tick_count)
 		var sprite_size := region.size * HotelArt.character_scale(actor) * zoom_factor
@@ -157,5 +175,7 @@ func _draw_simulation() -> void:
 func _status_badge(at: Vector2, label: String) -> void:
 	var font_size := maxi(9, int(12 * zoom_factor))
 	var text_size := ThemeDB.fallback_font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	if not _in_view(Rect2(at, text_size + Vector2(8, 2))):
+		return
 	draw_rect(Rect2(at, Vector2(text_size.x + 8, text_size.y + 2)), Color(0.12, 0.18, 0.17, 0.94))
 	_text(at + Vector2(4, text_size.y - 3), label, Color("ffe0a0"), font_size)
