@@ -34,6 +34,8 @@ Relatório: 6120 ticks, 39 reservas, 42 refeições, 31 limpezas, caixa 8121, ze
 falhas. Captura inspecionada em `windows-smoke.png`. Boot sem argumentos de teste
 também passou. Esses resultados usam o executável oficial release, não o editor.
 
-Pendências M10: matriz de compatibilidade/hardware e revisão de distribuição.
+Matriz local: `tools/test_windows_package.ps1` valida o ZIP em seis combinações de
+janela/texto; método, capturas e limites em `COMPATIBILITY.md`.
+Pendências M10: validação externa de hardware e revisão final de distribuição.
 Não há assinatura digital nem publicação nesta etapa. Os arquivos de licença do
 Godot não atribuem uma licença nova ao código ou à arte do Hotel Empire.
