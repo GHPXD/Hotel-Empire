@@ -1,7 +1,7 @@
 # Assets
 
-M7 usa 15 PNGs originais produzidos pelo **image_gen integrado ao chat** em
-16/09/2026. Sem CLI/API alternativa, SVG ou imagens copiadas de jogos de referência.
+M7 usa 17 PNGs originais produzidos pelo **image_gen integrado ao chat** em
+16/09/2026 e 21/09/2026. Sem CLI/API alternativa, SVG ou imagens copiadas de jogos de referência.
 Não são assets feitos manualmente por um ilustrador. Prompts completos e referências
 em `docs/art/*.txt` e `docs/art/characters.json`; dimensões/hashes em
 `docs/art/manifest.json`. Não atribuir licença de terceiros inexistente.
@@ -10,7 +10,7 @@ em `docs/art/*.txt` e `docs/art/characters.json`; dimensões/hashes em
 |---|---|
 | `assets/art/rooms/` | Recepção, quarto, bistrô, café e lounge |
 | `assets/art/environment/` | Poço, cabine, corredor, cidade e passeio |
-| `assets/art/characters/` | Cinco faixas RGBA de quatro poses e coordenadas |
+| `assets/art/characters/` | Cinco faixas de caminhada e duas de trabalho, RGBA com quatro poses e coordenadas |
 | `assets/audio/` | Três WAVs originais sintetizados localmente |
 
 O projeto consome cópias locais versionadas; não depende de `.codex/generated_images`.

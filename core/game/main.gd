@@ -86,6 +86,11 @@ func _ready() -> void:
 	hotel.changed.connect(_refresh)
 	_refresh()
 	hud.open_button.grab_focus()
+	if OS.get_cmdline_user_args().has("--release-smoke"):
+		call_deferred("_run_release_smoke")
+
+func _run_release_smoke() -> void:
+	await preload("res://debug/release_smoke.gd").new().run(self)
 
 func _process(delta: float) -> void:
 	if hud == null:

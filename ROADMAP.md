@@ -26,6 +26,9 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] Diagnóstico do check-in: 15 cenários isolando limpeza, quartos, recepção e elevador.
   - [x] Revisão final de QA e bateria conjunta de 21 suítes, sem falhas.
 - [ ] M10 Release Preparation: exports, compatibilidade e distribuição.
+  - [x] Preset Windows, build reproduzível, ZIP, licenças e manifesto de hash/revisão.
+  - [x] Boot e operação/save/load pela interface no executável, inclusive ZIP extraído em caminho com espaços.
+  - [ ] Matriz de compatibilidade, revisão final do pacote e preparação de distribuição.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 

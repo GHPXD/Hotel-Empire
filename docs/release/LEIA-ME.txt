@@ -1,0 +1,33 @@
+HOTEL EMPIRE — PROTÓTIPO DESKTOP
+
+Extraia todos os arquivos do ZIP e abra HotelEmpire.exe. Não requer o editor Godot.
+Versão local de desenvolvimento para Windows x86_64, renderização OpenGL.
+
+COMEÇAR
+Construa recepção, quartos e bistrô; para quartos nos andares superiores, construa
+um elevador. Contrate recepcionista e camareiro em Equipe, depois abra o hotel.
+Observe o caixa, as filas e os quartos sujos. Mais quartos também exigem limpeza.
+
+CONTROLES
+Mouse: catálogo, construção, seleção e painéis.
+Roda: zoom. Botão do meio: mover câmera. Botão direito/Esc: cancelar.
+Espaço: pausa. Ctrl+S: salvar. F2: Operação. F3: debug. F4: texto ampliado.
+Ctrl+F: buscar construção. Salvar/Carregar também estão na barra superior.
+
+SAVE
+O save fica em %APPDATA%\Godot\app_userdata\Hotel Empire\hotel-v1.json.
+Não há autosave. Novo hotel pede confirmação e preserva o arquivo já salvo.
+Som e tamanho de texto têm preferências separadas. Copie a pasta de dados para
+fazer backup antes de trocar de versão. Testes de build usam outra pasta isolada.
+
+ESTADO
+Protótipo com construção, hóspedes, serviços, equipe, elevadores, economia,
+objetivos, eventos e save/load. Ainda não é a edição comercial final.
+Validado na máquina de desenvolvimento; compatibilidade com outros computadores,
+desempenho mínimo e distribuição pública ainda estão em avaliação.
+
+CRÉDITOS DO RUNTIME
+Godot Engine 4.7.2 — https://godotengine.org/
+Licença e componentes de terceiros nos arquivos LICENSE-GODOT.txt e
+THIRD-PARTY-NOTICES.txt incluídos neste pacote.
+Arte original gerada com image_gen; efeitos sonoros sintetizados para o projeto.
