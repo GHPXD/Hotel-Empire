@@ -1,6 +1,6 @@
 # M8a — visibilidade e primeiro perfil (20/09/2026)
 
-Estado: M8 em andamento. Medições locais em Ryzen 7 5700U/Radeon integrada,
+Registro inicial M8a. Medições locais em Ryzen 7 5700U/Radeon integrada,
 Godot 4.7.2 Compatibility, Windows. Resultados brutos preservados em baseline.json
 e culled.json. Sem comparação com outro hardware nem promessa de 60 FPS integrado.
 
@@ -64,3 +64,5 @@ godot --path . --script res://tests/ui_culling.gd
 
 Não rodar benchmarks em paralelo com testes. Relatórios em `.runtime/m8-<label>.json`.
 Para referência sem descarte, HotelView.cull_offscreen pode ser desligado pelo harness.
+
+Conclusão do marco para a capacidade atual: [operação contínua com HUD](OPERATING.md).

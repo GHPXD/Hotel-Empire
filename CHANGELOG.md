@@ -1,5 +1,11 @@
 # Changelog
 
+## M8 concluído / início de QA M9
+- Perfil integrado contínuo: 118–120 hóspedes nas regras atuais, serviços e HUD em 1x/3x.
+- P95 local abaixo de 6 ms no cenário de demanda controlada; limitações registradas.
+- Não amplia o limite do jogo nem afirma operação sustentada de 1000 hóspedes.
+- QA do diálogo Novo hotel: cancelar, confirmar, restaurar fundos e preservar/recarregar save.
+
 ## M8 — admissão e saídas
 - Filtra recepções uma vez por step e evita buscar quarto para visitantes sem reserva.
 - Equivalência de snapshots com referência anterior em três seeds e save/load.

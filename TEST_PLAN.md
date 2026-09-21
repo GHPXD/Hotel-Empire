@@ -18,8 +18,9 @@ Evidências de cada marco serão registradas em `docs/VALIDATION.md`.
 Runner Windows: `powershell -File tools/test.ps1 -Visual`. Remove-se `-Visual` para
 somente os testes headless. Os testes gráficos usam `Viewport.push_input` com
 coordenadas locais, não invocação direta dos callbacks dos botões de gameplay.
-O teste de nova sessão usa a API interna de troca; diálogo de confirmação ainda
-precisa de cobertura dedicada. Save/load também tem teste em outro processo.
+O diálogo de nova sessão tem cobertura em ui_new_game: toolbar, Esc para cancelar,
+Enter para confirmar, snapshot preservado no cancelamento, arquivo preservado na
+confirmação e recuperação pela toolbar. A fixture inicial usa a API interna de troca. Save/load também tem teste em outro processo.
 
 `-Stress` adiciona continuidade em 20 checkpoints/5 seeds e verificações de conservação
 de agentes, reconciliação do caixa, capacidade, geometria, referências, ocupação e
@@ -74,3 +75,8 @@ benchmark de desempenho separado em debug/performance_profile.gd.
 Admissão M8: admission_equivalence_test integra -Stress e compara algoritmos em
 três seeds, reconstrução de recepção e continuidade após save/load. Total atual:
 19 suítes com -Stress -Visual (oito básicas, três de stress e oito gráficas).
+
+M9 iniciado: ui_new_game integra -Visual. Runner completo agora inclui 20 suítes
+(oito básicas, três de stress e nove gráficas). Perfil operacional M8 separado:
+debug/operating_profile.gd aquece por 300 segundos e mede fases 1x/3x com serviços
+reais, registra população e valida invariantes; não equivale a soak longo.
