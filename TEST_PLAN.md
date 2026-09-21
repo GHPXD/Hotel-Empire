@@ -80,3 +80,7 @@ M9 iniciado: ui_new_game integra -Visual. Runner completo agora inclui 20 suíte
 (oito básicas, três de stress e nove gráficas). Perfil operacional M8 separado:
 debug/operating_profile.gd aquece por 300 segundos e mede fases 1x/3x com serviços
 reais, registra população e valida invariantes; não equivale a soak longo.
+
+M9 longo: -Soak adiciona long_run_test (seis cenários de 30 dias, invariantes e
+30 checkpoints de continuidade). Conjunto opcional completo: 21 suítes. Metas
+e resultados em docs/benchmarks/m9/README.md; não confundir com FPS ou balanceamento final.

@@ -1,5 +1,10 @@
 # Changelog
 
+## M9 — continuidade longa
+- Seis cenários de 30 dias com orçamento inicial, procura natural e 30 checkpoints de save/load.
+- Runner -Soak e relatório econômico reprodutível para hotéis de dois/oito quartos.
+- Referência solvente; satisfação e decisões de gestão ainda em avaliação, sem mudar regras.
+
 ## M8 concluído / início de QA M9
 - Perfil integrado contínuo: 118–120 hóspedes nas regras atuais, serviços e HUD em 1x/3x.
 - P95 local abaixo de 6 ms no cenário de demanda controlada; limitações registradas.

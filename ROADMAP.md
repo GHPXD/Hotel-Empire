@@ -21,6 +21,8 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] M8b admissão/saídas otimizadas; perfil integrado contínuo com 118–120 hóspedes.
 - [ ] M9 QA: regressões, cenários e balanceamento.
   - [x] Confirmação/cancelamento de novo hotel e preservação do save pela interface.
+  - [x] Seis cenários de 30 dias com orçamento inicial e continuidade de save/load.
+  - [ ] Comparação de decisões de gestão, satisfação e gargalos; revisão final de QA.
 - [ ] M10 Release Preparation: exports, compatibilidade e distribuição.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.

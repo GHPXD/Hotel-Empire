@@ -226,3 +226,27 @@
   Não sustenta afirmação de 1000 hóspedes atendidos simultaneamente.
 - gda validou os quatro scripts envolvidos. Resultados e limitações completos em
   docs/benchmarks/m8/ADMISSION.md. Marco continua aberto para operação preenchida.
+
+
+## M8 operacional e transição M9 (verificado em 21/09/2026)
+- operating_profile: procura normal e controlada, 300 segundos de preparação real,
+  fases de 30 segundos em 1x/3x. Cenário controlado sustenta 118–120 hóspedes;
+  P95 5,70/5,96 ms, serviços ativos e invariantes válidas. operating.json versionado.
+- Regressão tools/test.ps1 -Visual iniciada na execução anterior foi retomada pelo
+  mesmo handle: completou 17 suítes sem falhas. Não foi reiniciada por timeout.
+- gda validou operating_profile e ui_new_game após liberação da revisão automática.
+- Diálogo nativo testado via Esc/Enter com window_id correto; cliques da toolbar
+  reais, cancelamento preserva snapshot/foco, confirmação preserva arquivo e Load
+  recupera partida. Primeira injeção no viewport errado foi corrigida no harness.
+- M8 concluído para a capacidade atual (120); não prova 1000 hóspedes atendidos.
+
+## M9 — continuidade longa (21/09/2026)
+- tools/test.ps1 -Soak: nove suítes passaram (oito básicas e long_run).
+- Seis partidas de 30 dias, 30 checkpoints de save com 120 ticks de continuação
+  comparada por checkpoint. Caixa, agentes, capacidade e referências sem violações.
+- Oito quartos financiados por $12.000: mínimo $2.370, final $34.832–35.112;
+  primeiro desbloqueio de serviços dentro de cinco dias nas três seeds.
+- Montagem inicial inválida (quartos sobre poço) detectada pelo teste, corrigida e
+  repetida. Os relatórios finais representam oito quartos realmente construídos.
+- Reputação modesta nos layouts estáticos exige análise de decisões de gestão;
+  M9 e balanceamento de produção continuam em andamento. Nenhuma regra alterada.

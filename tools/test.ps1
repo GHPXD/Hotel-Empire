@@ -1,7 +1,8 @@
 param(
     [string]$GodotPath = 'C:\Program Files (x86)\Godot\Godot_v4.7.2-stable_win64.exe',
     [switch]$Visual,
-    [switch]$Stress
+    [switch]$Stress,
+    [switch]$Soak
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
@@ -15,6 +16,7 @@ try {
     if ($run.ExitCode -ne 0 -or (Select-String -LiteralPath $importLog -Pattern 'SCRIPT ERROR:|^ERROR:' -Quiet)) { throw 'Godot import failed; inspect .runtime/import.log' }
     $suites = @('foundation_test', 'construction_test', 'simulation_test', 'save_test', 'management_test', 'progression_test', 'content_test', 'analytics_test')
     if ($Stress) { $suites += @('save_multiseed_test', 'stress_test', 'admission_equivalence_test') }
+    if ($Soak) { $suites += @('long_run_test') }
     if ($Visual) { $suites += @('ui_smoke', 'ui_resume', 'ui_management', 'ui_progression', 'ui_content', 'ui_operations', 'ui_art', 'ui_culling', 'ui_new_game') }
     foreach ($suite in $suites) {
         $testLog = Join-Path $runtimeRoot ($suite + '.log')
