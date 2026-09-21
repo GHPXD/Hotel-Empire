@@ -58,6 +58,20 @@ func run(game: Node) -> void:
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
 	game.session.speed = 0
+	game._show_finances()
+	game.get_tree().root.close_requested.emit()
+	check(game.exit_dialog.visible, "packaged close asks before exit")
+	check(not game.finances_dialog.visible, "packaged exit replaces management popup")
+	for pressed: bool in [true, false]:
+		var event := InputEventKey.new()
+		event.keycode = KEY_ESCAPE
+		event.physical_keycode = KEY_ESCAPE
+		event.pressed = pressed
+		event.window_id = game.exit_dialog.get_window_id()
+		Input.parse_input_event(event)
+		await tree.process_frame
+	check(not game.exit_dialog.visible, "packaged exit cancellation resumes game")
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "exit cancellation preserves packaged session")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		check(root.get_texture().get_image().save_png("user://release-smoke.png") == OK, "capture packaged game")

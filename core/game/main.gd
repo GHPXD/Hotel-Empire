@@ -17,6 +17,8 @@ var progression_panel: ProgressionPanel
 var operations_panel: OperationsPanel
 var large_text: bool = false
 var audio: HotelAudio
+var exit_dialog: ConfirmationDialog
+var exit_focus: Control
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -86,6 +88,26 @@ func _ready() -> void:
 	hotel.changed.connect(_refresh)
 	_refresh()
 	hud.open_button.grab_focus()
+	exit_dialog = ConfirmationDialog.new()
+	exit_dialog.theme = hud.theme
+	exit_dialog.title = "Sair do Hotel Empire"
+	exit_dialog.ok_button_text = "Salvar e sair"
+	exit_dialog.cancel_button_text = "Continuar jogando"
+	exit_dialog.dialog_hide_on_ok = false
+	exit_dialog.get_label().autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	exit_dialog.add_button("Sair sem salvar", true, "discard")
+	exit_dialog.confirmed.connect(_save_and_exit)
+	exit_dialog.custom_action.connect(func(action: StringName) -> void:
+		if action == &"discard":
+			_quit_game())
+	exit_dialog.canceled.connect(func() -> void:
+		if is_instance_valid(exit_focus):
+			exit_focus.grab_focus())
+	exit_dialog.transient = true
+	exit_dialog.exclusive = true
+	add_child(exit_dialog)
+	get_tree().auto_accept_quit = false
+	get_tree().root.close_requested.connect(_request_exit)
 	if OS.get_cmdline_user_args().has("--release-smoke"):
 		call_deferred("_run_release_smoke")
 
@@ -93,7 +115,7 @@ func _run_release_smoke() -> void:
 	await preload("res://debug/release_smoke.gd").new().run(self)
 
 func _process(delta: float) -> void:
-	if hud == null:
+	if hud == null or (exit_dialog != null and exit_dialog.visible):
 		return
 	accumulator += minf(delta, 0.25) * session.speed
 	var previous_objectives: int = session.progression.completed.size()
@@ -113,7 +135,33 @@ func _process(delta: float) -> void:
 		ui_timer = 0
 		_refresh()
 
+func _request_exit() -> void:
+	if hotel.rooms.is_empty() and hotel.floors == 1 and session.actors.is_empty() and economy.capital_spent == 0 and session.guests.completed == 0:
+		_quit_game()
+		return
+	if exit_dialog.visible:
+		return
+	for panel: Window in [new_dialog, finances_dialog, staff_panel, progression_panel, operations_panel]:
+		panel.hide()
+	exit_focus = get_viewport().gui_get_focus_owner()
+	exit_dialog.dialog_text = "Salvar esta partida antes de sair?\nSair sem salvar preserva apenas o último save."
+	exit_dialog.popup_centered(Vector2i(560, 190))
+	exit_dialog.get_cancel_button().grab_focus()
+
+func _save_and_exit() -> void:
+	var error := SaveStore.save_session(session, save_path)
+	if not error.is_empty():
+		exit_dialog.dialog_text = error + "\nA partida continua aberta. Tente novamente ou continue jogando."
+		hud.message.text = error
+		return
+	_quit_game()
+
+func _quit_game() -> void:
+	get_tree().quit()
+
 func _unhandled_input(event: InputEvent) -> void:
+	if exit_dialog != null and exit_dialog.visible:
+		return
 	if event.is_action_pressed("ui_cancel"):
 		_cancel()
 	elif event.is_action_pressed("toggle_debug"):

@@ -91,3 +91,10 @@ e quatro intervenções isoladas, usando `debug/checkin_metrics.gd` para atribui
 hóspede-segundos ao bloqueio da cabeça da fila. Ambos duram 30 dias por caso,
 usam orçamento real e verificam invariantes/solvência/compras. Resultados e limites
 em docs/benchmarks/m9/MANAGEMENT.md e CHECKIN.md.
+
+Saída M10: `ui_exit` integra -Visual e exercita o pedido de fechamento da janela,
+Escape/foco, pausa modal sem mudar velocidade, salvar e sair, descarte preservando
+bytes do save, falha de gravação mantendo o hotel aberto e construção só de andares.
+Intercepta apenas o método final de quit para inspecionar os resultados no teste.
+Total atual: 18 suítes com -Visual; 22 com -Visual -Stress -Soak.
+O smoke do executável também abre e cancela a saída preservando a sessão.

@@ -29,6 +29,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] Preset Windows, build reproduzível, ZIP, licenças e manifesto de hash/revisão.
   - [x] Boot e operação/save/load pela interface no executável, inclusive ZIP extraído em caminho com espaços.
   - [x] Matriz local de seis combinações de janela/texto, inventário do ZIP e hash do executável.
+  - [x] Saída com salvar/descartar/cancelar, pausa modal e proteção contra falha de gravação.
   - [ ] Revisão final de distribuição e compatibilidade externa documentada.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.

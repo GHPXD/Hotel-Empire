@@ -13,6 +13,18 @@ O diagnóstico é acionado somente por argumento explícito e escreve arquivos
 texturas, áudio e captura. Não mede FPS nem substitui playtest manual do pacote.
 Também injeta cliques nos controles Godot Salvar/Carregar e verifica a restauração
 completa da sessão após trocar por um hotel vazio. Não é automação do mouse do Windows.
+O smoke abre Finanças, solicita saída, verifica a substituição do modal e cancela
+com Escape, conferindo que a sessão permanece idêntica.
+
+O fechamento de uma partida agora oferece salvar, descartar ou continuar. A
+simulação pausa sem alterar a velocidade selecionada. Erro de gravação mantém
+o diálogo e o hotel abertos. Um hotel sem construção/atores/histórico fecha direto;
+construção só de andares também é protegida. Não há detecção de alterações desde
+o último save: uma partida construída sempre oferece a escolha ao sair.
+`tests/ui_exit.gd` verifica esses caminhos com o diálogo real e intercepta apenas
+o quit final, incluindo preservação dos bytes do save ao descartar. Em 21/09/2026,
+as 18 suítes base/visuais passaram; o caso de outro modal foi acrescentado depois
+e a suíte de saída repetida com sucesso.
 
 O primeiro preset por cena omitiu classes globais; foi corrigido para todos os
 recursos com exclusão de testes, documentação e perfis. Boot normal e diagnóstico
