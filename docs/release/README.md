@@ -29,6 +29,16 @@ o quit final, incluindo preservação dos bytes do save ao descartar. Em 21/09/2
 as 18 suítes base/visuais passaram; o caso de outro modal foi acrescentado depois
 e a suíte de saída repetida com sucesso.
 
+Recuperação: se o save principal falhar, Carregar valida o `.bak` com as mesmas
+regras de tamanho, formato e referências. Somente um backup válido é oferecido,
+com dia/salas/caixa e confirmação para substituir a partida aberta. Cancelar mantém
+o hotel; confirmar troca somente o estado em memória. Arquivos originais ficam
+intactos até um salvamento posterior. A simulação pausa durante a escolha.
+`ui_recovery` cobre corrupção/ausência do principal, backup inválido, precedência
+do principal válido, cancelamento e preservação dos bytes. As 20 suítes base/visuais
+passaram em 21/09/2026. O diagnóstico do pacote também cancela e confirma uma
+recuperação em arquivos exclusivos de teste.
+
 O primeiro preset por cena omitiu classes globais; foi corrigido para todos os
 recursos com exclusão de testes, documentação e perfis. Boot normal e diagnóstico
 do executável corrigido passaram. Evidência inicial: `windows-smoke.json/png`.

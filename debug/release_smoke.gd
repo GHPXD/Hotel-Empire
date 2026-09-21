@@ -71,6 +71,23 @@ func run(game: Node) -> void:
 	await close_popup(tree, game.exit_dialog)
 	check(not game.exit_dialog.visible, "packaged exit cancellation resumes game")
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "exit cancellation preserves packaged session")
+	var recovery_path := "user://release-smoke-corrupt.json"
+	check(SaveStore.save_session(game.session, recovery_path + ".bak").is_empty(), "packaged recovery backup fixture")
+	var broken := FileAccess.open(recovery_path, FileAccess.WRITE)
+	broken.store_string("{broken")
+	broken.close()
+	game.save_path = recovery_path
+	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
+	check(game.recovery_dialog.visible, "packaged recovery offered")
+	await close_popup(tree, game.recovery_dialog)
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "packaged recovery cancel preserves hotel")
+	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
+	game.recovery_dialog.get_ok_button().grab_focus()
+	await popup_key(tree, game.recovery_dialog, KEY_ENTER)
+	check(not game.recovery_dialog.visible, "packaged recovery confirmed")
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "packaged backup restored")
+	check(FileAccess.get_file_as_string(recovery_path) == "{broken", "packaged recovery preserves original file")
+	game.save_path = path
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		check(root.get_texture().get_image().save_png("user://release-smoke.png") == OK, "capture packaged game")
@@ -83,10 +100,13 @@ func run(game: Node) -> void:
 	tree.quit(1 if failures else 0)
 
 func close_popup(tree: SceneTree, window: Window) -> void:
+	await popup_key(tree, window, KEY_ESCAPE)
+
+func popup_key(tree: SceneTree, window: Window, code: Key) -> void:
 	for pressed: bool in [true, false]:
 		var event := InputEventKey.new()
-		event.keycode = KEY_ESCAPE
-		event.physical_keycode = KEY_ESCAPE
+		event.keycode = code
+		event.physical_keycode = code
 		event.pressed = pressed
 		event.window_id = window.get_window_id()
 		Input.parse_input_event(event)

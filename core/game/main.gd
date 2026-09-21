@@ -20,6 +20,8 @@ var audio: HotelAudio
 var exit_dialog: ConfirmationDialog
 var exit_focus: Control
 var help_panel: HotelHelpPanel
+var recovery_dialog: ConfirmationDialog
+var recovery_session: HotelSession
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -84,6 +86,17 @@ func _ready() -> void:
 	add_child(help_panel)
 	hud.help_requested.connect(help_panel.open_guide)
 	_bind_popup(help_panel, hud.help_button)
+	recovery_dialog = ConfirmationDialog.new()
+	recovery_dialog.theme = hud.theme
+	recovery_dialog.title = "Recuperar backup"
+	recovery_dialog.ok_button_text = "Recuperar backup"
+	recovery_dialog.cancel_button_text = "Manter partida aberta"
+	recovery_dialog.dialog_hide_on_ok = false
+	recovery_dialog.get_label().autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	recovery_dialog.confirmed.connect(_recover_save)
+	recovery_dialog.canceled.connect(func() -> void: recovery_session = null)
+	add_child(recovery_dialog)
+	_bind_popup(recovery_dialog, hud.session_buttons["Carregar"])
 	_bind_popup(operations_panel, hud.operations_button)
 	_bind_popup(progression_panel, hud.objectives_button)
 	_bind_popup(staff_panel, hud.session_buttons["Equipe"])
@@ -121,7 +134,7 @@ func _run_release_smoke() -> void:
 	await preload("res://debug/release_smoke.gd").new().run(self)
 
 func _process(delta: float) -> void:
-	if hud == null or (exit_dialog != null and exit_dialog.visible) or (help_panel != null and help_panel.visible):
+	if hud == null or (exit_dialog != null and exit_dialog.visible) or (help_panel != null and help_panel.visible) or (recovery_dialog != null and recovery_dialog.visible):
 		return
 	accumulator += minf(delta, 0.25) * session.speed
 	var previous_objectives: int = session.progression.completed.size()
@@ -147,8 +160,9 @@ func _request_exit() -> void:
 		return
 	if exit_dialog.visible:
 		return
-	for panel: Window in [new_dialog, finances_dialog, staff_panel, progression_panel, operations_panel, help_panel]:
+	for panel: Window in [new_dialog, finances_dialog, staff_panel, progression_panel, operations_panel, help_panel, recovery_dialog]:
 		panel.hide()
+	recovery_session = null
 	exit_focus = get_viewport().gui_get_focus_owner()
 	exit_dialog.dialog_text = "Salvar esta partida antes de sair?\nSair sem salvar preserva apenas o último save."
 	exit_dialog.popup_centered(Vector2i(560, 190))
@@ -166,7 +180,7 @@ func _quit_game() -> void:
 	get_tree().quit()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if exit_dialog != null and exit_dialog.visible:
+	if (exit_dialog != null and exit_dialog.visible) or (recovery_dialog != null and recovery_dialog.visible):
 		return
 	if event.is_action_pressed("ui_cancel"):
 		_cancel()
@@ -247,6 +261,8 @@ func _select_actor(id: int) -> void:
 	_refresh()
 
 func _replace_session(value: HotelSession) -> void:
+	recovery_dialog.hide()
+	recovery_session = null
 	help_panel.hide()
 	operations_panel.hide()
 	operations_panel.reset_filters()
@@ -275,12 +291,29 @@ func _save() -> void:
 	hud.message.text = "Hotel salvo. Você pode fechar e continuar depois." if error.is_empty() else error
 
 func _load() -> void:
+	recovery_session = null
 	var result := SaveStore.load_session(save_path)
 	if not result.error.is_empty():
 		hud.message.text = result.error
+		if FileAccess.file_exists(save_path + ".bak"):
+			var backup := SaveStore.load_session(save_path + ".bak")
+			if backup.error.is_empty():
+				recovery_session = backup.session
+				recovery_dialog.dialog_text = "%s\n\nHá um backup válido do dia %d, com %d salas e caixa $ %d.\nRecuperar substitui a partida aberta pelo backup anterior; progresso não salvo será perdido. Os arquivos não serão alterados." % [result.error, recovery_session.day + 1, recovery_session.hotel.rooms.size(), recovery_session.economy.cash]
+				recovery_dialog.popup_centered(Vector2i(590, 270))
+				recovery_dialog.get_cancel_button().grab_focus()
+			else:
+				hud.message.text += " O backup também não pôde ser carregado."
 		return
 	_replace_session(result.session)
 	hud.message.text = "Hotel carregado: quartos, hóspedes, filas e finanças restaurados."
+
+func _recover_save() -> void:
+	if recovery_session == null:
+		return
+	var restored: HotelSession = recovery_session
+	_replace_session(restored)
+	hud.message.text = "Backup recuperado. Confira a partida e use Salvar quando quiser gravá-la."
 
 func _confirm_new() -> void:
 	new_dialog.popup_centered(Vector2i(450, 170))

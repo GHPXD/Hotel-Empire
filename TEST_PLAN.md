@@ -104,3 +104,9 @@ rolagem com texto ampliado e fechamento ao substituir a partida. Bateria atual:
 19 suítes com -Visual; 23 com -Visual -Stress -Soak. Em 21/09/2026, as 19 passaram.
 O smoke do pacote abre/fecha a ajuda por controles reais e verifica preservação da
 sessão em todas as combinações da matriz de janela/texto.
+
+Recuperação M10: `ui_recovery` cobre backup válido com principal ausente/corrompido,
+rejeição de backup inválido, prioridade do principal válido, cancelamento, pausa
+e preservação dos dois arquivos. Total atual: 20 suítes com -Visual; 24 com
+-Visual -Stress -Soak. O smoke exportado testa cancelamento e recuperação com
+arquivos `release-smoke-corrupt*` isolados, sem tocar no save normal.

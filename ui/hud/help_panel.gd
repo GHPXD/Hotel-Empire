@@ -30,6 +30,7 @@ Som: ligar/desligar efeitos. Esta ajuda pausa o hotel; ao fechar, a velocidade a
 [b]SALVAR E CONTINUAR[/b]
 Clique em Salvar ou use Ctrl+S. Não há autosave.
 Carregar retoma o arquivo salvo. Novo hotel pede confirmação e preserva esse arquivo.
+Se o save principal falhar e houver um backup válido, Carregar oferece recuperar a versão anterior. Você pode cancelar; recuperar não altera os arquivos até usar Salvar.
 Ao fechar a janela, escolha salvar, sair sem salvar ou continuar jogando. Se a gravação falhar, o jogo permanece aberto.
 """
 

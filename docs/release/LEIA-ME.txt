@@ -20,6 +20,9 @@ Ctrl+F: buscar construção. Salvar/Carregar também estão na barra superior.
 SAVE
 O save fica em %APPDATA%\Godot\app_userdata\Hotel Empire\hotel-v1.json.
 Não há autosave. Novo hotel pede confirmação e preserva o arquivo já salvo.
+Se o arquivo principal estiver ausente ou danificado e existir um backup válido,
+Carregar oferece recuperar a versão anterior. Cancele para manter a partida aberta.
+Recuperar não altera os arquivos; confira o hotel antes de usar Salvar novamente.
 Ao fechar uma partida, escolha Salvar e sair, Sair sem salvar ou Continuar jogando.
 O hotel pausa durante essa escolha. Se a gravação falhar, a partida fica aberta.
 Som e tamanho de texto têm preferências separadas. Copie a pasta de dados para
