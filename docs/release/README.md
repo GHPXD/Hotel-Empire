@@ -15,6 +15,9 @@ Também injeta cliques nos controles Godot Salvar/Carregar e verifica a restaura
 completa da sessão após trocar por um hotel vazio. Não é automação do mouse do Windows.
 O smoke abre Finanças, solicita saída, verifica a substituição do modal e cancela
 com Escape, conferindo que a sessão permanece idêntica.
+Também abre Ajuda pelo botão e a fecha com Escape, conferindo a pausa e a ausência
+de alteração na sessão. O guia F1 reúne os primeiros passos, custos recorrentes,
+gargalos, controles e save/load dentro do jogo; usa rolagem e o tema de texto ampliado.
 
 O fechamento de uma partida agora oferece salvar, descartar ou continuar. A
 simulação pausa sem alterar a velocidade selecionada. Erro de gravação mantém

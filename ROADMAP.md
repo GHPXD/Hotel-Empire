@@ -30,6 +30,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] Boot e operação/save/load pela interface no executável, inclusive ZIP extraído em caminho com espaços.
   - [x] Matriz local de seis combinações de janela/texto, inventário do ZIP e hash do executável.
   - [x] Saída com salvar/descartar/cancelar, pausa modal e proteção contra falha de gravação.
+  - [x] Ajuda F1 no jogo: primeiros passos, diagnóstico de filas, controles e saves, com pausa e rolagem.
   - [ ] Revisão final de distribuição e compatibilidade externa documentada.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.

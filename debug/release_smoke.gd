@@ -58,18 +58,17 @@ func run(game: Node) -> void:
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
 	game.session.speed = 0
+	await click(tree, game.hud.help_button.get_global_rect().get_center())
+	check(game.help_panel.visible, "packaged help opens")
+	game._process(1.0)
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "packaged help preserves session")
+	await close_popup(tree, game.help_panel)
+	check(not game.help_panel.visible, "packaged help closes with Escape")
 	game._show_finances()
 	game.get_tree().root.close_requested.emit()
 	check(game.exit_dialog.visible, "packaged close asks before exit")
 	check(not game.finances_dialog.visible, "packaged exit replaces management popup")
-	for pressed: bool in [true, false]:
-		var event := InputEventKey.new()
-		event.keycode = KEY_ESCAPE
-		event.physical_keycode = KEY_ESCAPE
-		event.pressed = pressed
-		event.window_id = game.exit_dialog.get_window_id()
-		Input.parse_input_event(event)
-		await tree.process_frame
+	await close_popup(tree, game.exit_dialog)
 	check(not game.exit_dialog.visible, "packaged exit cancellation resumes game")
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "exit cancellation preserves packaged session")
 	if DisplayServer.get_name() != "headless":
@@ -82,6 +81,16 @@ func run(game: Node) -> void:
 	file.close()
 	print(JSON.stringify(report))
 	tree.quit(1 if failures else 0)
+
+func close_popup(tree: SceneTree, window: Window) -> void:
+	for pressed: bool in [true, false]:
+		var event := InputEventKey.new()
+		event.keycode = KEY_ESCAPE
+		event.physical_keycode = KEY_ESCAPE
+		event.pressed = pressed
+		event.window_id = window.get_window_id()
+		Input.parse_input_event(event)
+		await tree.process_frame
 
 func click(tree: SceneTree, point: Vector2) -> void:
 	var motion := InputEventMouseMotion.new()

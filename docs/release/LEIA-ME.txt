@@ -4,6 +4,8 @@ Extraia todos os arquivos do ZIP e abra HotelEmpire.exe. Não requer o editor Go
 Versão local de desenvolvimento para Windows x86_64, renderização OpenGL.
 
 COMEÇAR
+No jogo, Ajuda (F1) mostra um guia com passos, controles e diagnóstico das filas.
+O hotel pausa enquanto você lê; feche a ajuda para retomar a velocidade anterior.
 Construa recepção, quartos e bistrô; para quartos nos andares superiores, construa
 um elevador. Contrate recepcionista e camareiro em Equipe, depois abra o hotel.
 Observe o caixa, as filas e os quartos sujos. Mais quartos também exigem limpeza.
@@ -12,6 +14,7 @@ CONTROLES
 Mouse: catálogo, construção, seleção e painéis.
 Roda: zoom. Botão do meio: mover câmera. Botão direito/Esc: cancelar.
 Espaço: pausa. Ctrl+S: salvar. F2: Operação. F3: debug. F4: texto ampliado.
+F1: ajuda. No guia, use a rolagem ou as teclas de navegação; Esc fecha o painel.
 Ctrl+F: buscar construção. Salvar/Carregar também estão na barra superior.
 
 SAVE

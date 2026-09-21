@@ -19,6 +19,7 @@ var large_text: bool = false
 var audio: HotelAudio
 var exit_dialog: ConfirmationDialog
 var exit_focus: Control
+var help_panel: HotelHelpPanel
 
 func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--simulate"):
@@ -78,6 +79,11 @@ func _ready() -> void:
 	finances_dialog.theme = hud.theme
 	finances_dialog.title = "Finanças do hotel"
 	add_child(finances_dialog)
+	help_panel = HotelHelpPanel.new()
+	help_panel.theme = hud.theme
+	add_child(help_panel)
+	hud.help_requested.connect(help_panel.open_guide)
+	_bind_popup(help_panel, hud.help_button)
 	_bind_popup(operations_panel, hud.operations_button)
 	_bind_popup(progression_panel, hud.objectives_button)
 	_bind_popup(staff_panel, hud.session_buttons["Equipe"])
@@ -115,7 +121,7 @@ func _run_release_smoke() -> void:
 	await preload("res://debug/release_smoke.gd").new().run(self)
 
 func _process(delta: float) -> void:
-	if hud == null or (exit_dialog != null and exit_dialog.visible):
+	if hud == null or (exit_dialog != null and exit_dialog.visible) or (help_panel != null and help_panel.visible):
 		return
 	accumulator += minf(delta, 0.25) * session.speed
 	var previous_objectives: int = session.progression.completed.size()
@@ -141,7 +147,7 @@ func _request_exit() -> void:
 		return
 	if exit_dialog.visible:
 		return
-	for panel: Window in [new_dialog, finances_dialog, staff_panel, progression_panel, operations_panel]:
+	for panel: Window in [new_dialog, finances_dialog, staff_panel, progression_panel, operations_panel, help_panel]:
 		panel.hide()
 	exit_focus = get_viewport().gui_get_focus_owner()
 	exit_dialog.dialog_text = "Salvar esta partida antes de sair?\nSair sem salvar preserva apenas o último save."
@@ -176,6 +182,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_text_size()
 	elif event.is_action_pressed("search_build"):
 		hud.build_search.grab_focus()
+	elif event.is_action_pressed("show_help"):
+		help_panel.open_guide()
 
 func _on_build_requested(definition: RoomDefinition) -> void:
 	view.blueprint = definition
@@ -239,6 +247,7 @@ func _select_actor(id: int) -> void:
 	_refresh()
 
 func _replace_session(value: HotelSession) -> void:
+	help_panel.hide()
 	operations_panel.hide()
 	operations_panel.reset_filters()
 	hud.reset_catalog()
@@ -341,6 +350,11 @@ func _toggle_audio() -> void:
 	hud.audio_button.text = "Som: ligado" if audio.enabled else "Som: desligado"
 
 func _register_input() -> void:
+	if not InputMap.has_action("show_help"):
+		InputMap.add_action("show_help")
+		var help_key := InputEventKey.new()
+		help_key.physical_keycode = KEY_F1
+		InputMap.action_add_event("show_help", help_key)
 	for binding in [{"name": "toggle_debug", "key": KEY_F3}, {"name": "save_hotel", "key": KEY_S, "ctrl": true}, {"name": "pause_hotel", "key": KEY_SPACE}, {"name": "show_operations", "key": KEY_F2}, {"name": "large_text", "key": KEY_F4}, {"name": "search_build", "key": KEY_F, "ctrl": true}]:
 		if InputMap.has_action(binding.name):
 			continue

@@ -98,3 +98,9 @@ bytes do save, falha de gravação mantendo o hotel aberto e construção só de
 Intercepta apenas o método final de quit para inspecionar os resultados no teste.
 Total atual: 18 suítes com -Visual; 22 com -Visual -Stress -Soak.
 O smoke do executável também abre e cancela a saída preservando a sessão.
+
+Ajuda M10: `ui_help` testa botão/F1, foco, End/Escape, pausa sem mutar snapshot,
+rolagem com texto ampliado e fechamento ao substituir a partida. Bateria atual:
+19 suítes com -Visual; 23 com -Visual -Stress -Soak. Em 21/09/2026, as 19 passaram.
+O smoke do pacote abre/fecha a ajuda por controles reais e verifica preservação da
+sessão em todas as combinações da matriz de janela/texto.

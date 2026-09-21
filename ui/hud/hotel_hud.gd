@@ -19,6 +19,7 @@ signal objectives_requested
 signal operations_requested
 signal text_size_requested
 signal audio_requested
+signal help_requested
 
 var stats: Label
 var message: Label
@@ -40,6 +41,7 @@ var catalog_count: Label
 var sidebar_scroll: ScrollContainer
 var session_buttons: Dictionary = {}
 var audio_button: Button
+var help_button: Button
 const BUILD_CATEGORIES: Array[StringName] = [&"", &"lodging", &"service", &"infrastructure"]
 
 func _ready() -> void:
@@ -90,6 +92,7 @@ func _ready() -> void:
 	session_bar.add_child(objectives_button)
 	_button(session_bar, "Debug • F3", func() -> void: debug_requested.emit())
 	audio_button = _button(session_bar, "Som: ligado", func() -> void: audio_requested.emit())
+	help_button = _button(session_bar, "Ajuda • F1", func() -> void: help_requested.emit())
 	debug_label = Label.new()
 	debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	debug_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -172,7 +175,7 @@ func _ready() -> void:
 	layout.add_child(footer)
 	message = Label.new()
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	message.text = "Bem-vindo. Escolha uma sala e clique no terreno."
+	message.text = "Comece pela recepção, quartos e equipe. Ajuda • F1 mostra como abrir seu hotel."
 	footer.add_child(message)
 
 func refresh(hotel: HotelModel, selected: RoomState) -> void:
