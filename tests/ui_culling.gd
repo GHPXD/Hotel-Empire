@@ -14,6 +14,12 @@ func run() -> void:
 		actor.floor_index = index % 20
 		actor.state = &"walking" if index % 2 else &"checkin"
 		actor.target_x = 0
+		if index % 5 == 0:
+			actor.role = &"cleaner"
+			actor.state = &"cleaning"
+		elif index % 5 == 1:
+			actor.role = &"receptionist"
+			actor.state = &"working"
 	for room: RoomState in session.hotel.rooms:
 		if room.definition().category == &"lodging":
 			room.dirty = true

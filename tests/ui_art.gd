@@ -29,6 +29,21 @@ func run() -> void:
 		check(HotelArt.character_region(actor, 0) == HotelArt.character_region(actor, 4), "walk loops after four ticks")
 		for box: Array in regions:
 			check(Rect2(Vector2.ZERO, texture.get_size()).encloses(Rect2(box[0], box[1], box[2], box[3])), "frame contained in texture")
+	for actor: ActorState in session.actors.values():
+		if actor.role not in [&"cleaner", &"receptionist"]:
+			continue
+		var walk_texture := HotelArt.character(actor)
+		actor.state = &"cleaning" if actor.role == &"cleaner" else &"working"
+		var work_texture := HotelArt.character(actor)
+		check(work_texture != walk_texture, "dedicated work texture")
+		check(work_texture.get_image().detect_alpha() != Image.ALPHA_NONE, "work alpha")
+		check(HotelArt.character_region(actor, 0) != HotelArt.character_region(actor, 4), "work advances")
+		check(HotelArt.character_region(actor, 0) == HotelArt.character_region(actor, 16), "work loops")
+		for box: Array in HotelArt.character_regions(actor):
+			check(Rect2(Vector2.ZERO, work_texture.get_size()).encloses(Rect2(box[0], box[1], box[2], box[3])), "work frame bounds")
+		actor.state = &"idle"
+		check(HotelArt.character(actor) == walk_texture, "idle restores base texture")
+		actor.state = &"cleaning" if actor.role == &"cleaner" else &"working"
 	session.speed = 0
 	session.hotel.rooms.back().dirty = true
 	game._replace_session(session)

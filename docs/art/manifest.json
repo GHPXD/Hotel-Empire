@@ -133,5 +133,23 @@
     "bytes": 2175861,
     "sha256": "c6c32ecd371bf7e5ca7687271f31a62491354517d89d3026b7f7518a6075f696",
     "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/cleaner-cleaning.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 947616,
+    "sha256": "b8ccdaeb2c1702bf4a8b09e64b702bdd385a6088a02c7fac30aa740f1b8100e4",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/receptionist-working.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 956249,
+    "sha256": "299ea35c8fa182b32c88b137b066dfee8c2330639196b9cde325b37fe342afae",
+    "generator": "built-in image_gen"
   }
 ]

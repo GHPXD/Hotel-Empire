@@ -10,6 +10,10 @@ Arte original gerada pelo image_gen integrado; prompts e referências em `docs/a
 - Corredor modular, cidade ao fundo e passeio/jardim no primeiro plano.
 - Cinco personagens: hóspedes equilibrado, negócios e lazer, recepcionista e limpeza.
   Cada um tem PNG transparente com quatro poses de caminhada.
+- Duas faixas adicionais de trabalho: limpeza com esfregão e atendimento com
+  prancheta, quatro poses cada. Originais RGBA preservados, gerados no chat pelo
+  image_gen integrado; prompts em `art/staff-actions-prompts.json` e recortes em
+  `assets/art/characters/action-regions.json`.
 - Miniaturas do catálogo reaproveitam a arte da instalação correspondente.
 - Três efeitos WAV sintetizados por `tools/generate_audio.py`: construção, melhoria
   e objetivo. Botão Som com preferência em `user://audio.cfg`.
@@ -29,9 +33,14 @@ Caminhada: quatro frames a 10 quadros/s na velocidade normal, derivados do tick,
 com fase por ID. Espelhamento segue destino horizontal. Parado usa pose 1; pausa
 congela animação. Cabine acompanha posição autoritativa. Não há RNG, nós por ator
 ou estado visual no save. Não há mudanças de economia ou gameplay.
+Os estados `cleaning` e `working` selecionam as faixas próprias dos funcionários,
+com troca de pose a cada quatro ticks (2,5 fps). Caminhada e espera mantêm a faixa
+original. O atendimento representa trabalho administrativo durante a atribuição,
+mesmo sem um hóspede presente. A geração tem pequenas variações entre poses;
+não equivale a uma animação produzida com rig esquelético.
 
 ## Limites
-Sem poses dedicadas para sentar, dormir, limpar ou atender: parados usam uma pose da
+Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
 faixa. Upgrades usam a mesma pintura com nível textual. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
@@ -43,3 +52,8 @@ ausência de mutação da partida e persistência de Som. Capturas:
 `.runtime/m7-art-0.35.png`, `m7-art-0.90.png`, `m7-art-1.80.png`.
 Demais suítes cobrem construção, seleção, bloqueios, filas, save/load, foco,
 texto ampliado e retomada com novo render.
+
+Extensão de funcionários (21/09/2026): catálogo válido pelo gda; `ui_art` e
+`ui_culling` passaram sem falhas, incluindo nove combinações de câmera com as
+ações novas. Verificados alpha, limites, ciclo, retorno à faixa original e ausência
+de mutação do snapshot. Captura inspecionada: `art/hotel-staff-actions.png`.

@@ -19,6 +19,8 @@ static func room(id: StringName) -> Texture2D:
 	return ROOMS.get(id)
 
 const CHARACTERS: Dictionary = {
+	&"cleaner-cleaning": preload("res://assets/art/characters/cleaner-cleaning.png"),
+	&"receptionist-working": preload("res://assets/art/characters/receptionist-working.png"),
 	&"balanced": preload("res://assets/art/characters/balanced.png"),
 	&"business": preload("res://assets/art/characters/business.png"),
 	&"cleaner": preload("res://assets/art/characters/cleaner.png"),
@@ -31,15 +33,34 @@ static func character_id(actor: ActorState) -> StringName:
 	return actor.archetype_id if actor.role == &"guest" else actor.role
 
 static func character(actor: ActorState) -> Texture2D:
-	return CHARACTERS[character_id(actor)]
+	return CHARACTERS[animation_id(actor)]
+
+const ACTION_REGIONS: Dictionary = {
+	&"cleaner-cleaning": [[111, 88, 289, 710], [506, 104, 387, 694], [974, 91, 294, 707], [1364, 109, 384, 694]],
+	&"receptionist-working": [[121, 44, 271, 796], [531, 60, 297, 780], [955, 43, 275, 797], [1353, 41, 390, 799]],
+}
+
+static func animation_id(actor: ActorState) -> StringName:
+	if actor.role == &"cleaner" and actor.state == &"cleaning":
+		return &"cleaner-cleaning"
+	if actor.role == &"receptionist" and actor.state == &"working":
+		return &"receptionist-working"
+	return character_id(actor)
+
+static func character_regions(actor: ActorState) -> Array:
+	var id := animation_id(actor)
+	return ACTION_REGIONS[id] if ACTION_REGIONS.has(id) else REGIONS[id]
 
 static func character_region(actor: ActorState, tick: int) -> Rect2:
 	var index: int = (tick + actor.id * 2) % 4 if actor.state == &"walking" else 1
-	var box: Array = REGIONS[character_id(actor)][index]
+	if ACTION_REGIONS.has(animation_id(actor)):
+		# Deliberate work gestures at 2.5 fps; pausing freezes the authoritative tick.
+		index = (floori(tick / 4.0) + actor.id) % 4
+	var box: Array = character_regions(actor)[index]
 	return Rect2(box[0], box[1], box[2], box[3])
 
 static func character_scale(actor: ActorState) -> float:
 	var height: float = 0.0
-	for box: Array in REGIONS[character_id(actor)]:
+	for box: Array in character_regions(actor):
 		height = maxf(height, box[3])
 	return 46.0 / height
