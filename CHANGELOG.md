@@ -1,5 +1,12 @@
 # Changelog
 
+## M8 — admissão e saídas
+- Filtra recepções uma vez por step e evita buscar quarto para visitantes sem reserva.
+- Equivalência de snapshots com referência anterior em três seeds e save/load.
+- P95 de sobrecarga com alvo 1000: 83,35 para 9,28 ms neste hardware.
+- Perfil da cena real com HUD registra queda da população após rejeições;
+  operação preenchida sustentada continua pendente.
+
 ## M8a — visibilidade e perfil inicial
 - Descarte conservador de desenhos fora da câmera, preservando simulação e arte.
 - Perfil de render para 100/250/500/1000 hóspedes e sobrecarga de chegadas.

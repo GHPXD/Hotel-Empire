@@ -212,3 +212,17 @@
   do benchmark falho encerrado por PID identificado, execução repetida e concluída.
 - M8 permanece incompleto: perfil por sistema e teste integrado com ocupação real
   necessários antes de concluir o marco. project.godot anterior permanece fora do commit.
+
+
+## M8 — admissão/saídas (20/09/2026)
+- Duas otimizações locais, sem alterar decisões, ordem de filas ou estado salvo.
+- Bateria completa tools/test.ps1 -Stress -Visual: 19 suítes passaram sem erros/leaks.
+- Equivalência: três seeds, 240 ticks de reposição por seed, checkpoints completos,
+  recepção reconstruída após outras salas e 100 ticks de continuidade por save.
+- Perfil controlado da sobrecarga: P95 1000 caiu 83,35 → 16,85 → 9,28 ms.
+  Totais de saídas, população final e pedidos de transporte permaneceram iguais.
+- Perfil integrado com HUD: quatro ondas e 12 segundos de simulação a 1x cada;
+  todas terminaram com 24 hóspedes, quatro reservas e invariantes válidas.
+  Não sustenta afirmação de 1000 hóspedes atendidos simultaneamente.
+- gda validou os quatro scripts envolvidos. Resultados e limitações completos em
+  docs/benchmarks/m8/ADMISSION.md. Marco continua aberto para operação preenchida.

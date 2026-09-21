@@ -24,7 +24,10 @@ func run() -> void:
 	var view := HotelView.new()
 	root.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for population in [100, 250, 500, 1000]:
+	var render_sizes: Array[int] = []
+	if not OS.get_cmdline_user_args().has("--simulation-only"):
+		render_sizes.assign([100, 250, 500, 1000])
+	for population in render_sizes:
 		var session := SimulationRunner.make_hotel(123, "tower", 1000000)
 		session.speed = 0
 		for index in population:

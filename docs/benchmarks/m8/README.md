@@ -4,6 +4,8 @@ Estado: M8 em andamento. Medições locais em Ryzen 7 5700U/Radeon integrada,
 Godot 4.7.2 Compatibility, Windows. Resultados brutos preservados em baseline.json
 e culled.json. Sem comparação com outro hardware nem promessa de 60 FPS integrado.
 
+Continuação: [admissão, saídas e perfil integrado inicial](ADMISSION.md).
+
 ## Método
 `debug/performance_profile.gd` abre HotelView real com todos os PNGs M7, torre de
 20 andares e 10 funcionários. Acrescenta 100/250/500/1000 hóspedes posicionados

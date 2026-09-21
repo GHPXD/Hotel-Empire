@@ -70,3 +70,7 @@ válida. Capturas são inspecionadas no jogo. Bateria completa: 17 suítes com S
 M8a: `ui_culling.gd` compara pixel a pixel nove câmeras com/sem descarte de desenho
 e confirma snapshot inalterado. Bateria atual: 18 suítes com Stress/Visual;
 benchmark de desempenho separado em debug/performance_profile.gd.
+
+Admissão M8: admission_equivalence_test integra -Stress e compara algoritmos em
+três seeds, reconstrução de recepção e continuidade após save/load. Total atual:
+19 suítes com -Stress -Visual (oito básicas, três de stress e oito gráficas).

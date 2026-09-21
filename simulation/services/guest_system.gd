@@ -14,6 +14,8 @@ func _init(config: SimulationRules) -> void:
 
 func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, delta: float, time: float) -> void:
 	var departures: Array[int] = []
+	# Geometry cannot change inside this step. Filter once, preserving build order.
+	var arrival_rooms := _arrival_rooms(hotel)
 	for actor: ActorState in actors.values():
 		if actor.role != &"guest":
 			continue
@@ -26,7 +28,7 @@ func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, del
 			actor.happiness = maxf(0, actor.happiness - delta * 0.15)
 		match actor.state:
 			&"arriving":
-				_arrive(actor, hotel)
+				_arrive(actor, arrival_rooms)
 			&"checkin":
 				_check_in(actor, actors, hotel, transport, delta, time)
 			&"deciding":
@@ -44,8 +46,15 @@ func step(actors: Dictionary, hotel: HotelModel, transport: TransportSystem, del
 	for id in departures:
 		actors.erase(id)
 
-func _arrive(actor: ActorState, hotel: HotelModel) -> void:
+func _arrival_rooms(hotel: HotelModel) -> Array[RoomState]:
+	var result: Array[RoomState] = []
 	for room in hotel.rooms:
+		if room.definition().category == &"reception":
+			result.append(room)
+	return result
+
+func _arrive(actor: ActorState, arrival_rooms: Array[RoomState]) -> void:
+	for room in arrival_rooms:
 		if room.definition().category == &"reception" and room.queue.join(actor.id):
 			actor.target_room = room.id
 			actor.travel_to(room.center(), room.floor_index, &"checkin")
@@ -183,6 +192,9 @@ func _use(actor: ActorState, hotel: HotelModel, delta: float, time: float) -> vo
 	actor.state = &"deciding"
 
 func _release_room(actor: ActorState, hotel: HotelModel) -> void:
+	# Rejected arrivals never booked a room; -1 is already the released state.
+	if actor.bedroom == -1:
+		return
 	var room := hotel.by_id(actor.bedroom)
 	if room != null and room.occupant == actor.id:
 		room.occupant = -1
