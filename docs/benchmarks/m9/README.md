@@ -31,7 +31,8 @@ divergência de continuidade. Nenhuma alteração de balanceamento foi feita.
 Solvência não equivale a boa qualidade: trusted_hotel não foi obtido nesses layouts
 estáticos. Não afirmar que a economia está finalizada. Próxima investigação M9:
 comparar expansão, equipe, serviços e upgrades financiados pela própria partida,
-com métricas de satisfação/filas, antes de ajustar parâmetros.
+com métricas de satisfação/filas, antes de ajustar parâmetros. Essa comparação foi
+executada posteriormente: método e resultados em `MANAGEMENT.md`.
 
 ## Execução
 `tools/test.ps1 -Soak` executa import, oito suítes básicas e long_run_test.
