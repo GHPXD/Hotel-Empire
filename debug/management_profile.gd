@@ -5,10 +5,12 @@ var failures: int = 0
 
 func _initialize() -> void:
 	var reports: Array[Dictionary] = []
-	for policy: String in ["static", "services", "capacity", "combined"]:
+	var diagnose: bool = "--checkin" in OS.get_cmdline_user_args()
+	var policies: Array = ["static", "cleaner_only", "reception_only", "bedrooms_only", "lift_only"] if diagnose else ["static", "services", "capacity", "combined"]
+	for policy: String in policies:
 		for seed_value: int in [1, 17, 123]:
 			reports.append(run_case(seed_value, policy))
-	var file := FileAccess.open("res://.runtime/m9-management.json", FileAccess.WRITE)
+	var file := FileAccess.open("res://.runtime/m9-checkin.json" if diagnose else "res://.runtime/m9-management.json", FileAccess.WRITE)
 	file.store_string(JSON.stringify({"days": 30, "reserve": 1000, "failures": failures, "reports": reports}, "\t"))
 	file.close()
 	print(JSON.stringify({"suite": "management_profile", "failures": failures, "scenarios": reports.size()}))
@@ -17,7 +19,7 @@ func _initialize() -> void:
 func run_case(seed_value: int, policy: String) -> Dictionary:
 	var session := HotelSession.new(seed_value)
 	var starting_cash: int = session.economy.cash
-	session.hotel.build(HotelCatalog.room(&"reception"), 0, 0)
+	var reception := session.hotel.build(HotelCatalog.room(&"reception"), 0, 0)
 	session.hotel.build(HotelCatalog.room(&"restaurant"), 3, 0)
 	var lift := session.hotel.build(HotelCatalog.room(&"elevator"), 6, 0)
 	for level: int in [1, 2]:
@@ -40,7 +42,18 @@ func run_case(seed_value: int, policy: String) -> Dictionary:
 			for column: int in [10, 12]:
 				actions.append({"kind": "build", "room": &"bedroom", "column": column, "floor": level})
 	var purchases: Array[Dictionary] = []
+	if policy == "cleaner_only":
+		actions.append({"kind": "hire"})
+	if policy == "reception_only":
+		actions.append({"kind": "upgrade", "id": reception.id})
+	if policy == "lift_only":
+		actions.append({"kind": "upgrade", "id": lift.id})
+	if policy == "bedrooms_only":
+		for level: int in [1, 2]:
+			for column: int in [10, 12]:
+				actions.append({"kind": "build", "room": &"bedroom", "column": column, "floor": level})
 	var queues := preload("res://debug/queue_metrics.gd").new()
+	var checkin := preload("res://debug/checkin_metrics.gd").new()
 	var minimum_cash: int = session.economy.cash
 	var state_samples: Dictionary = {}
 	var objective_ticks: Dictionary = {}
@@ -54,6 +67,7 @@ func run_case(seed_value: int, policy: String) -> Dictionary:
 				action["tick"] = index
 				action["cost"] = before - session.economy.cash
 				purchases.append(action)
+		checkin.observe(session)
 		session.tick(session.rules.tick)
 		queues.observe(session)
 		minimum_cash = mini(minimum_cash, session.economy.cash)
@@ -73,6 +87,7 @@ func run_case(seed_value: int, policy: String) -> Dictionary:
 		failures += 1
 		push_error("Policy insolvent or unfinished: %s / %d" % [policy, seed_value])
 	var report: Dictionary = {"policy": policy, "seed": seed_value, "ticks": session.tick_count, "minimum_cash": minimum_cash, "ending_cash": session.economy.cash, "bookings": session.guests.bookings, "meals": session.guests.meals_served, "cleaned": session.employees.cleaned, "departures": session.guests.completed, "reputation": session.guests.reputation, "queues": queues.summary(), "guest_state_samples": state_samples, "purchases": purchases, "objective_ticks": objective_ticks}
+	report["checkin_guest_seconds_by_head_blocker"] = checkin.guest_seconds
 	print(JSON.stringify(report))
 	return report
 

@@ -84,3 +84,10 @@ reais, registra população e valida invariantes; não equivale a soak longo.
 M9 longo: -Soak adiciona long_run_test (seis cenários de 30 dias, invariantes e
 30 checkpoints de continuidade). Conjunto opcional completo: 21 suítes. Metas
 e resultados em docs/benchmarks/m9/README.md; não confundir com FPS ou balanceamento final.
+
+Perfis de gestão M9 separados da bateria: `debug/management_profile.gd` compara
+quatro políticas em três seeds. Com argumento `-- --checkin`, compara referência
+e quatro intervenções isoladas, usando `debug/checkin_metrics.gd` para atribuir
+hóspede-segundos ao bloqueio da cabeça da fila. Ambos duram 30 dias por caso,
+usam orçamento real e verificam invariantes/solvência/compras. Resultados e limites
+em docs/benchmarks/m9/MANAGEMENT.md e CHECKIN.md.

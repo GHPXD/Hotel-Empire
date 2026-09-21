@@ -19,16 +19,17 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M8 Optimization: perfis 100/250/500/1000 agentes e operação até o limite atual de 120.
   - [x] M8a perfil inicial, descarte de render fora da câmera e equivalência visual.
   - [x] M8b admissão/saídas otimizadas; perfil integrado contínuo com 118–120 hóspedes.
-- [ ] M9 QA: regressões, cenários e balanceamento.
+- [x] M9 QA: regressões, cenários e diagnóstico de balanceamento do protótipo desktop.
   - [x] Confirmação/cancelamento de novo hotel e preservação do save pela interface.
   - [x] Seis cenários de 30 dias com orçamento inicial e continuidade de save/load.
   - [x] Comparação de quatro decisões de gestão em três seeds, 30 dias e orçamento real.
-  - [ ] Diagnóstico causal do check-in e revisão final de QA.
+  - [x] Diagnóstico do check-in: 15 cenários isolando limpeza, quartos, recepção e elevador.
+  - [x] Revisão final de QA e bateria conjunta de 21 suítes, sem falhas.
 - [ ] M10 Release Preparation: exports, compatibilidade e distribuição.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
-Próximo incremento: M9, QA de cenários, continuidade longa e balanceamento.
+Próximo incremento: M10, export local, validação do pacote e documentação de distribuição.
 M6 não conclui suporte integral a teclado/controller, leitores de tela ou touch.
 M8 mede render isolado, transporte e sobrecarga até 1000; operação integrada
 contínua respeita o limite atual de 120. Não comprova 1000 hóspedes atendidos
