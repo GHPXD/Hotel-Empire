@@ -187,5 +187,23 @@
     "bytes": 2261648,
     "sha256": "fb4d1037bf29f677887af8347074d875b031e1a381ddaac47d0d8aca3815fca4",
     "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/bedroom-level-3.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGB",
+    "bytes": 2109663,
+    "sha256": "45587423ea6431bc45c4d3d0726c2569d26b6cd18bc564803172214155002d65",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/reception-level-3.png",
+    "width": 1625,
+    "height": 968,
+    "mode": "RGB",
+    "bytes": 2057506,
+    "sha256": "f7c6f6556b568e540b61bfe0d9ab3e2af9e44b2e4aa14050bcded862cab935bf",
+    "generator": "built-in image_gen"
   }
 ]

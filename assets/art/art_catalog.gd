@@ -22,6 +22,8 @@ const ROOM_UPGRADES: Dictionary = {
 }
 
 const ROOM_FINAL_UPGRADES: Dictionary = {
+	&"bedroom": preload("res://assets/art/rooms/bedroom-level-3.png"),
+	&"reception": preload("res://assets/art/rooms/reception-level-3.png"),
 	&"restaurant": preload("res://assets/art/rooms/restaurant-level-3.png"),
 }
 

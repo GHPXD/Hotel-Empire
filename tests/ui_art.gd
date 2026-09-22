@@ -22,6 +22,9 @@ func run() -> void:
 	for room: RoomState in session.hotel.rooms:
 		if room.definition_id in [&"reception", &"bedroom"] and room.column == 0:
 			check(session.upgrade_room(room.id).is_empty(), "showcase upgrade purchase")
+			check(session.upgrade_room(room.id).is_empty(), "showcase final upgrade purchase")
+		if room.definition_id == &"bedroom" and room.floor_index == 1 and room.column == 2:
+			check(session.upgrade_room(room.id).is_empty(), "keep bedroom level 2 comparison")
 	for index in 5:
 		var actor := session.spawn_guest()
 		actor.x = 1.2 + index * 2.1

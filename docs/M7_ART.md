@@ -41,8 +41,7 @@ não equivale a uma animação produzida com rig esquelético.
 
 ## Limites
 Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
-faixa. Quartos e recepções têm pintura dedicada a partir do nível 2, compartilhada
-com níveis superiores. O restaurante tem pinturas próprias para níveis 2 e 3;
+faixa. Quartos, recepções e restaurante têm pinturas próprias para níveis 2 e 3;
 upgrades de elevador ainda usam a pintura base com nível textual. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
@@ -81,3 +80,11 @@ os dois níveis de restaurante no andar superior e mantém o nível 1 no térreo
 Importação com mipmaps e `ui_art` validados; três zooms, compras reais e snapshot
 inalterado. Incluída no ZIP da revisão `80d51de`, com compra, save/load e seleção
 da pintura verificados no executável nas seis combinações de janela/texto.
+
+Extensão N3 de quarto/recepção (22/09/2026): cama com dossel e balcão de mármore
+distinguem os níveis máximos. PNGs gerados pelo image_gen integrado, preservados
+com mipmaps; prompts em `art/final-room-upgrades-prompts.json`. A vitrine compra
+os upgrades reais e coloca quartos N1/N2/N3 lado a lado. Essas duas pinturas novas
+ainda não estão no pacote Windows da revisão `80d51de`.
+`ui_art` passou sem falhas com compras e capturas nos três zooms; captura 0,90
+inspecionada. O snapshot da simulação permanece inalterado durante a renderização.
