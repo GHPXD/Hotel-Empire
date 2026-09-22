@@ -85,8 +85,8 @@ da pintura verificados no executável nas seis combinações de janela/texto.
 Extensão N3 de quarto/recepção (22/09/2026): cama com dossel e balcão de mármore
 distinguem os níveis máximos. PNGs gerados pelo image_gen integrado, preservados
 com mipmaps; prompts em `art/final-room-upgrades-prompts.json`. A vitrine compra
-os upgrades reais e coloca quartos N1/N2/N3 lado a lado. Essas duas pinturas novas
-ainda não estão no pacote Windows da revisão `80d51de`.
+os upgrades reais e coloca quartos N1/N2/N3 lado a lado. Essas duas pinturas estão
+no pacote Windows da revisão `c3f2b6a`.
 `ui_art` passou sem falhas com compras e capturas nos três zooms; captura 0,90
 inspecionada. O snapshot da simulação permanece inalterado durante a renderização.
 
@@ -95,4 +95,6 @@ elevador em movimento, preservando retângulo e posição da cabine. `ui_art` pa
 com compra real do upgrade; `ui_culling` passou nas nove câmeras. Captura 0,90
 inspecionada. PNG e prompt em `art/cabin-upgrades-prompts.json`; sem mudanças de
 transporte ou save. N3 reutiliza N2 até a geração da pintura própria, interrompida
-por `usage_limit_reached` do image_gen. Esta cabine ainda não está no ZIP anterior.
+por `usage_limit_reached` do image_gen. A cabine N2 está no ZIP da revisão
+`c3f2b6a`: compra, save/load e seleção da pintura passaram nas seis combinações
+de janela/texto, com evidência em `release/final-rooms-cabin-matrix.json`.

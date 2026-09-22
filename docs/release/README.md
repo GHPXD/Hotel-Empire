@@ -88,3 +88,15 @@ Captura de 1024×640 com texto ampliado inspecionada.
 
 ZIP SHA-256: `eb6bfdf06328b5736925f54e3b6f47eab75931c6adc1ba7d81e00f1feea321e0`.
 Executável SHA-256: `00124200363a6f565152fba683623e18cff62ac2aa9cceee14040a3880f075e9`.
+
+### Pacote atualizado — quartos/recepção N3 e cabine N2
+
+Revisão `c3f2b6a9853c7af9bd961180034734b43cca44ff`, árvore limpa no build.
+Boot e seis casos do ZIP extraído passaram; `final-rooms-cabin-matrix.json`
+registra os resultados. Compras reais de N3 para quarto, recepção e restaurante,
+e N2 para elevador, preservadas após save/load. Caixa 3521 após os upgrades;
+6120 ticks, 39 reservas, 42 refeições e 31 limpezas. Captura 1024×640 com texto
+ampliado inspecionada. Cabine N3 distinta e compatibilidade externa seguem pendentes.
+
+ZIP SHA-256: `a5db601a839a91af31deb8fc2be7d88b381e497cb6f82283957acd65493cbd6f`.
+Executável SHA-256: `f7244f13107b475569604a74eb496fb7f11887b538bdf76f1ddc1ba0f8fca185`.

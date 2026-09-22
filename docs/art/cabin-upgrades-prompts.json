@@ -8,6 +8,7 @@
   ],
   "pending": {
     "asset": "cabin-level-3.png",
-    "reason": "image_gen usage_limit_reached"
+    "reason": "image_gen usage_limit_reached",
+    "prompt": "Use case: stylized-concept. Dedicated LEVEL 3 moving elevator CABIN sprite for Hotel Empire. Reference base cabin provides exact framing, front-on open cabin geometry, portrait 2:3 proportions, warm hand-painted style and brass/jade palette. Create highest-tier grand cabin: bright ivory marble rear and side walls with restrained natural golden veining, central elegant sunburst brass medallion high on rear wall, slender brass handrail, emerald lower panels, polished cream marble floor with simple jade diamond center inlay, refined opal ceiling light. Maintain outer brass arch silhouette and threshold position, entire cabin visible, opaque full-bleed rectangular texture matching reference. Distinct bright marble interior easy to identify at 46x70 game pixels. Professional original 2D painterly game art with subtle material shading and clear large shapes. No people, text, numerals, labels, logos, watermark, UI, external scenery, isometric angle, vector flatness."
   }
 }
