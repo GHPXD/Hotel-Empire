@@ -68,4 +68,5 @@ a imagem do nível 1. A vitrine `ui_art` compra melhorias reais para mostrar qua
 base e melhorados juntos, além da recepção melhorada, nos três níveis de zoom.
 Validação: `tools/test.ps1 -Visual` passou nas 22 suítes do worktree em 22/09/2026.
 Após ativar mipmaps nos dois imports, `ui_art` passou novamente; captura de zoom
-0,90 inspecionada. Esta extensão está no projeto fonte, ainda não no ZIP Windows.
+0,90 inspecionada. Incluída no ZIP Windows da revisão `ce2ff22`; seis casos do
+pacote extraído aprovados em `release/upgrade-diagnostics-matrix.json`.

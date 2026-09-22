@@ -64,3 +64,15 @@ janela/texto; método, capturas e limites em `COMPATIBILITY.md`.
 Pendências M10: validação externa de hardware e revisão final de distribuição.
 Não há assinatura digital nem publicação nesta etapa. Os arquivos de licença do
 Godot não atribuem uma licença nova ao código ou à arte do Hotel Empire.
+
+## Atualização de 22/09/2026
+
+Pacote da revisão `ce2ff2204ded1bb8c50087acec95f8eab9533c51`, árvore limpa no
+build, inclui pinturas de upgrade de quarto/recepção e diagnóstico de check-in.
+Boot normal e smoke passaram. O ZIP extraído passou nos seis casos de janela/texto;
+evidência completa em `upgrade-diagnostics-matrix.json`. O smoke verifica também
+carregamento das pinturas novas, texto do diagnóstico e snapshot inalterado.
+
+ZIP SHA-256: `247d18e7067680b5490d0180bb02fccefd3f5059df634ce9f5d58f9e916d635f`.
+Executável SHA-256: `db3357537c553e53359ab03b51aba7635691fa991c94bb1825fbf4342e7970db`.
+As pendências de hardware externo e distribuição acima continuam abertas.
