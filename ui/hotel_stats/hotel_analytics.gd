@@ -44,5 +44,6 @@ static func rooms(session: HotelSession, category: StringName = &"", floor_index
 		if (status == 1 and queue == 0) or (status == 2 and not room.dirty) or (status == 3 and not occupied):
 			continue
 		rows.append({"id": room.id, "name": definition.display_name, "floor": room.floor_index, "transport": lift != null, "queue": queue, "dirty": room.dirty, "occupied": occupied, "level": room.level, "income": room.income})
+		rows.back()["checkin_reason"] = CheckinDiagnostics.reason(session, room) if definition.category == &"reception" else ""
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.queue > b.queue if a.queue != b.queue else a.id < b.id)
 	return rows

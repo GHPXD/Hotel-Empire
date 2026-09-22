@@ -58,3 +58,19 @@ terreno e selecionar hóspedes ainda requer mouse; não há suporte integral a c
 touch, leitor de tela, RTL ou remapeamento de controles. Não se declara acessibilidade
 completa. A fonte das legendas desenhadas no mundo segue o zoom da câmera; F4 amplia
 os controles/painéis. Não há alteração de balanço, RNG, calendário ou schema de save.
+
+## Diagnóstico de check-in — 22/09/2026
+
+Selecionar uma recepção no inspetor ou em Operação (F2) mostra a causa atual da
+espera do primeiro hóspede: deslocamento, ausência de recepcionista, atendimento,
+limpeza, ocupação, orçamento ou falta de quarto acessível. O texto recomenda uma
+ação e se atualiza sem exigir nova seleção. Detalhes têm rolagem e aceitam F4.
+É uma leitura do próximo passo de admissão, não uma estatística histórica nem
+uma previsão para todos os hóspedes. `CheckinDiagnostics` também alimenta o
+observador dos benchmarks M9, sem alterar regras, estado persistido ou RNG.
+
+Validação: a suíte de simulação observa bloqueio real por sujeira, contrata um
+camareiro, confirma a reserva e depois distingue ocupação de disponibilidade.
+A suíte visual verifica inspetor, painel, atualização e snapshot inalterado.
+`tools/test.ps1 -Visual` passou nas 22 suítes; captura com texto ampliado
+`.runtime/checkin-diagnosis.png` inspecionada sem corte da recomendação.

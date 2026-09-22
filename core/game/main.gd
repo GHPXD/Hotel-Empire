@@ -242,6 +242,9 @@ func _refresh() -> void:
 	hud.refresh(hotel, hotel.by_id(selection))
 	hud.refresh_simulation(session, selected_actor)
 	hud.refresh_unlock(session, hotel.by_id(selection))
+	var selected_room := hotel.by_id(selection)
+	if selected_room != null and selected_room.definition().category == &"reception":
+		hud.inspector.text += "\n\nCHECK-IN • AGORA\n" + UILabels.checkin(CheckinDiagnostics.reason(session, selected_room))
 	if progression_panel.visible:
 		progression_panel.refresh(session)
 	if operations_panel.visible:

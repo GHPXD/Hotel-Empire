@@ -96,7 +96,7 @@ Saída M10: `ui_exit` integra -Visual e exercita o pedido de fechamento da janel
 Escape/foco, pausa modal sem mudar velocidade, salvar e sair, descarte preservando
 bytes do save, falha de gravação mantendo o hotel aberto e construção só de andares.
 Intercepta apenas o método final de quit para inspecionar os resultados no teste.
-Total atual: 18 suítes com -Visual; 22 com -Visual -Stress -Soak.
+Total naquele marco: 18 suítes com -Visual; 22 com -Visual -Stress -Soak.
 O smoke do executável também abre e cancela a saída preservando a sessão.
 
 Ajuda M10: `ui_help` testa botão/F1, foco, End/Escape, pausa sem mutar snapshot,
@@ -107,6 +107,13 @@ sessão em todas as combinações da matriz de janela/texto.
 
 Recuperação M10: `ui_recovery` cobre backup válido com principal ausente/corrompido,
 rejeição de backup inválido, prioridade do principal válido, cancelamento, pausa
-e preservação dos dois arquivos. Total atual: 20 suítes com -Visual; 24 com
+e preservação dos dois arquivos. Total naquele marco: 20 suítes com -Visual; 24 com
 -Visual -Stress -Soak. O smoke exportado testa cancelamento e recuperação com
 arquivos `release-smoke-corrupt*` isolados, sem tocar no save normal.
+
+Diagnóstico de filas (22/09/2026): `checkin_diagnostics_test` cobre bloqueio real
+por sujeira, intervenção de limpeza, ocupação e quarto disponível;
+`ui_checkin_diagnostics` cobre atualização do inspetor/painel e leitura sem mutação.
+Total atual: 22 suítes com -Visual (aprovadas), 26 com -Visual -Stress -Soak
+(conjunto ampliado ainda não executado após este incremento). O smoke exportado
+verifica diagnóstico compartilhado, snapshot inalterado e texturas de upgrade.

@@ -15,6 +15,7 @@ Fila na recepção não significa apenas atendimento lento: o primeiro hóspede 
 Quartos marcados LIMPAR precisam de camareiro. Acrescentar quartos sem capacidade de limpeza pode não resolver a fila.
 Muita espera no elevador pede revisão do transporte. Selecione uma instalação para ver seus dados e melhorias; elas custam dinheiro.
 Use Operação (F2), Equipe e Finanças para investigar. Objetivos mostra o que libera novos serviços. Salários e manutenção continuam mesmo com as chegadas fechadas.
+Em Operação, selecione uma recepção para ver a causa atual da espera e uma orientação. A inspeção da recepção também mostra esse diagnóstico; ele se refere ao primeiro hóspede da fila.
 
 [b]CÂMERA E CONSTRUÇÃO[/b]
 Roda do mouse: zoom. Botão do meio: arrastar câmera.

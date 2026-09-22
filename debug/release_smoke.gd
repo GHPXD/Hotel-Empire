@@ -38,6 +38,8 @@ func run(game: Node) -> void:
 		check(texture.get_width() > 0, "character texture packaged")
 	for texture: Texture2D in HotelArt.ROOMS.values():
 		check(texture.get_width() > 0, "room texture packaged")
+	for texture: Texture2D in HotelArt.ROOM_UPGRADES.values():
+		check(texture.get_width() > 0, "upgrade texture packaged")
 	for cue: AudioStream in HotelAudio.SOUNDS.values():
 		check(cue.get_length() > 0.1, "sound packaged")
 	session.speed = 0
@@ -58,6 +60,12 @@ func run(game: Node) -> void:
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
 	game.session.speed = 0
+	var reception: RoomState = game.session.hotel.rooms[0]
+	game._inspect_room(reception.id)
+	var diagnosis := CheckinDiagnostics.reason(game.session, reception)
+	check(game.hud.inspector.text.contains(UILabels.checkin(diagnosis)), "packaged inspector shows live check-in diagnosis")
+	check(HotelAnalytics.rooms(game.session, &"reception")[0].checkin_reason == diagnosis, "packaged operations shares diagnosis")
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "packaged diagnosis is read-only")
 	await click(tree, game.hud.help_button.get_global_rect().get_center())
 	check(game.help_panel.visible, "packaged help opens")
 	game._process(1.0)

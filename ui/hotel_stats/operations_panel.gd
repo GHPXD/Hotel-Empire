@@ -47,7 +47,13 @@ func _ready() -> void:
 	column.add_child(room_list)
 	selected_details = Label.new()
 	selected_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(selected_details)
+	selected_details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var details_scroll := ScrollContainer.new()
+	details_scroll.custom_minimum_size.y = 145
+	details_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	details_scroll.focus_mode = Control.FOCUS_ALL
+	column.add_child(details_scroll)
+	details_scroll.add_child(selected_details)
 	inspect_button = Button.new()
 	inspect_button.text = "Inspecionar sala selecionada"
 	inspect_button.custom_minimum_size.y = 42
@@ -113,17 +119,22 @@ func refresh(session: HotelSession) -> void:
 		var row: Dictionary = rows[index]
 		var location: String = "todos os andares" if row.transport else ("térreo" if row.floor == 0 else "andar %d" % row.floor)
 		var status: String = "LIMPAR" if row.dirty else ("em uso" if row.occupied else "livre")
+		if not row.checkin_reason.is_empty():
+			status = "com fila" if row.queue > 0 else "sem fila"
 		var text: String = "#%d %s • %s • %s • fila %d" % [row.id, row.name, location, status, row.queue]
+		var details: String = "%s\nNível %d • Receita acumulada: $ %d" % [text, row.level, row.income]
+		if not row.checkin_reason.is_empty():
+			details += "\nCheck-in: " + UILabels.checkin(row.checkin_reason)
 		if not same_ids:
 			room_list.add_item("#%d %s • fila %d" % [row.id, row.name, row.queue])
 		else:
 			room_list.set_item_text(index, "#%d %s • fila %d" % [row.id, row.name, row.queue])
 		room_list.set_item_metadata(index, row.id)
-		room_list.set_item_tooltip(index, "%s\nNível %d • Receita acumulada: $ %d" % [text, row.level, row.income])
+		room_list.set_item_tooltip(index, details)
 		if row.id == selected_id:
 			room_list.select(index)
 			found = true
-			selected_details.text = "%s\nNível %d • Receita acumulada: $ %d" % [text, row.level, row.income]
+			selected_details.text = details
 	inspect_button.disabled = not found
 	count_label.text = "%d sala(s) • maior fila primeiro • Enter para inspecionar" % rows.size() if not rows.is_empty() else "Nenhuma sala corresponde aos filtros."
 
