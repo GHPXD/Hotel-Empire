@@ -120,7 +120,7 @@ func _draw_room(room: RoomState) -> void:
 	else:
 		if not _in_view(rectangle):
 			return
-		draw_texture_rect(HotelArt.room(definition.id), rectangle, false)
+		draw_texture_rect(HotelArt.room(definition.id, room.level), rectangle, false)
 		if zoom_factor >= 0.65:
 			draw_rect(Rect2(rectangle.position, Vector2(rectangle.size.x, 22 * zoom_factor)), Color(0.06, 0.14, 0.14, 0.88))
 			_text(rectangle.position + Vector2(7, 17) * zoom_factor, definition.display_name + (" N%d" % room.level if room.level > 1 else ""), Color("fff1cc"), int(13 * zoom_factor))

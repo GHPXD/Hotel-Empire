@@ -12,6 +12,10 @@ func run() -> void:
 		check(session.hotel.build(HotelCatalog.room(entry[0]), entry[1], 0) != null, "showcase room %s" % entry[0])
 	for column in [0, 2, 4, 6, 8]:
 		session.hotel.build(HotelCatalog.room(&"bedroom"), column, 1)
+	# Buy real upgrades so captures exercise the same visual state as gameplay.
+	for room: RoomState in session.hotel.rooms:
+		if room.definition_id in [&"reception", &"bedroom"] and room.column == 0:
+			check(session.upgrade_room(room.id).is_empty(), "showcase upgrade purchase")
 	for index in 5:
 		var actor := session.spawn_guest()
 		actor.x = 1.2 + index * 2.1

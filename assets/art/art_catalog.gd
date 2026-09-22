@@ -15,7 +15,14 @@ const GROUND: Texture2D = preload("res://assets/art/environment/ground.png")
 const CORRIDOR: Texture2D = preload("res://assets/art/environment/corridor.png")
 const CABIN: Texture2D = preload("res://assets/art/environment/cabin.png")
 
-static func room(id: StringName) -> Texture2D:
+const ROOM_UPGRADES: Dictionary = {
+	&"bedroom": preload("res://assets/art/rooms/bedroom-level-2.png"),
+	&"reception": preload("res://assets/art/rooms/reception-level-2.png"),
+}
+
+static func room(id: StringName, level: int = 1) -> Texture2D:
+	if level >= 2 and ROOM_UPGRADES.has(id):
+		return ROOM_UPGRADES[id]
 	return ROOMS.get(id)
 
 const CHARACTERS: Dictionary = {

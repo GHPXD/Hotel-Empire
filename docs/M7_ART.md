@@ -41,7 +41,8 @@ não equivale a uma animação produzida com rig esquelético.
 
 ## Limites
 Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
-faixa. Upgrades usam a mesma pintura com nível textual. Sem música ou ambiente
+faixa. Quartos e recepções têm pintura dedicada a partir do nível 2, compartilhada
+com níveis superiores; os demais upgrades usam a pintura base com nível textual. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
 renderizados a 60 FPS.
@@ -57,3 +58,14 @@ Extensão de funcionários (21/09/2026): catálogo válido pelo gda; `ui_art` e
 `ui_culling` passaram sem falhas, incluindo nove combinações de câmera com as
 ações novas. Verificados alpha, limites, ciclo, retorno à faixa original e ausência
 de mutação do snapshot. Captura inspecionada: `art/hotel-staff-actions.png`.
+
+Extensão de ambientes (22/09/2026): `bedroom-level-2.png` e
+`reception-level-2.png` gerados pelo image_gen integrado no chat. Prompts em
+`art/room-upgrades-prompts.json`; dimensões e SHA-256 em `art/manifest.json`.
+HotelView escolhe a textura a partir do nível persistido da sala. A compra e os
+efeitos econômicos continuam na lógica existente. O catálogo de construção mantém
+a imagem do nível 1. A vitrine `ui_art` compra melhorias reais para mostrar quartos
+base e melhorados juntos, além da recepção melhorada, nos três níveis de zoom.
+Validação: `tools/test.ps1 -Visual` passou nas 22 suítes do worktree em 22/09/2026.
+Após ativar mipmaps nos dois imports, `ui_art` passou novamente; captura de zoom
+0,90 inspecionada. Esta extensão está no projeto fonte, ainda não no ZIP Windows.
