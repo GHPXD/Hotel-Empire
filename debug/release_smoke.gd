@@ -25,6 +25,15 @@ func run(game: Node) -> void:
 		session.tick(session.rules.tick)
 	check(session.guests.bookings >= 10 and session.guests.meals_served >= 5 and session.employees.cleaned >= 5, "productive packaged game")
 	check(session.economy.cash > 0, "solvent packaged game")
+	var upgraded_levels: Dictionary = {}
+	for index: int in [0, 1, 3]:
+		var room: RoomState = session.hotel.rooms[index]
+		check(session.upgrade_room(room.id).is_empty(), "purchase packaged visual upgrade")
+		check(HotelArt.room(room.definition_id, room.level) == HotelArt.ROOM_UPGRADES[room.definition_id], "level 2 uses dedicated painting")
+		if room.definition_id == &"restaurant":
+			check(session.upgrade_room(room.id).is_empty(), "purchase final restaurant upgrade")
+			check(HotelArt.room(room.definition_id, room.level) == HotelArt.ROOM_FINAL_UPGRADES[room.definition_id], "level 3 uses final painting")
+		upgraded_levels[room.id] = room.level
 	var path := "user://release-smoke-save.json"
 	check(SaveStore.save_session(session, path).is_empty(), "save from executable")
 	var restored := SaveStore.load_session(path)
@@ -61,6 +70,11 @@ func run(game: Node) -> void:
 		check(root.get_visible_rect().encloses(button.get_global_rect()), "essential toolbar control fits viewport")
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
+	for id: int in upgraded_levels:
+		var room: RoomState = game.session.hotel.by_id(id)
+		check(room.level == upgraded_levels[id], "saved visual upgrade level restored")
+		var painting: Texture2D = HotelArt.ROOM_FINAL_UPGRADES[room.definition_id] if room.level == 3 else HotelArt.ROOM_UPGRADES[room.definition_id]
+		check(HotelArt.room(room.definition_id, room.level) == painting, "restored room uses upgraded painting")
 	game.session.speed = 0
 	var reception: RoomState = game.session.hotel.rooms[0]
 	game._inspect_room(reception.id)
