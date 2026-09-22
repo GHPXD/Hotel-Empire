@@ -146,7 +146,8 @@ func _draw_simulation() -> void:
 		var cabin := Rect2(world_to_screen(Vector2((lift.column - 0.37) * CELL, -(lift.floor_position + 0.72) * FLOOR_HEIGHT)), Vector2(CELL * 0.74, FLOOR_HEIGHT * 0.65) * zoom_factor)
 		if not _in_view(cabin):
 			continue
-		draw_texture_rect(HotelArt.CABIN, cabin, false)
+		var lift_room := hotel.by_id(lift.room_id)
+		draw_texture_rect(HotelArt.cabin(lift_room.level if lift_room != null else 1), cabin, false)
 		if zoom_factor > 0.65:
 			_text(cabin.position + Vector2(8, 24) * zoom_factor, "%d/%d" % [lift.passengers.size(), lift.capacity], Color.WHITE, int(13 * zoom_factor))
 	for room in hotel.rooms:

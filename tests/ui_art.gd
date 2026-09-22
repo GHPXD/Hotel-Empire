@@ -20,6 +20,8 @@ func run() -> void:
 		if column == 3:
 			check(session.upgrade_room(restaurant.id).is_empty(), "restaurant level 3 purchase")
 	for room: RoomState in session.hotel.rooms:
+		if room.definition_id == &"elevator":
+			check(session.upgrade_room(room.id).is_empty(), "showcase elevator upgrade purchase")
 		if room.definition_id in [&"reception", &"bedroom"] and room.column == 0:
 			check(session.upgrade_room(room.id).is_empty(), "showcase upgrade purchase")
 			check(session.upgrade_room(room.id).is_empty(), "showcase final upgrade purchase")

@@ -205,5 +205,14 @@
     "bytes": 2057506,
     "sha256": "f7c6f6556b568e540b61bfe0d9ab3e2af9e44b2e4aa14050bcded862cab935bf",
     "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/environment/cabin-level-2.png",
+    "width": 1024,
+    "height": 1536,
+    "mode": "RGB",
+    "bytes": 2089862,
+    "sha256": "913d97ea155ca4137f2616e56de7e7f89b96cde5c69fa92ca091d4af5795cd59",
+    "generator": "built-in image_gen"
   }
 ]

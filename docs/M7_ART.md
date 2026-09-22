@@ -42,7 +42,8 @@ não equivale a uma animação produzida com rig esquelético.
 ## Limites
 Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
 faixa. Quartos, recepções e restaurante têm pinturas próprias para níveis 2 e 3;
-upgrades de elevador ainda usam a pintura base com nível textual. Sem música ou ambiente
+cabines N2 usam pintura de nogueira e N3 compartilha N2 provisoriamente; o poço
+mantém a pintura base. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
 renderizados a 60 FPS.
@@ -88,3 +89,10 @@ os upgrades reais e coloca quartos N1/N2/N3 lado a lado. Essas duas pinturas nov
 ainda não estão no pacote Windows da revisão `80d51de`.
 `ui_art` passou sem falhas com compras e capturas nos três zooms; captura 0,90
 inspecionada. O snapshot da simulação permanece inalterado durante a renderização.
+
+Cabine N2 (22/09/2026): pintura de nogueira selecionada pelo nível da sala do
+elevador em movimento, preservando retângulo e posição da cabine. `ui_art` passou
+com compra real do upgrade; `ui_culling` passou nas nove câmeras. Captura 0,90
+inspecionada. PNG e prompt em `art/cabin-upgrades-prompts.json`; sem mudanças de
+transporte ou save. N3 reutiliza N2 até a geração da pintura própria, interrompida
+por `usage_limit_reached` do image_gen. Esta cabine ainda não está no ZIP anterior.

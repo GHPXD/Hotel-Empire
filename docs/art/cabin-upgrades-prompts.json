@@ -1,0 +1,13 @@
+{
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "path": "assets/art/environment/cabin-level-2.png",
+      "prompt": "Use case: stylized-concept. Dedicated LEVEL 2 moving elevator CABIN sprite for Hotel Empire. Reference is base cabin, match its portrait 2:3 proportions, front-on open cabin perspective, outer silhouette, threshold position, warm painterly rendering and hotel brass/jade palette. Upgrade interior to rich polished walnut panels with tasteful brass geometric inlays, jade side trim, warm cream opal ceiling fixture, oak and brass handrails, cream stone floor. Large walnut center panel is a clearly different dark warm silhouette from the base cream panel. Entire cabin visible, no cut-off edges, clean compact perimeter, opaque rectangular full-bleed texture matching reference framing. Professional original hand-painted 2D game sprite, tangible wood grain, restrained highlights, readable at 46x70 game pixels. No people, no text, no labels, no numbers, no logos, no watermark, no UI, no exterior scenery, no isometric camera, no flat vector art."
+    }
+  ],
+  "pending": {
+    "asset": "cabin-level-3.png",
+    "reason": "image_gen usage_limit_reached"
+  }
+}
