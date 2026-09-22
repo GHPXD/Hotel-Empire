@@ -30,10 +30,13 @@ func run(game: Node) -> void:
 		var room: RoomState = session.hotel.rooms[index]
 		check(session.upgrade_room(room.id).is_empty(), "purchase packaged visual upgrade")
 		check(HotelArt.room(room.definition_id, room.level) == HotelArt.ROOM_UPGRADES[room.definition_id], "level 2 uses dedicated painting")
-		if room.definition_id == &"restaurant":
-			check(session.upgrade_room(room.id).is_empty(), "purchase final restaurant upgrade")
-			check(HotelArt.room(room.definition_id, room.level) == HotelArt.ROOM_FINAL_UPGRADES[room.definition_id], "level 3 uses final painting")
+		check(session.upgrade_room(room.id).is_empty(), "purchase final room upgrade")
+		check(HotelArt.room(room.definition_id, room.level) == HotelArt.ROOM_FINAL_UPGRADES[room.definition_id], "level 3 uses final painting")
 		upgraded_levels[room.id] = room.level
+	var lift_room: RoomState = session.hotel.rooms[2]
+	check(session.upgrade_room(lift_room.id).is_empty(), "purchase upgraded cabin")
+	check(HotelArt.cabin(lift_room.level) == HotelArt.CABIN_UPGRADE, "upgraded cabin painting selected")
+	check(HotelArt.CABIN_UPGRADE.get_width() > 0, "upgraded cabin packaged")
 	var path := "user://release-smoke-save.json"
 	check(SaveStore.save_session(session, path).is_empty(), "save from executable")
 	var restored := SaveStore.load_session(path)
@@ -70,6 +73,9 @@ func run(game: Node) -> void:
 		check(root.get_visible_rect().encloses(button.get_global_rect()), "essential toolbar control fits viewport")
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
+	var restored_lift_room: RoomState = game.session.hotel.by_id(lift_room.id)
+	check(restored_lift_room.level == 2, "saved elevator upgrade restored")
+	check(HotelArt.cabin(restored_lift_room.level) == HotelArt.CABIN_UPGRADE, "restored elevator uses upgraded cabin")
 	for id: int in upgraded_levels:
 		var room: RoomState = game.session.hotel.by_id(id)
 		check(room.level == upgraded_levels[id], "saved visual upgrade level restored")
