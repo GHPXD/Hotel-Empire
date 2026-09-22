@@ -117,3 +117,9 @@ por sujeira, intervenção de limpeza, ocupação e quarto disponível;
 Total atual: 22 suítes com -Visual (aprovadas), 26 com -Visual -Stress -Soak
 (conjunto ampliado ainda não executado após este incremento). O smoke exportado
 verifica diagnóstico compartilhado, snapshot inalterado e texturas de upgrade.
+
+Arte persistida no pacote: o smoke compra melhorias de recepção/quarto para N2 e
+do restaurante para N2/N3 com o caixa ganho na simulação. Confere a pintura de cada
+nível antes de salvar e depois de Carregar pela barra; a comparação do snapshot e
+a continuidade de 120 ticks também incluem esses upgrades. A compra usa as regras
+de custo e desbloqueio reais, sem conceder dinheiro ou objetivos de teste.

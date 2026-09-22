@@ -76,3 +76,15 @@ carregamento das pinturas novas, texto do diagnóstico e snapshot inalterado.
 ZIP SHA-256: `247d18e7067680b5490d0180bb02fccefd3f5059df634ce9f5d58f9e916d635f`.
 Executável SHA-256: `db3357537c553e53359ab03b51aba7635691fa991c94bb1825fbf4342e7970db`.
 As pendências de hardware externo e distribuição acima continuam abertas.
+
+### Pacote atualizado — restaurante N2/N3
+
+Revisão `80d51de9b6d79700bf63807709e32eddc06844f9`, árvore limpa no build.
+Inclui as duas pinturas do restaurante e teste de compra/save/load dos upgrades
+visuais. Boot e seis casos do ZIP extraído passaram; relatório em
+`restaurant-upgrades-matrix.json`. A simulação continua com 6120 ticks, 39 reservas,
+42 refeições e 31 limpezas. O caixa final é 5721 após 2400 gastos nas melhorias.
+Captura de 1024×640 com texto ampliado inspecionada.
+
+ZIP SHA-256: `eb6bfdf06328b5736925f54e3b6f47eab75931c6adc1ba7d81e00f1feea321e0`.
+Executável SHA-256: `00124200363a6f565152fba683623e18cff62ac2aa9cceee14040a3880f075e9`.

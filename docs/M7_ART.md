@@ -79,4 +79,5 @@ O catálogo mantém a pintura base; a sala usa seu nível persistido para escolh
 a textura. Café e lounge não têm upgrades definidos atualmente. A vitrine compra
 os dois níveis de restaurante no andar superior e mantém o nível 1 no térreo.
 Importação com mipmaps e `ui_art` validados; três zooms, compras reais e snapshot
-inalterado. Esta extensão do restaurante ainda não está no ZIP Windows anterior.
+inalterado. Incluída no ZIP da revisão `80d51de`, com compra, save/load e seleção
+da pintura verificados no executável nas seis combinações de janela/texto.
