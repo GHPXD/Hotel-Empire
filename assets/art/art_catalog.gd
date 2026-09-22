@@ -16,11 +16,18 @@ const CORRIDOR: Texture2D = preload("res://assets/art/environment/corridor.png")
 const CABIN: Texture2D = preload("res://assets/art/environment/cabin.png")
 
 const ROOM_UPGRADES: Dictionary = {
+	&"restaurant": preload("res://assets/art/rooms/restaurant-level-2.png"),
 	&"bedroom": preload("res://assets/art/rooms/bedroom-level-2.png"),
 	&"reception": preload("res://assets/art/rooms/reception-level-2.png"),
 }
 
+const ROOM_FINAL_UPGRADES: Dictionary = {
+	&"restaurant": preload("res://assets/art/rooms/restaurant-level-3.png"),
+}
+
 static func room(id: StringName, level: int = 1) -> Texture2D:
+	if level >= 3 and ROOM_FINAL_UPGRADES.has(id):
+		return ROOM_FINAL_UPGRADES[id]
 	if level >= 2 and ROOM_UPGRADES.has(id):
 		return ROOM_UPGRADES[id]
 	return ROOMS.get(id)

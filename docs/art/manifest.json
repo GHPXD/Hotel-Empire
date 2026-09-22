@@ -169,5 +169,23 @@
     "bytes": 2027522,
     "sha256": "829824bcb46c18a0c934ef612d6a419ac23052263344d523f8a0712199752206",
     "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/restaurant-level-2.png",
+    "width": 1624,
+    "height": 969,
+    "mode": "RGB",
+    "bytes": 2296926,
+    "sha256": "1f156667829eabd092d769177387def85e4cd747c7802b60e246bdd24f0f3c81",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/rooms/restaurant-level-3.png",
+    "width": 1624,
+    "height": 968,
+    "mode": "RGB",
+    "bytes": 2261648,
+    "sha256": "fb4d1037bf29f677887af8347074d875b031e1a381ddaac47d0d8aca3815fca4",
+    "generator": "built-in image_gen"
   }
 ]

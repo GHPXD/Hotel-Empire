@@ -40,6 +40,8 @@ func run(game: Node) -> void:
 		check(texture.get_width() > 0, "room texture packaged")
 	for texture: Texture2D in HotelArt.ROOM_UPGRADES.values():
 		check(texture.get_width() > 0, "upgrade texture packaged")
+	for texture: Texture2D in HotelArt.ROOM_FINAL_UPGRADES.values():
+		check(texture.get_width() > 0, "final upgrade texture packaged")
 	for cue: AudioStream in HotelAudio.SOUNDS.values():
 		check(cue.get_length() > 0.1, "sound packaged")
 	session.speed = 0

@@ -16,7 +16,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M5 Content Expansion: novos serviços, perfis e eventos.
 - [x] M6 UI/UX Polish: filtros, analytics e melhorias de leitura/foco no desktop.
   - [x] Causa atual da fila de check-in e ação sugerida no inspetor e em Operação.
-- [x] M7 Art & Animation: 19 PNGs originais, caminhada, ações de funcionários e efeitos sonoros.
+- [x] M7 Art & Animation: 21 PNGs originais, caminhada, ações de funcionários e efeitos sonoros.
   - [x] Pinturas dedicadas para quartos e recepções a partir do nível 2.
 - [x] M8 Optimization: perfis 100/250/500/1000 agentes e operação até o limite atual de 120.
   - [x] M8a perfil inicial, descarte de render fora da câmera e equivalência visual.

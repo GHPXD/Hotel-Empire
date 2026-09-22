@@ -13,6 +13,12 @@ func run() -> void:
 	for column in [0, 2, 4, 6, 8]:
 		session.hotel.build(HotelCatalog.room(&"bedroom"), column, 1)
 	# Buy real upgrades so captures exercise the same visual state as gameplay.
+	session.hotel.add_floor()
+	for column: int in [0, 3]:
+		var restaurant := session.hotel.build(HotelCatalog.room(&"restaurant"), column, 2)
+		check(session.upgrade_room(restaurant.id).is_empty(), "restaurant level 2 purchase")
+		if column == 3:
+			check(session.upgrade_room(restaurant.id).is_empty(), "restaurant level 3 purchase")
 	for room: RoomState in session.hotel.rooms:
 		if room.definition_id in [&"reception", &"bedroom"] and room.column == 0:
 			check(session.upgrade_room(room.id).is_empty(), "showcase upgrade purchase")
@@ -49,7 +55,9 @@ func run() -> void:
 		check(HotelArt.character(actor) == walk_texture, "idle restores base texture")
 		actor.state = &"cleaning" if actor.role == &"cleaner" else &"working"
 	session.speed = 0
-	session.hotel.rooms.back().dirty = true
+	for room: RoomState in session.hotel.rooms:
+		if room.definition().category == &"lodging" and room.column == 8:
+			room.dirty = true
 	game._replace_session(session)
 	var before := SessionSnapshot.capture(session)
 	for zoom: float in [0.35, 0.9, 1.8]:

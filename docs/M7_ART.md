@@ -42,7 +42,8 @@ não equivale a uma animação produzida com rig esquelético.
 ## Limites
 Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
 faixa. Quartos e recepções têm pintura dedicada a partir do nível 2, compartilhada
-com níveis superiores; os demais upgrades usam a pintura base com nível textual. Sem música ou ambiente
+com níveis superiores. O restaurante tem pinturas próprias para níveis 2 e 3;
+upgrades de elevador ainda usam a pintura base com nível textual. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
 renderizados a 60 FPS.
@@ -70,3 +71,12 @@ Validação: `tools/test.ps1 -Visual` passou nas 22 suítes do worktree em 22/09
 Após ativar mipmaps nos dois imports, `ui_art` passou novamente; captura de zoom
 0,90 inspecionada. Incluída no ZIP Windows da revisão `ce2ff22`; seis casos do
 pacote extraído aprovados em `release/upgrade-diagnostics-matrix.json`.
+
+Extensão do restaurante (22/09/2026): pinturas distintas para níveis 2 e 3,
+com mesas e iluminação progressivamente refinadas. Prompts em
+`art/restaurant-upgrades-prompts.json`, PNGs preservados e hashes no manifesto.
+O catálogo mantém a pintura base; a sala usa seu nível persistido para escolher
+a textura. Café e lounge não têm upgrades definidos atualmente. A vitrine compra
+os dois níveis de restaurante no andar superior e mantém o nível 1 no térreo.
+Importação com mipmaps e `ui_art` validados; três zooms, compras reais e snapshot
+inalterado. Esta extensão do restaurante ainda não está no ZIP Windows anterior.
