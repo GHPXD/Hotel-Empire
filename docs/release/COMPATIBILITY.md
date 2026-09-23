@@ -42,3 +42,22 @@ O manifesto identifica a revisão e indica quando havia alterações locais no b
 A matriz local não encerra a validação externa. A próxima revisão de distribuição
 deve manter estes limites explícitos e acrescentar resultados reais de outras
 máquinas quando disponíveis.
+
+## Kit independente para coleta externa — 23/09/2026
+
+`tools/build_compatibility_kit.ps1` empacota o ZIP atual, o validador PowerShell,
+um iniciador e o roteiro `EXTERNAL-TEST.txt` em
+`builds/HotelEmpire-compatibility-kit.zip`. Extraia o kit e execute
+`powershell -NoProfile -File .\Start-Validation.ps1` na pasta extraída.
+O kit dispensa Godot/repositório e grava dados isolados em `results`.
+O ZIP de resultados contém logs, capturas, matriz e versão do PowerShell,
+incluindo diagnóstico de falha; não inclui executável, caches ou saves.
+Não transmite dados. Caminhos locais e informações de GPU/OS constam dos relatórios.
+
+Validação local do kit: Windows PowerShell, extração em caminho com espaços,
+seis casos aprovados e relatório compactado produzido. Pacote ausente retorna
+falha e produz relatório. Um problema com caminhos longos no cache de shaders
+foi corrigido coletando apenas arquivos conhecidos, sem percorrer caches.
+Evidência: `external-kit-local-matrix.json`. Isso comprova a operação do kit nesta
+máquina, não compatibilidade externa. O roteiro inclui as verificações manuais
+de entrada, leitura, áudio, saves e suspensão que o smoke não certifica.

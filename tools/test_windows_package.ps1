@@ -1,14 +1,17 @@
 param(
-    [string]$ArchivePath = ''
+    [string]$ArchivePath = '',
+    [string]$OutputRoot = ''
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 if (-not $ArchivePath) { $ArchivePath = Join-Path $projectRoot 'builds/HotelEmpire-windows-x86_64.zip' }
-$runRoot = Join-Path $projectRoot ('.runtime/package-matrix/' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss'))
+if (-not $OutputRoot) { $OutputRoot = Join-Path $projectRoot '.runtime/package-matrix' }
+$runRoot = Join-Path $OutputRoot ([DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8))
 $extractRoot = Join-Path $runRoot 'Hotel Empire extraido'
 New-Item -ItemType Directory -Force -Path $extractRoot | Out-Null
 # Only expected top-level files may enter the package. Validate before extraction.
 $expected = @('HotelEmpire.exe','LEIA-ME.txt','LICENSE-GODOT.txt','THIRD-PARTY-NOTICES.txt','build-manifest.json')
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($ArchivePath))
 try {
     $names = @($zip.Entries | ForEach-Object { $_.FullName })

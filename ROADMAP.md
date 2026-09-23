@@ -38,6 +38,7 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
   - [x] Ajuda F1 no jogo: primeiros passos, diagnóstico de filas, controles e saves, com pausa e rolagem.
   - [x] Recuperação de backup validado pela interface, com confirmação e preservação dos arquivos.
   - [ ] Revisão final de distribuição e compatibilidade externa documentada.
+  - [x] Kit independente de compatibilidade com coleta de relatórios e roteiro manual; validado localmente.
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
