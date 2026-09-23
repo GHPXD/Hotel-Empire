@@ -1,0 +1,28 @@
+{
+  "scope": "Local distribution integrity; not external compatibility or commercial clearance",
+  "archiveSha256": "ac423e9899fafccaf222b8725a065192bd30b9a8bc485869e0966c495b61cfa6",
+  "sourceRevision": "290bdcd270b4e7f6ee6286ae596724cfbad6474b",
+  "executableSha256": "5602c743a242991fe84400951e7b599016d0676774445ef2f9eec4337e452439",
+  "sourceDirtyAtBuild": false,
+  "packagedFiles": [
+    "HotelEmpire.exe",
+    "LEIA-ME.txt",
+    "LICENSE-GODOT.txt",
+    "THIRD-PARTY-NOTICES.txt",
+    "build-manifest.json"
+  ],
+  "artFilesVerified": 25,
+  "checks": [
+    "exact ZIP inventory",
+    "executable hash and size",
+    "clean build manifest",
+    "build smoke result",
+    "packaged documents equal source",
+    "complete art inventory and hashes"
+  ],
+  "limitations": [
+    "External hardware remains untested",
+    "Manual compatibility checklist remains open",
+    "No assertion of signature, installer, store publication or legal clearance"
+  ]
+}
