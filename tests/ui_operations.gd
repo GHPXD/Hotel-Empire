@@ -83,6 +83,12 @@ func run() -> void:
 	check(not game.finances_dialog.visible and game.hud.session_buttons["Finanças"].has_focus(), "finance Escape restores opener")
 	panel.reset_filters()
 	await key(root, KEY_F2)
+	for index in panel.rows.size():
+		if panel.rows[index].transport:
+			panel.room_list.select(index)
+			break
+	panel.refresh(session)
+	check(panel.selected_details.text.contains("Sem embarques registrados"), "selected elevator distinguishes absent history")
 	for frame in 5:
 		await process_frame
 	await RenderingServer.frame_post_draw

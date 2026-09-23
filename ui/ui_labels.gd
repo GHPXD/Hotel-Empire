@@ -25,6 +25,12 @@ const CHECKIN: Dictionary = {
 static func checkin(reason: String) -> String:
 	return CHECKIN.get(reason, "Não foi possível avaliar esta fila.")
 
+static func elevator(metrics: Dictionary) -> String:
+	var history: String = "Sem embarques registrados."
+	if metrics.boarded > 0:
+		history = "Espera até embarcar: média %.1fs • máxima %.1fs" % [metrics.average_wait, metrics.max_wait]
+	return "Cabine: %d/%d • Na fila: %d • Maior espera atual: %.1fs\n%s\nHistórico: %d embarques • %d viagens de passageiros concluídas" % [metrics.passengers, metrics.capacity, metrics.queue, metrics.current_max, history, metrics.boarded, metrics.delivered]
+
 static func search_key(value: String) -> String:
 	var result := value.strip_edges().to_lower()
 	for replacement in [["á", "a"], ["à", "a"], ["â", "a"], ["ã", "a"], ["é", "e"], ["ê", "e"], ["í", "i"], ["ó", "o"], ["ô", "o"], ["õ", "o"], ["ú", "u"], ["ç", "c"]]:

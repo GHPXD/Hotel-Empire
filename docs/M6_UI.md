@@ -74,3 +74,19 @@ camareiro, confirma a reserva e depois distingue ocupação de disponibilidade.
 A suíte visual verifica inspetor, painel, atualização e snapshot inalterado.
 `tools/test.ps1 -Visual` passou nas 22 suítes; captura com texto ampliado
 `.runtime/checkin-diagnosis.png` inspecionada sem corte da recomendação.
+
+## Métricas por elevador — 23/09/2026
+
+Ao selecionar um elevador em Operação, os detalhes mostram ocupação da cabine,
+fila, maior espera atual, espera média/máxima até embarcar e totais de embarques
+e viagens de passageiros concluídas. Incluem hóspedes e funcionários. Uma mesma
+pessoa pode contar em várias viagens. O histórico pertence ao elevador e utiliza
+os contadores já persistidos; a espera atual lê apenas os membros da fila.
+Sem embarques, o painel informa ausência de histórico, em vez de sugerir que
+ninguém esperou. Não há percentual de utilização: o tempo de existência de cada
+elevador ainda não é registrado para calcular esse denominador corretamente.
+
+`analytics_test` passou com embarque/desembarque reais e separação entre espera
+pendente e concluída. `ui_operations` passou com teclado, texto ampliado e snapshot
+inalterado. Captura `.runtime/m6-large-panel.png` inspecionada. Este incremento
+ainda não foi incluído no ZIP da revisão `f8eb7b2`.

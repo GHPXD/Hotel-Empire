@@ -45,5 +45,17 @@ static func rooms(session: HotelSession, category: StringName = &"", floor_index
 			continue
 		rows.append({"id": room.id, "name": definition.display_name, "floor": room.floor_index, "transport": lift != null, "queue": queue, "dirty": room.dirty, "occupied": occupied, "level": room.level, "income": room.income})
 		rows.back()["checkin_reason"] = CheckinDiagnostics.reason(session, room) if definition.category == &"reception" else ""
+		rows.back()["lift_metrics"] = elevator(session, lift) if lift != null else {}
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.queue > b.queue if a.queue != b.queue else a.id < b.id)
 	return rows
+
+static func elevator(session: HotelSession, lift: ElevatorState) -> Dictionary:
+	var current_max: float = 0.0
+	for id: int in lift.queue.members:
+		var actor: ActorState = session.actors.get(id)
+		if actor != null:
+			current_max = maxf(current_max, actor.waiting)
+	return {"passengers": lift.passengers.size(), "capacity": lift.capacity,
+		"queue": lift.queue.members.size(), "current_max": current_max,
+		"boarded": lift.boarded, "delivered": lift.delivered,
+		"average_wait": lift.average_wait(), "max_wait": lift.wait_max}

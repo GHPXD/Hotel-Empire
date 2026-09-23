@@ -125,6 +125,8 @@ func refresh(session: HotelSession) -> void:
 		var details: String = "%s\nNível %d • Receita acumulada: $ %d" % [text, row.level, row.income]
 		if not row.checkin_reason.is_empty():
 			details += "\nCheck-in: " + UILabels.checkin(row.checkin_reason)
+		if not row.lift_metrics.is_empty():
+			details = "%s • N%d\n%s" % [text, row.level, UILabels.elevator(row.lift_metrics)]
 		if not same_ids:
 			room_list.add_item("#%d %s • fila %d" % [row.id, row.name, row.queue])
 		else:

@@ -46,6 +46,18 @@ func _initialize() -> void:
 	var ordered := HotelAnalytics.rooms(session)
 	check(ordered[0].id == reception.id and ordered[1].id == shaft.id, "queues first with stable ID tiebreak")
 	check(SessionSnapshot.capture(session) == before, "analytics never mutates simulation")
+	var elevator_metrics: Dictionary = HotelAnalytics.rooms(session, &"transport")[0].lift_metrics
+	check(elevator_metrics.current_max == 8 and elevator_metrics.boarded == 0, "current unserved wait is separate from boarding history")
+	check(UILabels.elevator(elevator_metrics).contains("Sem embarques"), "no history does not imply zero wait")
+	# Exercise real boarding and delivery rather than setting historical counters.
+	passenger.target_floor = 1
+	session.transport.step(session.actors, session.rules.tick)
+	elevator_metrics = HotelAnalytics.elevator(session, session.transport.lifts[0])
+	check(elevator_metrics.boarded == 1 and elevator_metrics.passengers == 1 and elevator_metrics.current_max == 0, "boarding moves wait into history")
+	check(is_equal_approx(elevator_metrics.average_wait, 8.1), "recorded boarding wait includes final tick")
+	for tick in 80:
+		session.transport.step(session.actors, session.rules.tick)
+	check(HotelAnalytics.elevator(session, session.transport.lifts[0]).delivered == 1, "completed passenger trip exposed")
 	check(UILabels.state(&"riding") == "No elevador" and UILabels.role(&"guest") == "Hóspede", "player labels translated")
 	var path: String = "user://preferences-test.cfg"
 	check(UIPreferences.save_large_text(true, path) == OK and UIPreferences.load_large_text(path), "text preference roundtrip")
