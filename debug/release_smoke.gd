@@ -91,6 +91,24 @@ func run(game: Node) -> void:
 	check(game.hud.inspector.text.contains(UILabels.checkin(diagnosis)), "packaged inspector shows live check-in diagnosis")
 	check(HotelAnalytics.rooms(game.session, &"reception")[0].checkin_reason == diagnosis, "packaged operations shares diagnosis")
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "packaged diagnosis is read-only")
+	var operational_lift: ElevatorState = game.session.transport.lift_by_id(lift_room.id)
+	var elevator_metrics := HotelAnalytics.elevator(game.session, operational_lift)
+	check(elevator_metrics.boarded > 0 and elevator_metrics.delivered > 0, "real packaged transport history exists")
+	game._inspect_room(lift_room.id)
+	check(game.hud.inspector.text.contains(UILabels.elevator(elevator_metrics)), "inspector shares elevator metrics")
+	check(not game.hud.inspector.text.contains("Utilização:"), "inspector avoids hotel-age utilization denominator")
+	game._show_operations()
+	for index in game.operations_panel.rows.size():
+		if game.operations_panel.rows[index].id == lift_room.id:
+			game.operations_panel.room_list.select(index)
+	game.operations_panel.refresh(game.session)
+	check(game.operations_panel.selected_details.text.contains(UILabels.elevator(elevator_metrics)), "operations shows actual elevator history")
+	for frame in 3:
+		await tree.process_frame
+	await RenderingServer.frame_post_draw
+	game.operations_panel.get_texture().get_image().save_png("user://release-elevator-metrics.png")
+	await close_popup(tree, game.operations_panel)
+	check(equivalent(expected, SessionSnapshot.capture(game.session)), "elevator metrics preserve session")
 	await click(tree, game.hud.help_button.get_global_rect().get_center())
 	check(game.help_panel.visible, "packaged help opens")
 	game._process(1.0)

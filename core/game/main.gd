@@ -251,7 +251,7 @@ func _refresh() -> void:
 		operations_panel.refresh(session)
 	var lift := session.transport.lift_by_id(selection)
 	if lift != null:
-		hud.inspector.text = "ELEVADOR #%d • N%d\n\nPassageiros: %d / %d\nFila: %d\nEspera média: %.1fs\nMaior espera: %.1fs\nUtilização: %.0f%%\nTransportados: %d\nDestino: andar %d" % [lift.room_id, hotel.by_id(selection).level, lift.passengers.size(), lift.capacity, lift.queue.members.size(), lift.average_wait(), lift.wait_max, 100 * lift.busy_seconds / maxf(session.time, 0.1), lift.delivered, lift.target_floor]
+		hud.inspector.text = "ELEVADOR #%d • N%d\n\n%s\nTempo ocupado acumulado: %.1fs\nDestino: andar %d" % [lift.room_id, selected_room.level, UILabels.elevator(HotelAnalytics.elevator(session, lift)), lift.busy_seconds, lift.target_floor]
 
 func _hire(definition: EmployeeDefinition) -> void:
 	var error := session.hire(definition)
