@@ -42,7 +42,7 @@ não equivale a uma animação produzida com rig esquelético.
 ## Limites
 Sem poses dedicadas para sentar ou dormir: hóspedes parados usam uma pose da
 faixa. Quartos, recepções e restaurante têm pinturas próprias para níveis 2 e 3;
-cabines N2 usam pintura de nogueira e N3 compartilha N2 provisoriamente; o poço
+cabines N2 usam pintura de nogueira e N3 tem mármore e medalhão de latão; o poço
 mantém a pintura base. Sem música ou ambiente
 contínuo nesta entrega. Novos conteúdos precisam de arte própria. M8 ainda deve
 medir custo de render/VRAM em grandes hotéis; esta entrega não comprova 1000 agentes
@@ -94,7 +94,14 @@ Cabine N2 (22/09/2026): pintura de nogueira selecionada pelo nível da sala do
 elevador em movimento, preservando retângulo e posição da cabine. `ui_art` passou
 com compra real do upgrade; `ui_culling` passou nas nove câmeras. Captura 0,90
 inspecionada. PNG e prompt em `art/cabin-upgrades-prompts.json`; sem mudanças de
-transporte ou save. N3 reutiliza N2 até a geração da pintura própria, interrompida
-por `usage_limit_reached` do image_gen. A cabine N2 está no ZIP da revisão
+transporte ou save. A geração N3 inicialmente encontrou o limite de uso; a nova
+tentativa produziu a pintura própria descrita abaixo. A cabine N2 está no ZIP da revisão
 `c3f2b6a`: compra, save/load e seleção da pintura passaram nas seis combinações
 de janela/texto, com evidência em `release/final-rooms-cabin-matrix.json`.
+
+Cabine N3 (23/09/2026): pintura própria de mármore claro, painéis verdes e medalhão
+de latão gerada pelo image_gen integrado. Prompt preservado em
+`art/cabin-upgrades-prompts.json`; dimensões/hash no manifesto. `ui_art` passou
+com compra real de N2/N3, capturas nos três zooms e snapshot inalterado; captura
+0,90 inspecionada. O teste do executável também compra N3 e confere nível/textura
+depois de Carregar. Não muda geometria, regras de transporte ou schema de save.

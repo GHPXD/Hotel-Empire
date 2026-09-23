@@ -37,6 +37,9 @@ func run(game: Node) -> void:
 	check(session.upgrade_room(lift_room.id).is_empty(), "purchase upgraded cabin")
 	check(HotelArt.cabin(lift_room.level) == HotelArt.CABIN_UPGRADE, "upgraded cabin painting selected")
 	check(HotelArt.CABIN_UPGRADE.get_width() > 0, "upgraded cabin packaged")
+	check(session.upgrade_room(lift_room.id).is_empty(), "purchase final cabin")
+	check(HotelArt.cabin(lift_room.level) == HotelArt.CABIN_FINAL_UPGRADE, "final cabin painting selected")
+	check(HotelArt.CABIN_FINAL_UPGRADE.get_width() > 0, "final cabin packaged")
 	var path := "user://release-smoke-save.json"
 	check(SaveStore.save_session(session, path).is_empty(), "save from executable")
 	var restored := SaveStore.load_session(path)
@@ -74,8 +77,8 @@ func run(game: Node) -> void:
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
 	var restored_lift_room: RoomState = game.session.hotel.by_id(lift_room.id)
-	check(restored_lift_room.level == 2, "saved elevator upgrade restored")
-	check(HotelArt.cabin(restored_lift_room.level) == HotelArt.CABIN_UPGRADE, "restored elevator uses upgraded cabin")
+	check(restored_lift_room.level == 3, "saved elevator upgrade restored")
+	check(HotelArt.cabin(restored_lift_room.level) == HotelArt.CABIN_FINAL_UPGRADE, "restored elevator uses final cabin")
 	for id: int in upgraded_levels:
 		var room: RoomState = game.session.hotel.by_id(id)
 		check(room.level == upgraded_levels[id], "saved visual upgrade level restored")

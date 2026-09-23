@@ -15,9 +15,11 @@ const GROUND: Texture2D = preload("res://assets/art/environment/ground.png")
 const CORRIDOR: Texture2D = preload("res://assets/art/environment/corridor.png")
 const CABIN: Texture2D = preload("res://assets/art/environment/cabin.png")
 const CABIN_UPGRADE: Texture2D = preload("res://assets/art/environment/cabin-level-2.png")
+const CABIN_FINAL_UPGRADE: Texture2D = preload("res://assets/art/environment/cabin-level-3.png")
 
 static func cabin(level: int) -> Texture2D:
-	# N3 currently shares N2; its dedicated painting is still pending.
+	if level >= 3:
+		return CABIN_FINAL_UPGRADE
 	return CABIN_UPGRADE if level >= 2 else CABIN
 
 const ROOM_UPGRADES: Dictionary = {
