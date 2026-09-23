@@ -88,5 +88,10 @@ elevador ainda não é registrado para calcular esse denominador corretamente.
 
 `analytics_test` passou com embarque/desembarque reais e separação entre espera
 pendente e concluída. `ui_operations` passou com teclado, texto ampliado e snapshot
-inalterado. Captura `.runtime/m6-large-panel.png` inspecionada. Este incremento
-ainda não foi incluído no ZIP da revisão `f8eb7b2`.
+inalterado. Captura `.runtime/m6-large-panel.png` inspecionada.
+
+O inspetor usa a mesma projeção e informa tempo ocupado acumulado. Foi removido
+o percentual que dividia o tempo ocupado pela idade do hotel, subestimando
+elevadores construídos depois. A alteração é somente de apresentação: não muda
+contadores, transporte ou arquivos de save. O smoke exportado abre Operação após
+6120 ticks reais, seleciona o elevador e compara seu histórico com o inspetor.

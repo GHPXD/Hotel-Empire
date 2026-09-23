@@ -112,3 +112,16 @@ foi resolvida; compatibilidade externa e revisão final de distribuição seguem
 
 ZIP SHA-256: `31661155966d14f0f11e6693830207cbf82bde429e1f18ff56dd21854cbb0c2c`.
 Executável SHA-256: `b7f7aba94dc47cb881697e4a1f8453e7530e59bf72a5f442840cecb34ef13283`.
+
+### Pacote atualizado — métricas de elevador (23/09/2026)
+
+Revisão `290bdcd270b4e7f6ee6286ae596724cfbad6474b`, árvore limpa no build.
+Inclui métricas por elevador em Operação e no inspetor. O percentual incorreto
+baseado na idade do hotel foi substituído por tempo ocupado acumulado.
+Boot e seis combinações de janela/texto passaram (`elevator-metrics-matrix.json`).
+O smoke verifica histórico real de transporte, concordância entre painel e
+inspetor e snapshot inalterado; captura específica `release-elevator-metrics.png`
+gerada em cada pasta de usuário isolada. Caso 1024×640 ampliado inspecionado.
+
+ZIP SHA-256: `ac423e9899fafccaf222b8725a065192bd30b9a8bc485869e0966c495b61cfa6`.
+Executável SHA-256: `5602c743a242991fe84400951e7b599016d0676774445ef2f9eec4337e452439`.
