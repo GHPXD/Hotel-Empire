@@ -105,3 +105,5 @@ de latão gerada pelo image_gen integrado. Prompt preservado em
 com compra real de N2/N3, capturas nos três zooms e snapshot inalterado; captura
 0,90 inspecionada. O teste do executável também compra N3 e confere nível/textura
 depois de Carregar. Não muda geometria, regras de transporte ou schema de save.
+Incluída no pacote da revisão `f8eb7b2`, aprovado nos seis casos de janela/texto;
+relatório em `release/cabin3-matrix.json`.

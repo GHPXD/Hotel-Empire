@@ -100,3 +100,15 @@ ampliado inspecionada. Cabine N3 distinta e compatibilidade externa seguem pende
 
 ZIP SHA-256: `a5db601a839a91af31deb8fc2be7d88b381e497cb6f82283957acd65493cbd6f`.
 Executável SHA-256: `f7244f13107b475569604a74eb496fb7f11887b538bdf76f1ddc1ba0f8fca185`.
+
+### Pacote atualizado — cabine N3 (23/09/2026)
+
+Revisão `f8eb7b26cdb867e26bcbb9f0622b688316d5e6fd`, árvore limpa no build.
+A cabine N3 agora tem pintura própria. Boot, compra dos upgrades N2/N3 e save/load
+passaram nas seis combinações locais de janela/texto (`cabin3-matrix.json`).
+6120 ticks, 39 reservas, 42 refeições, 31 limpezas e caixa 2021 após as compras.
+Captura 1024×640 com texto ampliado inspecionada. A pendência de geração da cabine
+foi resolvida; compatibilidade externa e revisão final de distribuição seguem abertas.
+
+ZIP SHA-256: `31661155966d14f0f11e6693830207cbf82bde429e1f18ff56dd21854cbb0c2c`.
+Executável SHA-256: `b7f7aba94dc47cb881697e4a1f8453e7530e59bf72a5f442840cecb34ef13283`.
