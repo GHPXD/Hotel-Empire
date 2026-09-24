@@ -81,6 +81,8 @@ func run(game: Node) -> void:
 	game._inspect_room(priced_room.id)
 	check(game.session.hotel.by_id(priced_room.id).price_percent == 125, "packaged tariff restored")
 	check(game.hud.tariff_choice.visible and game.hud.tariff_choice.selected == 2, "packaged tariff control reflects save")
+	for frame in 3:
+		await tree.process_frame
 	game.hud.sidebar_scroll.ensure_control_visible(game.hud.tariff_choice)
 	for frame in 3:
 		await tree.process_frame
