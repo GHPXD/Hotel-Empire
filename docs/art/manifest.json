@@ -223,5 +223,32 @@
     "bytes": 2116136,
     "sha256": "19d511cd3e2791252dd2a9c3c474314e741c2822398d9e22d028c63dcb0e193a",
     "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/balanced-waiting.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 984168,
+    "sha256": "d548690f69e6303e987aa0efbfacc3058e06f24124c974c9596f5db8f1119637",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/business-waiting.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 896228,
+    "sha256": "9c0b41c04fd1fdfad074d8fbd692feb54de7e33f1687f04750a096f3bb283cd8",
+    "generator": "built-in image_gen"
+  },
+  {
+    "path": "assets/art/characters/leisure-waiting.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "bytes": 968442,
+    "sha256": "05e79025bdf513747c365aa952acbf1a321396ffa551bfa68cfb8d7303f11380",
+    "generator": "built-in image_gen"
   }
 ]

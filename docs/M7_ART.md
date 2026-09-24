@@ -107,3 +107,9 @@ com compra real de N2/N3, capturas nos três zooms e snapshot inalterado; captur
 depois de Carregar. Não muda geometria, regras de transporte ou schema de save.
 Incluída no pacote da revisão `f8eb7b2`, aprovado nos seis casos de janela/texto;
 relatório em `release/cabin3-matrix.json`.
+
+Espera dos hóspedes (24/09/2026): três sequências dedicadas, com quatro poses
+por perfil, geradas diretamente no chat. Integradas às filas de check-in,
+serviços e elevador. PNGs RGBA preservados, mipmaps, prompts e hashes registrados.
+Detalhes e validação em art/guest-waiting.md. ui_art: zero falhas. Ainda não
+incluídas no ZIP Windows anterior.

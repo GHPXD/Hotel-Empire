@@ -42,6 +42,9 @@ static func room(id: StringName, level: int = 1) -> Texture2D:
 	return ROOMS.get(id)
 
 const CHARACTERS: Dictionary = {
+	&"balanced-waiting": preload("res://assets/art/characters/balanced-waiting.png"),
+	&"business-waiting": preload("res://assets/art/characters/business-waiting.png"),
+	&"leisure-waiting": preload("res://assets/art/characters/leisure-waiting.png"),
 	&"cleaner-cleaning": preload("res://assets/art/characters/cleaner-cleaning.png"),
 	&"receptionist-working": preload("res://assets/art/characters/receptionist-working.png"),
 	&"balanced": preload("res://assets/art/characters/balanced.png"),
@@ -59,11 +62,16 @@ static func character(actor: ActorState) -> Texture2D:
 	return CHARACTERS[animation_id(actor)]
 
 const ACTION_REGIONS: Dictionary = {
+	&"balanced-waiting": [[116, 55, 275, 778], [517, 55, 286, 778], [982, 55, 273, 778], [1404, 55, 270, 778]],
+	&"business-waiting": [[114, 35, 272, 808], [550, 35, 245, 808], [964, 35, 273, 808], [1392, 35, 251, 808]],
+	&"leisure-waiting": [[100, 43, 249, 795], [507, 43, 256, 795], [988, 43, 273, 795], [1428, 43, 245, 795]],
 	&"cleaner-cleaning": [[111, 88, 289, 710], [506, 104, 387, 694], [974, 91, 294, 707], [1364, 109, 384, 694]],
 	&"receptionist-working": [[121, 44, 271, 796], [531, 60, 297, 780], [955, 43, 275, 797], [1353, 41, 390, 799]],
 }
 
 static func animation_id(actor: ActorState) -> StringName:
+	if actor.role == &"guest" and actor.state in [&"lift_queue", &"checkin", &"service_queue"]:
+		return StringName("%s-waiting" % actor.archetype_id)
 	if actor.role == &"cleaner" and actor.state == &"cleaning":
 		return &"cleaner-cleaning"
 	if actor.role == &"receptionist" and actor.state == &"working":
@@ -77,8 +85,9 @@ static func character_regions(actor: ActorState) -> Array:
 static func character_region(actor: ActorState, tick: int) -> Rect2:
 	var index: int = (tick + actor.id * 2) % 4 if actor.state == &"walking" else 1
 	if ACTION_REGIONS.has(animation_id(actor)):
-		# Deliberate work gestures at 2.5 fps; pausing freezes the authoritative tick.
-		index = (floori(tick / 4.0) + actor.id) % 4
+		# Waiting uses slower gestures; all animations freeze with the simulation.
+		var frame_ticks := 12.0 if actor.role == &"guest" else 4.0
+		index = (floori(tick / frame_ticks) + actor.id) % 4
 	var box: Array = character_regions(actor)[index]
 	return Rect2(box[0], box[1], box[2], box[3])
 

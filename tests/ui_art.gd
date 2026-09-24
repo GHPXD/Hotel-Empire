@@ -46,6 +46,20 @@ func run() -> void:
 		for box: Array in regions:
 			check(Rect2(Vector2.ZERO, texture.get_size()).encloses(Rect2(box[0], box[1], box[2], box[3])), "frame contained in texture")
 	for actor: ActorState in session.actors.values():
+		if actor.role == &"guest":
+			var walking := HotelArt.character(actor)
+			for waiting_state: StringName in [&"checkin", &"service_queue", &"lift_queue"]:
+				actor.state = waiting_state
+				var waiting := HotelArt.character(actor)
+				check(waiting != walking, "guest has dedicated waiting texture")
+				check(waiting.get_image().detect_alpha() != Image.ALPHA_NONE, "waiting alpha")
+				check(HotelArt.character_region(actor, 0) != HotelArt.character_region(actor, 12), "waiting gesture advances")
+				check(HotelArt.character_region(actor, 0) == HotelArt.character_region(actor, 48), "waiting loops")
+				for box: Array in HotelArt.character_regions(actor):
+					check(Rect2(Vector2.ZERO, waiting.get_size()).encloses(Rect2(box[0], box[1], box[2], box[3])), "waiting frame bounds")
+			actor.state = &"walking"
+			check(HotelArt.character(actor) == walking, "leaving queue restores walking")
+			actor.state = &"checkin"
 		if actor.role not in [&"cleaner", &"receptionist"]:
 			continue
 		var walk_texture := HotelArt.character(actor)
