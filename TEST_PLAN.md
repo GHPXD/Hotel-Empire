@@ -115,7 +115,7 @@ Diagnóstico de filas (22/09/2026): `checkin_diagnostics_test` cobre bloqueio re
 por sujeira, intervenção de limpeza, ocupação e quarto disponível;
 `ui_checkin_diagnostics` cobre atualização do inspetor/painel e leitura sem mutação.
 Total atual: 22 suítes com -Visual (aprovadas), 26 com -Visual -Stress -Soak
-(conjunto ampliado ainda não executado após este incremento). O smoke exportado
+(conjunto ampliado aprovado em 24/09/2026). O smoke exportado
 verifica diagnóstico compartilhado, snapshot inalterado e texturas de upgrade.
 
 Arte persistida no pacote: o smoke compra melhorias de recepção/quarto, restaurante

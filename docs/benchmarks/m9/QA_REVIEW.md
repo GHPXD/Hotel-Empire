@@ -38,3 +38,17 @@ poses dedicadas para dormir/sentar; sem música ambiente; operação contínua m
 até o limite atual de 120 hóspedes. Os testes não substituem avaliação humana de
 diversão, acessibilidade ou balanceamento em muitos mapas. Esses limites permanecem
 visíveis no roadmap e documentação de arte/desempenho.
+
+## Regressão completa de 24/09/2026
+
+`tools/test.ps1 -Visual -Stress -Soak` passou com exit 0 na revisão `e816873`:
+26 suítes, incluindo os incrementos de confirmação de saída, ajuda, recuperação,
+diagnóstico de check-in, pinturas de upgrade e métricas de elevador. Resultados
+extraídos dos logs desta execução, com hash e horário, em
+`regression-20260924.json`; seis cenários de 30 dias e 30 checkpoints de
+continuidade em `long-run-20260924.json`. Nenhum erro de script ou aviso de
+recursos vazados foi detectado pelo runner.
+
+Stress de transporte entregou 100/250/500/1000 agentes nos cenários isolados;
+isso continua sem provar operação sustentada de 1000 hóspedes. A revisão não
+substitui a matriz do executável nem a compatibilidade externa pendente em M10.
