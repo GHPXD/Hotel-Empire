@@ -27,6 +27,23 @@ func run() -> void:
 	await click(root, game.hud.upgrade_button.get_global_rect().get_center())
 	check(room.level == 2 and session.economy.cash == initial_cash - price, "upgrade via real button")
 	check(game.hud.inspector.text.contains("N2"), "inspector updates level")
+	check(not game.hud.tariff_choice.visible, "reception tariff hidden")
+	var restaurant: RoomState
+	for candidate: RoomState in session.hotel.rooms:
+		if candidate.definition_id == &"restaurant":
+			restaurant = candidate
+	game.selection = restaurant.id
+	game._refresh()
+	for frame in 3:
+		await process_frame
+	scroll.ensure_control_visible(game.hud.tariff_choice)
+	game.hud.tariff_choice.grab_focus()
+	await key(root, KEY_SPACE)
+	await key(game.hud.tariff_choice.get_popup(), KEY_DOWN)
+	await key(game.hud.tariff_choice.get_popup(), KEY_ENTER)
+	check(restaurant.price_percent == 125, "keyboard applies premium tariff")
+	check(session.speed == 0, "tariff keyboard activation preserves pause")
+	check(game.hud.inspector.text.contains("Tarifa: $ 35"), "inspector displays effective tariff")
 	for button: Node in game.hud.find_children("*", "Button", true, false):
 		if button.text == "Equipe":
 			await click(root, button.get_global_rect().get_center())

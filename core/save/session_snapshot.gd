@@ -1,9 +1,9 @@
 class_name SessionSnapshot
 extends RefCounted
-## Schema v4 adds guest profiles and separates meals from all service uses.
+## Schema v5 adds per-room tariff policies; older rooms retain standard prices.
 
-const VERSION: int = 4
-const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income", "level"]
+const VERSION: int = 5
+const ROOM_FIELDS: Array[String] = ["id", "definition_id", "column", "floor_index", "occupant", "dirty", "cleaning_by", "income", "level", "price_percent"]
 const ACTOR_FIELDS: Array[String] = ["id", "role", "display_name", "state", "x", "floor_index", "target_x", "target_floor", "target_room", "destination_state", "elevator_id", "timer", "age", "waiting", "happiness", "money", "bedroom", "checked_in", "meals", "sleeps", "speed", "skill", "assignment", "workload", "agreed_price", "preferred_room", "preferred_floor", "archetype_id", "service_uses"]
 const LIFT_FIELDS: Array[String] = ["room_id", "column", "capacity", "floor_position", "target_floor", "door_timer", "boarded", "delivered", "wait_total", "wait_max", "busy_seconds"]
 const SESSION_FIELDS: Array[String] = ["next_actor_id", "time", "tick_count", "arrival_timer", "day", "opened", "speed"]
@@ -42,6 +42,15 @@ static func restore(data: Variant) -> Dictionary:
 		data["progression"] = {"completed": [], "legacy_access": true}
 	if data is Dictionary and data.get("version") == 3:
 		data = _migrate_v3(data)
+	if data is Dictionary and data.get("version") == 4:
+		data = data.duplicate(true)
+		if not data.get("rooms") is Array:
+			return _error("Salas inválidas.")
+		for room_data: Variant in data.rooms:
+			if not room_data is Dictionary:
+				return _error("Sala inválida.")
+			room_data["price_percent"] = 100
+		data.version = VERSION
 	if not data is Dictionary or data.get("version") != VERSION:
 		return _error("Versão de save desconhecida ou formato inválido.")
 	var session := HotelSession.new()
@@ -73,6 +82,8 @@ static func restore(data: Variant) -> Dictionary:
 			return _error("Sala desconhecida ou ID inválido.")
 		if room.level < 1 or room.level > room.definition().upgrades.size() + 1:
 			return _error("Nível de sala inválido.")
+		if room.price_percent not in [75, 100, 125] or (room.definition().category not in [&"lodging", &"service"] and room.price_percent != 100):
+			return _error("Tarifa de sala inválida.")
 		var previous_cash: int = session.economy.cash
 		session.economy.cash = 100000000
 		var geometry_error := session.hotel.build_error(room.definition(), room.column, room.floor_index)
@@ -280,5 +291,5 @@ static func _migrate_v3(original: Dictionary) -> Dictionary:
 		actor["archetype_id"] = "balanced"
 		actor["service_uses"] = actor.get("meals")
 	data.guests["service_uses"] = data.guests.get("meals_served")
-	data.version = VERSION
+	data.version = 4
 	return data

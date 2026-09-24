@@ -56,6 +56,7 @@ func _ready() -> void:
 	hud.finances_requested.connect(_show_finances)
 	hud.staff_requested.connect(_show_staff)
 	hud.upgrade_requested.connect(_upgrade_selected)
+	hud.tariff_requested.connect(_set_selected_tariff)
 	hud.objectives_requested.connect(_show_objectives)
 	hud.operations_requested.connect(_show_operations)
 	hud.text_size_requested.connect(_toggle_text_size)
@@ -189,7 +190,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("save_hotel"):
 		_save()
 	elif event.is_action_pressed("pause_hotel"):
-		session.speed = 1 if session.speed == 0 else 0
+		var focus := get_viewport().gui_get_focus_owner()
+		if not (focus is BaseButton or focus is LineEdit or focus is TextEdit):
+			session.speed = 1 if session.speed == 0 else 0
 	elif event.is_action_pressed("show_operations"):
 		_show_operations()
 	elif event.is_action_pressed("large_text"):
@@ -379,6 +382,11 @@ func _upgrade_selected() -> void:
 	if error.is_empty():
 		audio.play(&"upgrade")
 	hud.message.text = "Melhoria aplicada. Serviços em curso mantêm o preço combinado." if error.is_empty() else error
+	_refresh()
+
+func _set_selected_tariff(percent: int) -> void:
+	var error := session.set_room_tariff(selection, percent)
+	hud.message.text = "Tarifa atualizada. Atendimentos em curso mantêm o preço combinado." if error.is_empty() else error
 	_refresh()
 
 func _toggle_audio() -> void:

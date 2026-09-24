@@ -41,6 +41,8 @@ func run(game: Node) -> void:
 	check(HotelArt.cabin(lift_room.level) == HotelArt.CABIN_FINAL_UPGRADE, "final cabin painting selected")
 	check(HotelArt.CABIN_FINAL_UPGRADE.get_width() > 0, "final cabin packaged")
 	var path := "user://release-smoke-save.json"
+	var priced_room: RoomState = session.hotel.rooms[1]
+	check(session.set_room_tariff(priced_room.id, 125).is_empty(), "packaged tariff accepted")
 	check(SaveStore.save_session(session, path).is_empty(), "save from executable")
 	var restored := SaveStore.load_session(path)
 	check(restored.error.is_empty(), "load from executable")
@@ -76,6 +78,13 @@ func run(game: Node) -> void:
 		check(root.get_visible_rect().encloses(button.get_global_rect()), "essential toolbar control fits viewport")
 	await click(tree, game.hud.session_buttons["Carregar"].get_global_rect().get_center())
 	check(equivalent(expected, SessionSnapshot.capture(game.session)), "toolbar restores packaged session")
+	game._inspect_room(priced_room.id)
+	check(game.session.hotel.by_id(priced_room.id).price_percent == 125, "packaged tariff restored")
+	check(game.hud.tariff_choice.visible and game.hud.tariff_choice.selected == 2, "packaged tariff control reflects save")
+	game.hud.sidebar_scroll.ensure_control_visible(game.hud.tariff_choice)
+	for frame in 3:
+		await tree.process_frame
+	check(root.get_visible_rect().encloses(game.hud.tariff_choice.get_global_rect()), "tariff control fits viewport")
 	var restored_lift_room: RoomState = game.session.hotel.by_id(lift_room.id)
 	check(restored_lift_room.level == 3, "saved elevator upgrade restored")
 	check(HotelArt.cabin(restored_lift_room.level) == HotelArt.CABIN_FINAL_UPGRADE, "restored elevator uses final cabin")

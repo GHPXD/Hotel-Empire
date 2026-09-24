@@ -4,6 +4,7 @@ var failures: int = 0
 
 func _initialize() -> void:
 	_test_upgrades()
+	_test_tariffs()
 	_test_service_contract()
 	_test_staff()
 	_test_reservations_and_transit()
@@ -62,6 +63,7 @@ func _test_service_contract() -> void:
 	session.tick(0.1)
 	check(actor.state == &"using" and actor.agreed_price == 28, "price agreed at admission")
 	session.upgrade_room(room.id)
+	check(session.set_room_tariff(room.id, 125).is_empty(), "change tariff during service")
 	var restored := SessionSnapshot.restore(JSON.parse_string(JSON.stringify(SessionSnapshot.capture(session))))
 	check(restored.error.is_empty(), "in-flight service survives upgrade/save")
 	if restored.session != null:
@@ -78,6 +80,65 @@ func _test_service_contract() -> void:
 	late.money = 28
 	session.tick(0.1)
 	check(late.state == &"deciding", "new admission rechecks upgraded price")
+
+func _test_tariffs() -> void:
+	var session := HotelSession.new()
+	var room := session.hotel.build(HotelCatalog.room(&"restaurant"), 0, 0)
+	var reception := session.hotel.build(HotelCatalog.room(&"reception"), 3, 0)
+	var cash := session.economy.cash
+	check(session.set_room_tariff(room.id, 75).is_empty() and room.price() == 21, "economical service price")
+	check(session.economy.cash == cash, "policy change is free")
+	check(not session.set_room_tariff(room.id, 80).is_empty() and room.price_percent == 75, "invalid tariff leaves policy unchanged")
+	check(not session.set_room_tariff(reception.id, 125).is_empty(), "reception has no tariff")
+	check(not session.set_room_tariff(-1, 125).is_empty(), "unknown room rejected")
+	var actor := session.spawn_guest()
+	actor.state = &"service_queue"
+	actor.target_room = room.id
+	actor.x = room.center()
+	actor.money = 21
+	session.tick(0.1)
+	check(actor.state == &"using" and actor.agreed_price == 21, "discount enables actual service admission")
+	var snapshot := SessionSnapshot.capture(session)
+	var restored := SessionSnapshot.restore(JSON.parse_string(JSON.stringify(snapshot)))
+	check(restored.error.is_empty(), "discount snapshot valid")
+	if restored.session != null:
+		check(restored.session.hotel.by_id(room.id).price() == 21, "tariff survives JSON save/load")
+	var legacy := snapshot.duplicate(true)
+	legacy.version = 4
+	for entry: Dictionary in legacy.rooms:
+		entry.erase("price_percent")
+	var before := JSON.stringify(legacy)
+	var migrated := SessionSnapshot.restore(legacy)
+	check(migrated.error.is_empty(), "v4 migrates to v5")
+	if migrated.session != null:
+		check(migrated.session.hotel.by_id(room.id).price_percent == 100, "legacy standard tariff")
+	check(JSON.stringify(legacy) == before, "migration preserves input")
+	for bad: Variant in [0, 80, 125.5, "75", null]:
+		var broken := snapshot.duplicate(true)
+		broken.rooms[0].price_percent = bad
+		check(not SessionSnapshot.restore(broken).error.is_empty(), "invalid saved tariff rejected")
+	var invalid_reception := snapshot.duplicate(true)
+	invalid_reception.rooms[1].price_percent = 125
+	check(not SessionSnapshot.restore(invalid_reception).error.is_empty(), "saved reception tariff rejected")
+	check(session.set_room_tariff(room.id, 125).is_empty() and room.price() == 35, "premium service price")
+	var lodging := HotelSession.new()
+	lodging.hotel.build(HotelCatalog.room(&"reception"), 0, 0)
+	var bedroom := lodging.hotel.build(HotelCatalog.room(&"bedroom"), 3, 0)
+	lodging.hire(HotelSession.EMPLOYEES[0])
+	var guest := lodging.spawn_guest()
+	guest.money = roundi(bedroom.price() * 0.75)
+	for tick in 150:
+		lodging.tick(0.1)
+	check(not guest.checked_in, "standard room beyond guest budget")
+	check(lodging.set_room_tariff(bedroom.id, 75).is_empty(), "lower lodging tariff")
+	for tick in 100:
+		lodging.tick(0.1)
+		if guest.checked_in:
+			break
+	check(guest.checked_in and guest.money == 0 and bedroom.income == bedroom.price(), "discount charged at actual check-in")
+	var earned := bedroom.income
+	lodging.set_room_tariff(bedroom.id, 125)
+	check(bedroom.income == earned and guest.money == 0, "lodging price change never rebills existing occupant")
 
 func _test_staff() -> void:
 	var session := HotelSession.new()

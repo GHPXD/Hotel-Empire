@@ -15,6 +15,7 @@ signal debug_requested
 signal finances_requested
 signal staff_requested
 signal upgrade_requested
+signal tariff_requested(percent: int)
 signal objectives_requested
 signal operations_requested
 signal text_size_requested
@@ -30,6 +31,9 @@ var open_button: Button
 var debug_label: Label
 var upgrade_button: Button
 var upgrade_preview: Label
+var tariff_choice: OptionButton
+var tariff_label: Label
+const TARIFFS: Array[int] = [75, 100, 125]
 var objectives_button: Button
 var build_buttons: Dictionary = {}
 var event_label: Label
@@ -164,6 +168,16 @@ func _ready() -> void:
 	inspector.text = "Construa uma recepção no térreo para começar."
 	inspector.custom_minimum_size.x = 235
 	tools.add_child(inspector)
+	tariff_label = Label.new()
+	tariff_label.text = "TARIFA DA SALA"
+	tools.add_child(tariff_label)
+	tariff_choice = OptionButton.new()
+	tariff_choice.custom_minimum_size.y = 44
+	for label in ["Econômica • 75%", "Padrão • 100%", "Premium • 125%"]:
+		tariff_choice.add_item(label)
+	tariff_choice.tooltip_text = "Quartos: cobrança no check-in. Serviços: preço combinado ao iniciar. Atendimentos em curso mantêm o preço."
+	tariff_choice.item_selected.connect(func(index: int) -> void: tariff_requested.emit(TARIFFS[index]))
+	tools.add_child(tariff_choice)
 	upgrade_preview = Label.new()
 	upgrade_preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tools.add_child(upgrade_preview)
@@ -179,6 +193,10 @@ func _ready() -> void:
 	footer.add_child(message)
 
 func refresh(hotel: HotelModel, selected: RoomState) -> void:
+	tariff_choice.visible = selected != null and selected.definition().category in [&"lodging", &"service"]
+	tariff_label.visible = tariff_choice.visible
+	if tariff_choice.visible:
+		tariff_choice.select(TARIFFS.find(selected.price_percent))
 	upgrade_button.visible = selected != null
 	upgrade_preview.visible = selected != null
 	stats.text = "$ %s    |    %d andar(es)    |    Investido: $ %d" % [hotel.economy.cash, hotel.floors, hotel.economy.capital_spent]
@@ -188,7 +206,7 @@ func refresh(hotel: HotelModel, selected: RoomState) -> void:
 		var next := selected.next_upgrade()
 		upgrade_button.disabled = next == null or hotel.economy.cash < next.cost
 		upgrade_button.text = "Nível máximo" if next == null else "Melhorar para N%d • $ %d" % [selected.level + 1, next.cost]
-		upgrade_preview.text = "" if next == null else "PRÓXIMO NÍVEL\nCapacidade: %d → %d\nTarifa: $ %d → $ %d\nManutenção: $ %d → $ %d/dia" % [selected.capacity(), definition.capacity + next.capacity_bonus, selected.price(), definition.price + next.price_bonus, selected.maintenance(), definition.maintenance + next.maintenance_bonus]
+		upgrade_preview.text = "" if next == null else "PRÓXIMO NÍVEL\nCapacidade: %d → %d\nTarifa: $ %d → $ %d\nManutenção: $ %d → $ %d/dia" % [selected.capacity(), definition.capacity + next.capacity_bonus, selected.price(), selected.scaled_price(definition.price + next.price_bonus), selected.maintenance(), definition.maintenance + next.maintenance_bonus]
 		if next != null and definition.category == &"transport":
 			upgrade_preview.text += "\nVelocidade: %.2fx → %.2fx" % [selected.speed_multiplier(), next.speed_multiplier]
 		elif next != null:

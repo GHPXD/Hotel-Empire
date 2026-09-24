@@ -169,6 +169,16 @@ func upgrade_room(id: int) -> String:
 	hotel.changed.emit()
 	return ""
 
+func set_room_tariff(id: int, percent: int) -> String:
+	var room := hotel.by_id(id)
+	if room == null or room.definition().category not in [&"lodging", &"service"]:
+		return "Selecione um quarto ou serviço."
+	if percent not in [75, 100, 125]:
+		return "Tarifa inválida."
+	room.price_percent = percent
+	hotel.changed.emit()
+	return ""
+
 func configure_employee(id: int, destination: int) -> String:
 	var actor: ActorState = actors.get(id)
 	if actor == null or actor.role == &"guest":

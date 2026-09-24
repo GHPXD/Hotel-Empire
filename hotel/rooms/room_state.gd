@@ -12,6 +12,7 @@ var users: Array[int] = []
 var queue := ServiceQueue.new()
 var income: int = 0
 var level: int = 1
+var price_percent: int = 100
 
 func upgrade() -> UpgradeDefinition:
 	return null if level == 1 else definition().upgrades[level - 2]
@@ -23,7 +24,10 @@ func capacity() -> int:
 	return definition().capacity + (upgrade().capacity_bonus if upgrade() != null else 0)
 
 func price() -> int:
-	return definition().price + (upgrade().price_bonus if upgrade() != null else 0)
+	return scaled_price(definition().price + (upgrade().price_bonus if upgrade() != null else 0))
+
+func scaled_price(base: int) -> int:
+	return maxi(1, roundi(base * price_percent / 100.0)) if base > 0 else 0
 
 func maintenance() -> int:
 	return definition().maintenance + (upgrade().maintenance_bonus if upgrade() != null else 0)
