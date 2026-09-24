@@ -123,3 +123,10 @@ e elevador para N2/N3 com o caixa ganho na simulação. Confere a pintura de cad
 nível antes de salvar e depois de Carregar pela barra; a comparação do snapshot e
 a continuidade de 120 ticks também incluem esses upgrades. A compra usa as regras
 de custo e desbloqueio reais, sem conceder dinheiro ou objetivos de teste.
+
+Tarifas e espera (24/09/2026): 25 suítes de -Visual -Stress aprovadas. Teste
+management adicional confirmou desconto liberando hospedagem real e ausência de
+cobrança retroativa; ui_management repetido após correção do Espaço preserva
+pausa ao operar o seletor. Executável 9237939 passou nas seis combinações de
+janela/texto, com persistência da tarifa e controle visível após Carregar.
+Evidência: docs/release/tariffs-waiting-matrix.json. Soak não repetido neste lote.

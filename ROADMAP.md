@@ -17,10 +17,11 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 - [x] M6 UI/UX Polish: filtros, analytics e melhorias de leitura/foco no desktop.
   - [x] Causa atual da fila de check-in e ação sugerida no inspetor e em Operação.
   - [x] Métricas por elevador em Operação: cabine, fila, espera atual e histórico de embarques.
-- [x] M7 Art & Animation: 25 PNGs originais, caminhada, ações de funcionários e efeitos sonoros.
+- [x] M7 Art & Animation: 28 PNGs originais, caminhada, espera de hóspedes, ações de funcionários e efeitos sonoros.
   - [x] Pinturas dedicadas para quartos, recepções e restaurante nos níveis 2 e 3.
   - [x] Cabine de elevador N2 com pintura dedicada.
   - [x] Cabine N3 distinta, com mármore e medalhão de latão.
+  - [x] Quatro poses de espera próprias para cada um dos três perfis de hóspede.
 - [x] M8 Optimization: perfis 100/250/500/1000 agentes e operação até o limite atual de 120.
   - [x] M8a perfil inicial, descarte de render fora da câmera e equivalência visual.
   - [x] M8b admissão/saídas otimizadas; perfil integrado contínuo com 118–120 hóspedes.
@@ -44,7 +45,9 @@ O pedido operacional atual organiza o trabalho abaixo; a visão permanente em
 
 Uma caixa só é marcada após execução e validação. Publicação será decidida depois.
 
-Próximo incremento: M10, export local, validação do pacote e documentação de distribuição.
+Evolução de gestão: tarifas por sala de 75%, 100% e 125%, com migração de saves
+v1–v4 para v5 e contratos em curso preservados. Detalhes em `docs/TARIFFS.md`.
+M10 permanece aberto para resultados de compatibilidade em outro computador.
 M6 não conclui suporte integral a teclado/controller, leitores de tela ou touch.
 M8 mede render isolado, transporte e sobrecarga até 1000; operação integrada
 contínua respeita o limite atual de 120. Não comprova 1000 hóspedes atendidos

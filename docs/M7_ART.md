@@ -113,3 +113,6 @@ por perfil, geradas diretamente no chat. Integradas às filas de check-in,
 serviços e elevador. PNGs RGBA preservados, mipmaps, prompts e hashes registrados.
 Detalhes e validação em art/guest-waiting.md. ui_art: zero falhas. Ainda não
 incluídas no ZIP Windows anterior.
+
+Lote de espera incluído no ZIP Windows 9237939, validado nas seis combinações
+de janela/texto em release/tariffs-waiting-matrix.json.

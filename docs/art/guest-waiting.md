@@ -23,5 +23,8 @@ recorte, ciclo de 48 ticks, retorno à caminhada e ausência de mutação da
 simulação ao renderizar. Capturas verificadas no cenário. O Godot emitiu aviso
 do repositório de certificados do Windows; a suíte terminou normalmente.
 
-Assets integrados ao projeto fonte. O ZIP Windows anterior ainda não contém
+Assets integrados ao projeto fonte. Na geração inicial, o ZIP ainda não continha
 este lote. As poses são gestos discretos, sem interpolação entre desenhos.
+
+Atualização de distribuição: incluído no ZIP da revisão 9237939, com os seis
+casos locais aprovados em docs/release/tariffs-waiting-matrix.json.

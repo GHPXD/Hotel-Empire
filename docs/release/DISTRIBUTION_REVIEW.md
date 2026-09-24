@@ -1,10 +1,10 @@
-# Revisão local de distribuição — 23/09/2026
+# Revisão local de distribuição — 24/09/2026
 
 Resultado: pacote do protótipo preparado e verificado para testes externos.
 Isso não conclui M10 nem autoriza publicação comercial.
 
 Artefato revisado: `builds/HotelEmpire-windows-x86_64.zip`, revisão de código
-`290bdcd270b4e7f6ee6286ae596724cfbad6474b`. O manifesto registra árvore limpa
+`92379391996078d826a54fb0d6ecad3a7415608d`. O manifesto registra árvore limpa
 no build. Evidência reproduzível: `python tools/audit_release.py`; saída em
 `local-distribution-audit.json`. O comando falha se qualquer verificação divergir.
 
@@ -13,8 +13,8 @@ no build. Evidência reproduzível: `python tools/audit_release.py`; saída em
 | Inventário do ZIP | Exatamente executável, guia, licença Godot, avisos de terceiros e manifesto; sem entradas adicionais ou duplicadas |
 | Identidade do executável | SHA-256 e tamanho conferem com o manifesto |
 | Guia e avisos | Bytes empacotados iguais aos arquivos fonte; guia explica instalação, controles, save, recuperação e limites |
-| Arte | Todos os 25 PNGs em `assets/art` têm entrada única no manifesto e hash/tamanho conferidos |
-| Funcionamento exportado | `elevator-metrics-matrix.json`: seis combinações locais; boot, operação, upgrades, save/load, recuperação, ajuda e métricas |
+| Arte | Todos os 28 PNGs em `assets/art` têm entrada única no manifesto e hash/tamanho conferidos |
+| Funcionamento exportado | `tariffs-waiting-matrix.json`: seis combinações locais; boot, operação, upgrades, save/load, recuperação, ajuda e métricas |
 | Teste sem repositório | `external-kit-local-matrix.json`: kit extraído, Windows PowerShell 5.1, relatório compactado; falha por pacote ausente também tratada |
 | Dados do jogador | Testes usam APPDATA isolado; o guia informa ausência de autosave e localização do save manual |
 | Distribuição pública | Não publicada, não assinada; sem instalador, atualização automática ou requisito mínimo certificado |
